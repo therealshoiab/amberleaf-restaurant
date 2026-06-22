@@ -14,6 +14,8 @@ interface GalleryItem {
 
 export const Gallery: React.FC = () => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [activeCategory, setActiveCategory] = useState<'all' | 'image' | 'video'>('all');
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const lightboxVideoRef = useRef<HTMLVideoElement | null>(null);
 
   // Unified Gallery Items (13 Google Maps images + 14 Instagram posts/reels)
@@ -253,43 +255,82 @@ export const Gallery: React.FC = () => {
     },
   ];
 
-  // Video refs for scroll play / pause
+  const filteredItems = galleryItems.filter((item) => {
+    if (activeCategory === 'all') return true;
+    return item.type === activeCategory;
+  });
+
+  // Video refs for scroll focus & hover autoplay
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
+  const isHoveringVideoRef = useRef<boolean>(false);
 
-  useEffect(() => {
-    // Create Intersection Observer to autoplay videos when scrolled into view
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.5, // Play when 50% of video card is visible
-    };
+  // Recalculates which video is closest to the vertical center of the viewport and sets it active
+  const recalculateCenterVideo = () => {
+    if (isHoveringVideoRef.current) return;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const video = entry.target as HTMLVideoElement;
-        if (entry.isIntersecting) {
-          // Play video muted automatically when in viewport
-          video.play().catch((err) => console.log('Autoplay blocked:', err));
-        } else {
-          video.pause();
+    const viewportCenter = window.innerHeight / 2;
+    let closestVideoId: string | null = null;
+    let minDistance = Infinity;
+
+    Object.entries(videoRefs.current).forEach(([id, video]) => {
+      if (video) {
+        const rect = video.getBoundingClientRect();
+        const videoCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(viewportCenter - videoCenter);
+        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+        if (isVisible && distance < minDistance) {
+          minDistance = distance;
+          closestVideoId = id;
         }
-      });
-    }, observerOptions);
-
-    // Register video elements
-    Object.values(videoRefs.current).forEach((video) => {
-      if (video) observer.observe(video);
+      }
     });
 
-    return () => {
-      observer.disconnect();
+    setActiveVideoId(closestVideoId);
+  };
+
+  // Synchronize play/pause across all videos based on activeVideoId
+  useEffect(() => {
+    Object.entries(videoRefs.current).forEach(([id, video]) => {
+      if (video) {
+        if (id === activeVideoId) {
+          // Play active video (muted by default unless unmuted by hover)
+          video.play().catch((err) => console.log('Autoplay blocked for:', id, err));
+        } else {
+          // Pause all other videos
+          video.pause();
+        }
+      }
+    });
+  }, [activeVideoId]);
+
+  // Monitor scroll stopping to update the center-focused video
+  useEffect(() => {
+    let scrollTimeout: number;
+
+    const handleScroll = () => {
+      window.clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(() => {
+        recalculateCenterVideo();
+      }, 150);
     };
-  }, []);
+
+    window.addEventListener('scroll', handleScroll);
+    
+    // Initial check once items are rendered
+    const initTimeout = setTimeout(recalculateCenterVideo, 250);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.clearTimeout(scrollTimeout);
+      clearTimeout(initTimeout);
+    };
+  }, [activeCategory]); // Re-run when active category changes to recalculate visible videos
 
   // Auto-play the video in the lightbox when it opens
   useEffect(() => {
     if (lightboxIndex !== null) {
-      const item = galleryItems[lightboxIndex];
+      const item = filteredItems[lightboxIndex];
       if (item && item.type === 'video') {
         setTimeout(() => {
           if (lightboxVideoRef.current) {
@@ -307,11 +348,13 @@ export const Gallery: React.FC = () => {
     }
   }, [lightboxIndex]);
 
-  // Video hover controls: play unmuted on hover if possible, else muted, keep playing muted on hover out
+  // Video hover controls: set as activeVideoId, try to play unmuted
   const handleVideoMouseEnter = (id: string) => {
+    isHoveringVideoRef.current = true;
     const video = videoRefs.current[id];
     if (video) {
       video.muted = false;
+      setActiveVideoId(id);
       video.play().catch(() => {
         if (video) {
           video.muted = true;
@@ -322,24 +365,25 @@ export const Gallery: React.FC = () => {
   };
 
   const handleVideoMouseLeave = (id: string) => {
+    isHoveringVideoRef.current = false;
     const video = videoRefs.current[id];
     if (video) {
       video.muted = true;
-      // Do not pause the video so it continues playing muted in the grid
     }
+    recalculateCenterVideo();
   };
 
   // Lightbox slideshow navigation
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (lightboxIndex === null) return;
-    setLightboxIndex(lightboxIndex === 0 ? galleryItems.length - 1 : lightboxIndex - 1);
+    setLightboxIndex(lightboxIndex === 0 ? filteredItems.length - 1 : lightboxIndex - 1);
   };
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (lightboxIndex === null) return;
-    setLightboxIndex(lightboxIndex === galleryItems.length - 1 ? 0 : lightboxIndex + 1);
+    setLightboxIndex(lightboxIndex === filteredItems.length - 1 ? 0 : lightboxIndex + 1);
   };
 
   return (
@@ -350,7 +394,7 @@ export const Gallery: React.FC = () => {
       />
 
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '4rem' }} className="animate-fade-in">
+      <div style={{ textAlign: 'center', marginBottom: '3rem' }} className="animate-fade-in">
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -373,9 +417,61 @@ export const Gallery: React.FC = () => {
         />
       </div>
 
-      {/* Gallery Grid - Displays all 27 Items */}
+      {/* Category Tabs */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '1rem',
+          marginBottom: '3rem',
+          animation: 'fadeIn 1s ease forwards',
+        }}
+      >
+        {[
+          { id: 'all', label: 'All Media' },
+          { id: 'image', label: 'Photos' },
+          { id: 'video', label: 'Videos' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => {
+              setActiveCategory(tab.id as any);
+              setLightboxIndex(null); // Close lightbox on filter change
+            }}
+            style={{
+              background: activeCategory === tab.id ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.02)',
+              color: activeCategory === tab.id ? '#000' : 'var(--text-primary)',
+              border: '1px solid',
+              borderColor: activeCategory === tab.id ? 'var(--accent-gold)' : 'var(--border-light)',
+              padding: '0.6rem 1.8rem',
+              borderRadius: '8px',
+              fontSize: '0.95rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: activeCategory === tab.id ? '0 4px 15px rgba(var(--accent-gold-rgb), 0.2)' : 'none',
+            }}
+            onMouseEnter={(e) => {
+              if (activeCategory !== tab.id) {
+                e.currentTarget.style.borderColor = 'var(--accent-gold)';
+                e.currentTarget.style.background = 'rgba(var(--accent-gold-rgb), 0.05)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeCategory !== tab.id) {
+                e.currentTarget.style.borderColor = 'var(--border-light)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+              }
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Gallery Grid - Displays Filtered Items */}
       <div className="grid-container grid-3" style={{ animation: 'fadeIn 0.8s ease forwards' }}>
-        {galleryItems.map((item, index) => (
+        {filteredItems.map((item, index) => (
           <div
             key={item.id}
             className="glass-panel"
@@ -420,7 +516,13 @@ export const Gallery: React.FC = () => {
               ) : (
                 <div style={{ width: '100%', height: '100%' }}>
                   <video
-                    ref={(el) => { videoRefs.current[item.id] = el; }}
+                    ref={(el) => {
+                      if (el) {
+                        videoRefs.current[item.id] = el;
+                      } else {
+                        delete videoRefs.current[item.id];
+                      }
+                    }}
                     src={item.url}
                     loop
                     muted
@@ -601,10 +703,10 @@ export const Gallery: React.FC = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {galleryItems[lightboxIndex].type === 'image' ? (
+            {filteredItems[lightboxIndex].type === 'image' ? (
               <img
-                src={galleryItems[lightboxIndex].url}
-                alt={galleryItems[lightboxIndex].caption}
+                src={filteredItems[lightboxIndex].url}
+                alt={filteredItems[lightboxIndex].caption}
                 style={{
                   maxWidth: '100%',
                   maxHeight: '65vh',
@@ -616,7 +718,7 @@ export const Gallery: React.FC = () => {
             ) : (
               <video
                 ref={lightboxVideoRef}
-                src={galleryItems[lightboxIndex].url}
+                src={filteredItems[lightboxIndex].url}
                 controls
                 autoPlay
                 playsInline
@@ -640,7 +742,7 @@ export const Gallery: React.FC = () => {
                 textShadow: '0 1px 5px rgba(0,0,0,0.5)',
               }}
             >
-              {galleryItems[lightboxIndex].caption}
+              {filteredItems[lightboxIndex].caption}
             </p>
           </div>
 
