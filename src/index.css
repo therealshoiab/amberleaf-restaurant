@@ -2,41 +2,41 @@
 
 /* Color Variables & Themes */
 :root {
-  /* Dark Theme (Default) - Emerald Green Accent */
-  --bg-primary: #050806;
-  --bg-secondary: #0c120f;
-  --bg-tertiary: #141f19;
-  --text-primary: #f2f7f4;
-  --text-secondary: #9aa89f;
-  --accent-gold: #2e7d32; /* Main Brand Green */
-  --accent-gold-rgb: 46, 125, 50;
-  --accent-gold-hover: #3d9c43;
-  --accent-amber: #1b5e20; /* Darker Green */
-  --border-color: rgba(46, 125, 50, 0.2);
-  --border-light: rgba(255, 255, 255, 0.04);
-  --shadow-color: rgba(0, 0, 0, 0.8);
-  --navbar-bg: rgba(5, 8, 6, 0.7);
-  --glass-bg: rgba(12, 18, 15, 0.65);
-  --glass-glow: rgba(46, 125, 50, 0.03);
+  /* Dark Theme (Default) - Glowing Gamma Green Accent */
+  --bg-primary: #020503;
+  --bg-secondary: #060e0a;
+  --bg-tertiary: #0d1e14;
+  --text-primary: #e6f9ed;
+  --text-secondary: #8bb79b;
+  --accent-gold: #00ff66; /* Glowing Gamma Green */
+  --accent-gold-rgb: 0, 255, 102;
+  --accent-gold-hover: #33ff85;
+  --accent-amber: #00cc52;
+  --border-color: rgba(0, 255, 102, 0.25);
+  --border-light: rgba(0, 255, 102, 0.08);
+  --shadow-color: rgba(0, 0, 0, 0.85);
+  --navbar-bg: rgba(2, 5, 3, 0.75);
+  --glass-bg: rgba(6, 14, 10, 0.65);
+  --glass-glow: rgba(0, 255, 102, 0.06);
 }
 
 :root.light-theme {
-  /* Light Theme - Forest Green & Cream White */
+  /* Light Theme - Glowing Mint/Gamma Green & White */
   --bg-primary: #ffffff;
-  --bg-secondary: #f3f7f5;
-  --bg-tertiary: #e2ede6;
-  --text-primary: #101c16;
-  --text-secondary: #586960;
-  --accent-gold: #1b4d3e; /* Deep Forest Green */
-  --accent-gold-rgb: 27, 77, 62;
-  --accent-gold-hover: #143a2f;
-  --accent-amber: #133329;
-  --border-color: rgba(27, 77, 62, 0.18);
-  --border-light: rgba(0, 0, 0, 0.04);
-  --shadow-color: rgba(16, 28, 22, 0.06);
-  --navbar-bg: rgba(255, 255, 255, 0.7);
-  --glass-bg: rgba(243, 247, 245, 0.7);
-  --glass-glow: rgba(27, 77, 62, 0.01);
+  --bg-secondary: #f0fbf4;
+  --bg-tertiary: #dbf7e5;
+  --text-primary: #031409;
+  --text-secondary: #3d6d4e;
+  --accent-gold: #00b347; /* Bright Green */
+  --accent-gold-rgb: 0, 179, 71;
+  --accent-gold-hover: #00993c;
+  --accent-amber: #008032;
+  --border-color: rgba(0, 179, 71, 0.22);
+  --border-light: rgba(0, 179, 71, 0.06);
+  --shadow-color: rgba(3, 20, 9, 0.06);
+  --navbar-bg: rgba(255, 255, 255, 0.75);
+  --glass-bg: rgba(240, 251, 244, 0.75);
+  --glass-glow: rgba(0, 179, 71, 0.02);
 }
 
 /* Global Reset & Base */

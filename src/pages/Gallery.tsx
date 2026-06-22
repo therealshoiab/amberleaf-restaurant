@@ -14,6 +14,7 @@ interface GalleryItem {
 
 export const Gallery: React.FC = () => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const lightboxVideoRef = useRef<HTMLVideoElement | null>(null);
 
   // Unified Gallery Items (13 Google Maps images + 14 Instagram posts/reels)
   const galleryItems: GalleryItem[] = [
@@ -127,7 +128,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's1',
       type: 'video',
-      url: 'https://player.vimeo.com/external/384775870.sd.mp4?s=d072b22ec6f70912181bc747e9ad4fa3b073570c&profile_id=165&oauth2_token_id=57447761',
+      url: './images/s1.mp4',
       caption: 'Behind the scenes: Chef plating our signature Wazwan delicacies.',
       likes: 432,
       comments: 65,
@@ -136,7 +137,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's2',
       type: 'video',
-      url: 'https://player.vimeo.com/external/434045526.sd.mp4?s=c27dbceeddc8085449efcf40074c35e8d89e4726&profile_id=165&oauth2_token_id=57447761',
+      url: './images/s2.mp4',
       caption: 'Sip the morning brew. Perfect espresso pours at the Balgarden counter.',
       likes: 312,
       comments: 29,
@@ -145,7 +146,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's3',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+      url: './images/s3.jpg',
       caption: 'Dine under the warmth of modern emerald lattices. Book your table.',
       likes: 540,
       comments: 78,
@@ -154,7 +155,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's4',
       type: 'video',
-      url: 'https://player.vimeo.com/external/517602126.sd.mp4?s=c83ccf24e2300b9573f0896014e7a68a2bf68297&profile_id=165&oauth2_token_id=57447761',
+      url: './images/s4.mp4',
       caption: 'Pouring our Saffron Cooler mocktail. Sparkling mint refreshment.',
       likes: 671,
       comments: 92,
@@ -163,7 +164,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's5',
       type: 'video',
-      url: 'https://player.vimeo.com/external/454530008.sd.mp4?s=be8e65842881a5a0ebca7780072b05b63bc5a93d&profile_id=165&oauth2_token_id=57447761',
+      url: './images/s5.mp4',
       caption: 'Sizzling charcoal flames roasting our juicy mutton seekhs.',
       likes: 812,
       comments: 110,
@@ -172,7 +173,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's6',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=800&q=80',
+      url: './images/s6.jpg',
       caption: 'Our royal Zafrani Phirni chilled dessert served in clay kasoras.',
       likes: 398,
       comments: 41,
@@ -181,7 +182,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's7',
       type: 'video',
-      url: 'https://player.vimeo.com/external/434045526.sd.mp4?s=c27dbceeddc8085449efcf40074c35e8d89e4726&profile_id=165&oauth2_token_id=57447761',
+      url: './images/s7.mp4',
       caption: 'Artisan coffee beans ground fresh for every cup.',
       likes: 245,
       comments: 15,
@@ -190,7 +191,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's8',
       type: 'video',
-      url: 'https://player.vimeo.com/external/384775870.sd.mp4?s=d072b22ec6f70912181bc747e9ad4fa3b073570c&profile_id=165&oauth2_token_id=57447761',
+      url: './images/s8.mp4',
       caption: 'Review by Sarmista Acharya. Tasting the Wazwan courses.',
       likes: 912,
       comments: 142,
@@ -199,7 +200,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's9',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80',
+      url: './images/s9.jpg',
       caption: 'Our ambient green wood structures. Designed for memorable dates.',
       likes: 512,
       comments: 63,
@@ -208,8 +209,8 @@ export const Gallery: React.FC = () => {
     {
       id: 's10',
       type: 'video',
-      url: 'https://player.vimeo.com/external/517602126.sd.mp4?s=c83ccf24e2300b9573f0896014e7a68a2bf68297&profile_id=165&oauth2_token_id=57447761',
-      caption: 'Pouring traditional saffron mojito over crushed mint.',
+      url: './images/s10.mp4',
+      caption: 'Pouring traditional saffron mojito over compressed mint.',
       likes: 432,
       comments: 31,
       instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXb3kQzias_/',
@@ -217,7 +218,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's11',
       type: 'video',
-      url: 'https://player.vimeo.com/external/454530008.sd.mp4?s=be8e65842881a5a0ebca7780072b05b63bc5a93d&profile_id=165&oauth2_token_id=57447761',
+      url: './images/s11.mp4',
       caption: 'Perfect charcoal tandoor roast. Freshly grilled kebabs.',
       likes: 567,
       comments: 48,
@@ -226,7 +227,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's12',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=800&q=80',
+      url: './images/s12.jpg',
       caption: 'Authentic presentation. Saffron rice and lamb chops wazwan style.',
       likes: 412,
       comments: 36,
@@ -235,7 +236,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's13',
       type: 'video',
-      url: 'https://player.vimeo.com/external/384775870.sd.mp4?s=d072b22ec6f70912181bc747e9ad4fa3b073570c&profile_id=165&oauth2_token_id=57447761',
+      url: './images/s13.mp4',
       caption: 'The wazas preparing the famous gushtaba curd gravy.',
       likes: 721,
       comments: 84,
@@ -244,7 +245,7 @@ export const Gallery: React.FC = () => {
     {
       id: 's14',
       type: 'video',
-      url: 'https://player.vimeo.com/external/434045526.sd.mp4?s=c27dbceeddc8085449efcf40074c35e8d89e4726&profile_id=165&oauth2_token_id=57447761',
+      url: './images/s14.mp4',
       caption: 'Vibe check: Sarmista Acharya visiting the Balgarden space.',
       likes: 853,
       comments: 98,
@@ -285,12 +286,38 @@ export const Gallery: React.FC = () => {
     };
   }, []);
 
-  // Video hover controls: play unmuted on hover, pause/mute on hover out
+  // Auto-play the video in the lightbox when it opens
+  useEffect(() => {
+    if (lightboxIndex !== null) {
+      const item = galleryItems[lightboxIndex];
+      if (item && item.type === 'video') {
+        setTimeout(() => {
+          if (lightboxVideoRef.current) {
+            lightboxVideoRef.current.muted = false;
+            lightboxVideoRef.current.play().catch((err) => {
+              console.log("Lightbox autoplay unmuted blocked, falling back to muted:", err);
+              if (lightboxVideoRef.current) {
+                lightboxVideoRef.current.muted = true;
+                lightboxVideoRef.current.play().catch((e) => console.log("Muted fallback failed:", e));
+              }
+            });
+          }
+        }, 150);
+      }
+    }
+  }, [lightboxIndex]);
+
+  // Video hover controls: play unmuted on hover if possible, else muted, keep playing muted on hover out
   const handleVideoMouseEnter = (id: string) => {
     const video = videoRefs.current[id];
     if (video) {
       video.muted = false;
-      video.play().catch((err) => console.log(err));
+      video.play().catch(() => {
+        if (video) {
+          video.muted = true;
+          video.play().catch((e) => console.log("Muted play failed:", e));
+        }
+      });
     }
   };
 
@@ -298,7 +325,7 @@ export const Gallery: React.FC = () => {
     const video = videoRefs.current[id];
     if (video) {
       video.muted = true;
-      video.pause(); // Pause and mute on hover out
+      // Do not pause the video so it continues playing muted in the grid
     }
   };
 
@@ -588,6 +615,7 @@ export const Gallery: React.FC = () => {
               />
             ) : (
               <video
+                ref={lightboxVideoRef}
                 src={galleryItems[lightboxIndex].url}
                 controls
                 autoPlay
