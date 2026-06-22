@@ -29,7 +29,7 @@ export const FAQ: React.FC = () => {
     },
     {
       question: 'How does your Table Reservation work?',
-      answer: 'When you fill out our reservation form, the website automatically formats your details and opens WhatsApp addressed to our Booking Desk. Once you send the message, our team will confirm your table and slot.',
+      answer: 'When you fill out our reservation form, the details are transmitted directly to our on-site booking desk. A table is immediately allocated, and your digital luxury pass is generated on-screen.',
     },
     {
       question: 'Can I order online for delivery?',

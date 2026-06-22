@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SplineHero } from '../components/SplineHero';
 import { SEO } from '../components/SEO';
 import { ArrowRight, Star, Clock, Utensils, Calendar } from 'lucide-react';
@@ -14,6 +14,79 @@ export const Home: React.FC = () => {
     './images/g6.jpg',
     './images/g7.jpg',
   ];
+
+  // Video autoplay states & refs
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
+  const rowRef = useRef<HTMLDivElement | null>(null);
+  const isHovering = useRef(false);
+
+  // Recalculates which video is closest to the horizontal center of the scroll container
+  const recalculateCenterVideo = () => {
+    if (isHovering.current || !rowRef.current) return;
+
+    const row = rowRef.current;
+    const containerRect = row.getBoundingClientRect();
+    const containerCenter = containerRect.left + containerRect.width / 2;
+    
+    let closestVideoId: string | null = null;
+    let minDistance = Infinity;
+
+    Object.entries(videoRefs.current).forEach(([id, video]) => {
+      if (video) {
+        const rect = video.getBoundingClientRect();
+        const videoCenter = rect.left + rect.width / 2;
+        const distance = Math.abs(containerCenter - videoCenter);
+        const isVisible = rect.left < containerRect.right && rect.right > containerRect.left;
+
+        if (isVisible && distance < minDistance) {
+          minDistance = distance;
+          closestVideoId = id;
+        }
+      }
+    });
+
+    setActiveVideoId(closestVideoId);
+  };
+
+  // Sync play/pause based on activeVideoId
+  useEffect(() => {
+    Object.entries(videoRefs.current).forEach(([id, video]) => {
+      if (video) {
+        if (id === activeVideoId) {
+          video.play().catch((err) => console.log('Home autoplay blocked:', err));
+        } else {
+          video.pause();
+        }
+      }
+    });
+  }, [activeVideoId]);
+
+  // Listen to horizontal scroll stopping
+  useEffect(() => {
+    const row = rowRef.current;
+    if (!row) return;
+
+    let scrollTimeout: number;
+
+    const handleScroll = () => {
+      window.clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(() => {
+        recalculateCenterVideo();
+      }, 150);
+    };
+
+    row.addEventListener('scroll', handleScroll);
+    
+    // Initial check on load
+    const initTimeout = setTimeout(recalculateCenterVideo, 500);
+
+    return () => {
+      row.removeEventListener('scroll', handleScroll);
+      window.clearTimeout(scrollTimeout);
+      clearTimeout(initTimeout);
+    };
+  }, []);
 
   return (
     <div className="page-container">
@@ -170,16 +243,16 @@ export const Home: React.FC = () => {
         className="glass-panel ambience-grid"
         style={{
           marginTop: '3.5rem',
-          padding: '2.5rem',
+          padding: 'clamp(1.2rem, 5vw, 2.5rem)', /* Responsive padding to fit small viewports */
           display: 'grid',
-          gridTemplateColumns: '1fr',
+          gridTemplateColumns: 'minmax(0, 1fr)', /* Avoid horizontal grid stretch */
           gap: '2.5rem',
           alignItems: 'center',
           animation: 'fadeIn 1s ease forwards',
         }}
       >
         {/* Large Preview & Thumbnails Container */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minWidth: 0 }}>
           <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', height: '330px', border: '1px solid var(--border-color)' }}>
             <img
               src={activeImage}
@@ -225,7 +298,7 @@ export const Home: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', minWidth: 0 }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
             Dine-In Ambiance
           </span>
@@ -290,6 +363,7 @@ export const Home: React.FC = () => {
 
         {/* Videos Horizontal Row */}
         <div
+          ref={rowRef}
           style={{
             display: 'flex',
             gap: '1rem',
@@ -306,81 +380,96 @@ export const Home: React.FC = () => {
             { id: 's4', url: './images/s4.mp4', caption: 'Saffron Cooler Mocktail' },
             { id: 's5', url: './images/s5.mp4', caption: 'Mutton seekhs roasting' },
             { id: 's7', url: './images/s7.mp4', caption: 'Fresh artisan coffee beans' },
-          ].map((vid) => (
-            <div
-              key={vid.id}
-              className="glass-panel"
-              style={{
-                padding: '0.5rem',
-                borderRadius: '12px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-                minWidth: '200px',
-                width: '200px',
-                flexShrink: 0,
-                cursor: 'pointer',
-                position: 'relative',
-              }}
-              onClick={() => { window.location.hash = '#/gallery'; }}
-            >
+          ].map((vid) => {
+            const isActive = activeVideoId === vid.id;
+            return (
               <div
+                key={vid.id}
+                className="glass-panel"
                 style={{
-                  width: '100%',
-                  height: '280px',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
+                  padding: '0.5rem',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem',
+                  minWidth: '200px',
+                  width: '200px',
+                  flexShrink: 0,
+                  cursor: 'pointer',
                   position: 'relative',
-                  backgroundColor: '#000',
+                  border: isActive ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
+                  boxShadow: isActive ? '0 8px 24px rgba(197, 160, 89, 0.2)' : 'none',
+                  transition: 'all 0.3s ease',
                 }}
+                onClick={() => { window.location.hash = '#/gallery'; }}
               >
-                <video
-                  src={vid.url}
-                  loop
-                  muted
-                  playsInline
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.play().catch(err => console.log(err)); }}
-                  onMouseLeave={(e) => { e.currentTarget.pause(); }}
-                />
                 <div
                   style={{
-                    position: 'absolute',
-                    top: '0.5rem',
-                    right: '0.5rem',
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    borderRadius: '50%',
-                    width: '24px',
-                    height: '24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#fff',
-                    fontSize: '0.7rem',
+                    width: '100%',
+                    height: '280px',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    backgroundColor: '#000',
                   }}
                 >
-                  ▶
+                  <video
+                    ref={(el) => { videoRefs.current[vid.id] = el; }}
+                    src={vid.url}
+                    loop
+                    muted
+                    playsInline
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                    onMouseEnter={() => {
+                      isHovering.current = true;
+                      setActiveVideoId(vid.id);
+                    }}
+                    onMouseLeave={() => {
+                      isHovering.current = false;
+                      setActiveVideoId(null);
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '0.5rem',
+                      right: '0.5rem',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#fff',
+                      fontSize: '0.7rem',
+                      boxShadow: isActive ? '0 0 10px var(--accent-gold)' : 'none',
+                    }}
+                  >
+                    {isActive ? '⏸' : '▶'}
+                  </div>
                 </div>
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    color: isActive ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                    textAlign: 'center',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    padding: '0.2rem 0',
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  {vid.caption}
+                </span>
               </div>
-              <span
-                style={{
-                  fontSize: '0.75rem',
-                  color: 'var(--text-secondary)',
-                  textAlign: 'center',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  padding: '0.2rem 0',
-                }}
-              >
-                {vid.caption}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

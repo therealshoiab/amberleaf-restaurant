@@ -14,9 +14,10 @@
   --border-color: rgba(197, 160, 89, 0.22);
   --border-light: rgba(255, 255, 255, 0.04);
   --shadow-color: rgba(0, 0, 0, 0.85);
-  --navbar-bg: rgba(4, 9, 6, 0.94); /* High Opacity to block underlying text */
-  --glass-bg: rgba(8, 18, 13, 0.91); /* High Opacity for luxury panels */
+  --navbar-bg: rgba(4, 9, 6, 0.97); /* Very high opacity to block scrolled text */
+  --glass-bg: rgba(8, 18, 13, 0.95); /* High opacity for solid luxury panels */
   --glass-glow: rgba(197, 160, 89, 0.02);
+  --mobile-menu-bg: rgba(4, 9, 6, 0.99); /* Maximum opacity for mobile drawer */
 }
 
 :root.light-theme {
@@ -33,9 +34,10 @@
   --border-color: rgba(179, 141, 71, 0.22);
   --border-light: rgba(18, 33, 24, 0.05);
   --shadow-color: rgba(18, 33, 24, 0.05);
-  --navbar-bg: rgba(251, 250, 247, 0.95); /* High Opacity */
-  --glass-bg: rgba(244, 242, 235, 0.92); /* High Opacity */
+  --navbar-bg: rgba(251, 250, 247, 0.98); /* Very high opacity */
+  --glass-bg: rgba(244, 242, 235, 0.96); /* High opacity */
   --glass-glow: rgba(179, 141, 71, 0.01);
+  --mobile-menu-bg: rgba(251, 250, 247, 0.99); /* Maximum opacity */
 }
 
 /* Global Reset & Base */
@@ -45,9 +47,10 @@
   padding: 0;
 }
 
-html, body, #root {
+html, body, #root, main {
   overflow-x: hidden;
   width: 100%;
+  position: relative;
 }
 
 html {
@@ -98,8 +101,8 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 /* Glassmorphism Styles */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(55px) saturate(180%);
+  -webkit-backdrop-filter: blur(55px) saturate(180%);
   border: 1px solid var(--border-color);
   box-shadow: 0 12px 40px 0 var(--shadow-color), inset 0 0 12px var(--glass-glow);
   border-radius: 16px;
@@ -107,8 +110,8 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 
 .glass-navbar {
   background: var(--navbar-bg);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  backdrop-filter: blur(55px) saturate(200%);
+  -webkit-backdrop-filter: blur(55px) saturate(200%);
   border-bottom: 1px solid var(--border-color);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
 }
@@ -206,8 +209,28 @@ h1, h2, h3, h4, h5, h6, .font-serif {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes goldPulse {
+  0% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.4); }
+  50% { transform: scale(1.02); opacity: 1; box-shadow: 0 0 15px 4px rgba(197, 160, 89, 0.7); }
+  100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.4); }
+}
+
+@keyframes ticketGlow {
+  0% { border-color: var(--border-color); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  50% { border-color: var(--accent-gold); box-shadow: 0 8px 30px rgba(197, 160, 89, 0.25); }
+  100% { border-color: var(--border-color); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.8s ease forwards;
+}
+
+.luxury-pulse {
+  animation: goldPulse 2s infinite ease-in-out;
+}
+
+.ticket-glow {
+  animation: ticketGlow 3s infinite ease-in-out;
 }
 
 /* Grid Layouts */

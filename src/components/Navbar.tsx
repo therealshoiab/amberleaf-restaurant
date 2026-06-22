@@ -84,27 +84,29 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
             objectFit: 'cover',
           }}
         />
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', whiteSpace: 'nowrap' }}>
           <span
             style={{
               fontFamily: "'Playfair Display', serif",
-              fontSize: '1.25rem',
+              fontSize: 'clamp(1.05rem, 4.5vw, 1.25rem)',
               fontWeight: 700,
               letterSpacing: '0.05em',
               color: 'var(--text-primary)',
               textTransform: 'uppercase',
               lineHeight: 1,
+              whiteSpace: 'nowrap',
             }}
           >
             Amberleaf
           </span>
           <span
             style={{
-              fontSize: '0.65rem',
+              fontSize: 'clamp(0.55rem, 2.5vw, 0.65rem)',
               letterSpacing: '0.25em',
               color: 'var(--accent-gold)',
               textTransform: 'uppercase',
               fontWeight: 600,
+              whiteSpace: 'nowrap',
             }}
           >
             Fine Dine & Cafe
@@ -222,9 +224,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
             gap: '1rem',
             zIndex: 999,
             borderRadius: '12px',
-            backgroundColor: 'rgba(8, 18, 13, 0.97)', /* Extremely opaque for luxury feel */
-            backdropFilter: 'blur(45px)', /* High-end blur */
-            WebkitBackdropFilter: 'blur(45px)',
+            backgroundColor: 'var(--mobile-menu-bg)', /* Dynamic theme-based background */
+            backdropFilter: 'blur(55px)', /* Stronger blur matching global standard */
+            WebkitBackdropFilter: 'blur(55px)',
             border: '1px solid var(--border-color)',
             boxShadow: '0 15px 45px rgba(0, 0, 0, 0.75), inset 0 0 15px rgba(197, 160, 89, 0.05)',
             animation: 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',

@@ -77,7 +77,7 @@ export const Reviews: React.FC = () => {
         author: 'Vikram Singh',
         rating: 4,
         date: 'May 02, 2026',
-        comment: 'Tasty food, beautiful ambiance. Tandoori Paneer Tikka was spiced well. Redirection to WhatsApp for booking was seamless.',
+        comment: 'Tasty food, beautiful ambiance. Tandoori Paneer Tikka was spiced well. Direct booking on the website was seamless.',
         type: 'Group Outing',
       },
       {
@@ -126,7 +126,7 @@ export const Reviews: React.FC = () => {
       'Excellent dining spot! The wazwan is amazing and the environment is very neat and clean.',
       'Superb taste, polite staff, and beautiful ambiance. Definitely coming back.',
       'Loved the vibe here. The glass panels look amazing. Rogan Josh is highly recommended.',
-      'Great customer service. The booking process was very smooth on WhatsApp.',
+      'Great customer service. The booking process was very smooth with the direct ticket pass.',
       'One of the best premium multi-cuisine restaurants in Srinagar. Highly recommend Gushtaba.',
       'Really nice cafe ambiance. Ideal for family dining and weekend groups.',
       'The Kashmiri Kahwa is outstanding. The cardamom and saffron aroma is so soothing.',

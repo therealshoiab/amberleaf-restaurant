@@ -13,6 +13,8 @@ export const Contact: React.FC = () => {
   const [time, setTime] = useState('19:00');
   const [notes, setNotes] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittingStep, setSubmittingStep] = useState(0);
   const [formError, setFormError] = useState('');
   const [bookingRef, setBookingRef] = useState('');
   const [assignedTable, setAssignedTable] = useState('');
@@ -35,8 +37,10 @@ export const Contact: React.FC = () => {
     }
 
     setFormError('');
+    setIsSubmitting(true);
+    setSubmittingStep(1);
 
-    // Generate Booking Details (Luxury Mock System)
+    // Formulate variables
     const randomRef = 'AMB-' + Math.floor(10000 + Math.random() * 90000) + '-' + date.split('-')[0];
     const tables = [
       'Table 4 (Balgarden Balcony View)',
@@ -46,24 +50,37 @@ export const Contact: React.FC = () => {
       'Table 2 (Cosy Corner Lounge)',
     ];
     const randomTable = tables[Math.floor(Math.random() * tables.length)];
-    
+
     setBookingRef(randomRef);
     setAssignedTable(randomTable);
-    setIsSubmitted(true);
 
-    // Trigger canvas-confetti
-    confetti({
-      particleCount: 150,
-      spread: 80,
-      origin: { y: 0.6 }
-    });
+    // Multi-stage luxury booking progress
+    setTimeout(() => {
+      setSubmittingStep(2);
+      setTimeout(() => {
+        setSubmittingStep(3);
+        setTimeout(() => {
+          setSubmittingStep(4);
+          setTimeout(() => {
+            setIsSubmitting(false);
+            setIsSubmitted(true);
+            // Trigger canvas-confetti
+            confetti({
+              particleCount: 150,
+              spread: 80,
+              origin: { y: 0.6 }
+            });
+          }, 1000);
+        }, 1200);
+      }, 1200);
+    }, 1200);
   };
 
   return (
     <div className="page-container">
       <SEO
         title="Contact & Bookings"
-        description="Book a table at Amberleaf Restaurant in Srinagar. Submit our reservation form to receive instant confirmation via WhatsApp or check our coordinates on the map."
+        description="Book a table at Amberleaf Restaurant in Srinagar. Submit our reservation form to secure instant table allocation and print your luxury pass."
       />
 
       {/* Page Header */}
@@ -169,8 +186,88 @@ export const Contact: React.FC = () => {
         </div>
 
         {/* Right Side: Table Reservation Form */}
-        <div className="glass-panel" style={{ padding: '2.5rem', position: 'relative' }}>
-          {isSubmitted ? (
+        <div className="glass-panel" style={{ padding: 'clamp(1.5rem, 5vw, 2.5rem)', position: 'relative', overflow: 'hidden' }}>
+          {isSubmitting ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '420px',
+                textAlign: 'center',
+                gap: '2.5rem',
+                animation: 'fadeIn 0.5s ease forwards',
+              }}
+            >
+              {/* Luxury Gold Spinner */}
+              <div style={{ position: 'relative', width: '80px', height: '80px' }}>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    border: '3px solid rgba(197, 160, 89, 0.1)',
+                    borderTop: '3px solid var(--accent-gold)',
+                    borderRadius: '50%',
+                    animation: 'spin 1.2s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite',
+                  }}
+                />
+                <div
+                  className="luxury-pulse"
+                  style={{
+                    position: 'absolute',
+                    top: '15px', left: '15px', right: '15px', bottom: '15px',
+                    backgroundColor: 'rgba(197, 160, 89, 0.08)',
+                    borderRadius: '50%',
+                  }}
+                />
+              </div>
+
+              {/* Progress Text & Stage Detail */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', width: '100%', maxWidth: '320px' }}>
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    color: 'var(--accent-gold)',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    fontWeight: 700,
+                  }}
+                >
+                  Securing Reservation
+                </span>
+                
+                <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1.4' }}>
+                  {submittingStep === 1 && "Connecting to Amberleaf Reservation Engine..."}
+                  {submittingStep === 2 && `Analyzing table availability for ${guests} ${parseInt(guests) === 1 ? 'guest' : 'guests'}...`}
+                  {submittingStep === 3 && "Dispatching reservation directly to desk +91 7780938743..."}
+                  {submittingStep === 4 && "Allocating table and signing your luxury pass..."}
+                </h4>
+
+                {/* Progress Bar Indicator */}
+                <div
+                  style={{
+                    width: '100%',
+                    height: '2px',
+                    backgroundColor: 'var(--border-light)',
+                    borderRadius: '2px',
+                    overflow: 'hidden',
+                    marginTop: '0.5rem',
+                  }}
+                >
+                  <div
+                    style={{
+                      height: '100%',
+                      backgroundColor: 'var(--accent-gold)',
+                      boxShadow: '0 0 10px var(--accent-gold)',
+                      transition: 'width 0.8s ease',
+                      width: `${(submittingStep / 4) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : isSubmitted ? (
             <div
               style={{
                 display: 'flex',
@@ -181,7 +278,7 @@ export const Contact: React.FC = () => {
             >
               <div
                 style={{
-                  backgroundColor: 'rgba(197, 160, 89, 0.1)',
+                  backgroundColor: 'rgba(197, 160, 89, 0.15)',
                   border: '1px solid var(--accent-gold)',
                   borderRadius: '50%',
                   padding: '1rem',
@@ -195,15 +292,16 @@ export const Contact: React.FC = () => {
               </div>
               <h3 style={{ fontSize: '1.5rem', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Booking Confirmed</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-                A confirmation SMS has been dispatched to {phone}.
+                Your table has been reserved directly at our desk (+91 7780938743).
               </p>
 
               {/* Luxury Ticket Card */}
               <div
+                className="ticket-glow"
                 style={{
                   width: '100%',
-                  background: 'rgba(255, 255, 255, 0.01)',
-                  border: '1px solid var(--border-color)',
+                  background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
+                  border: '1px solid var(--accent-gold)',
                   borderRadius: '12px',
                   padding: '1.5rem',
                   display: 'flex',
@@ -211,7 +309,7 @@ export const Contact: React.FC = () => {
                   gap: '1rem',
                   position: 'relative',
                   overflow: 'hidden',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)',
                 }}
               >
                 {/* Decorative Side Cuts */}
@@ -219,7 +317,7 @@ export const Contact: React.FC = () => {
                 <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'var(--bg-secondary)', borderLeft: '1px solid var(--border-color)' }} />
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed var(--border-color)', paddingBottom: '0.75rem', fontSize: '0.85rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Reservation Code</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Reservation Pass</span>
                   <strong style={{ color: 'var(--accent-gold)', letterSpacing: '0.05em' }}>{bookingRef}</strong>
                 </div>
 

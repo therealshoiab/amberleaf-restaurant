@@ -47,7 +47,7 @@ export const Legal: React.FC = () => {
             
             <div>
               <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>1. Reservations & Table Bookings</strong>
-              <span>Table reservations placed through our website are subject to availability. Bookings are confirmed only when our desk contacts you via phone or WhatsApp. We reserve the right to release tables if you are more than 15 minutes late without notifying us.</span>
+              <span>Table reservations placed through our website are subject to availability. Bookings are confirmed instantly on-screen and verified directly by our booking desk via phone call or SMS. We reserve the right to release tables if you are more than 15 minutes late without notifying us.</span>
             </div>
 
             <div>
@@ -76,7 +76,7 @@ export const Legal: React.FC = () => {
 
             <div>
               <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>1. Information We Collect</strong>
-              <span>When you use our Table Reservation Form, we collect your Name, Phone Number, Email, and special request notes. This data is used solely to construct your booking template and is forwarded directly to WhatsApp. We do not store this information on a public database.</span>
+              <span>When you use our Table Reservation Form, we collect your Name, Phone Number, Email, and special request notes. This data is used solely to process your booking and is transmitted securely to our on-site reservation desk system. We do not sell or share this information.</span>
             </div>
 
             <div>
