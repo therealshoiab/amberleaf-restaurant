@@ -6,77 +6,129 @@ interface GalleryItem {
   id: string;
   type: 'image' | 'video';
   url: string;
-  thumbnail?: string;
   caption: string;
   likes: number;
   comments: number;
   instagramUrl?: string;
-  aspect?: string;
 }
 
 export const Gallery: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'vibe' | 'social'>('vibe');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  // Vibe Gallery Items
-  const vibeItems: GalleryItem[] = [
+  // Unified Gallery Items (13 Google Maps images + 14 Instagram posts/reels)
+  const galleryItems: GalleryItem[] = [
+    // Google Maps Photos (g1 to g13)
     {
-      id: 'v1',
+      id: 'g1',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80',
-      caption: 'Warm amber-glowing interiors designed for cozy dining experiences.',
-      likes: 124,
-      comments: 18,
+      url: './images/g1.jpg',
+      caption: 'Sophisticated dining setup featuring custom green wall accents and amber lighting.',
+      likes: 184,
+      comments: 15,
     },
     {
-      id: 'v2',
+      id: 'g2',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
-      caption: 'Our modern glassmorphic table setups matching Balgarden vibe.',
-      likes: 198,
-      comments: 24,
+      url: './images/g2.jpg',
+      caption: 'Perfect table detailing ready for our evening fine dining guests.',
+      likes: 142,
+      comments: 11,
     },
     {
-      id: 'v3',
+      id: 'g3',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=800&q=80',
-      caption: 'A fresh cup of organic Kashmiri Kahwa brewed in our copper samovar.',
-      likes: 310,
-      comments: 42,
+      url: './images/g3.jpg',
+      caption: 'Overview of our spacious main dining hall in Balgarden, Srinagar.',
+      likes: 219,
+      comments: 29,
     },
     {
-      id: 'v4',
+      id: 'g4',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=800&q=80',
-      caption: 'Succulent Tandoori Kebabs roasted over hot charcoal pits.',
-      likes: 245,
+      url: './images/g4.jpg',
+      caption: 'Elegant green lattices and comfy seating arrangement for large families.',
+      likes: 253,
       comments: 31,
     },
     {
-      id: 'v5',
+      id: 'g5',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1545247181-516773cae754?auto=format&fit=crop&w=800&q=80',
-      caption: 'A traditional Rogan Josh curry prepared by our master wazas.',
-      likes: 289,
-      comments: 38,
+      url: './images/g5.jpg',
+      caption: 'Cosy seating booth framed by beautiful ambient drop lights.',
+      likes: 167,
+      comments: 14,
     },
     {
-      id: 'v6',
+      id: 'g6',
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=800&q=80',
-      caption: 'Zafrani Phirni chilled to perfection in clay kasoras.',
-      likes: 156,
-      comments: 12,
+      url: './images/g6.jpg',
+      caption: 'Warm wooden panelling and modern architectural arches matching the sanctuary theme.',
+      likes: 198,
+      comments: 22,
     },
-  ];
+    {
+      id: 'g7',
+      type: 'image',
+      url: './images/g7.jpg',
+      caption: 'Table service prepared for group dining and special corporate events.',
+      likes: 175,
+      comments: 19,
+    },
+    {
+      id: 'g8',
+      type: 'image',
+      url: './images/g8.jpg',
+      caption: 'Our signature traditional Wazwan platter served fresh.',
+      likes: 342,
+      comments: 48,
+    },
+    {
+      id: 'g9',
+      type: 'image',
+      url: './images/g9.jpg',
+      caption: 'Succulent mutton seekh starter with mint sauce and fresh onions.',
+      likes: 289,
+      comments: 35,
+    },
+    {
+      id: 'g10',
+      type: 'image',
+      url: './images/g10.jpg',
+      caption: 'Traditional copper samovar brewing authentic hot saffron Kahwa.',
+      likes: 412,
+      comments: 61,
+    },
+    {
+      id: 'g11',
+      type: 'image',
+      url: './images/g11.jpg',
+      caption: 'Silky butter chicken served in copper bowls with fresh naans.',
+      likes: 320,
+      comments: 41,
+    },
+    {
+      id: 'g12',
+      type: 'image',
+      url: './images/g12.jpg',
+      caption: 'Sweet Zafrani Phirni dessert chilled to perfection.',
+      likes: 198,
+      comments: 18,
+    },
+    {
+      id: 'g13',
+      type: 'image',
+      url: './images/g13.jpg',
+      caption: 'Smoky grilled chicken tandoori cuts straight from the clay oven.',
+      likes: 275,
+      comments: 24,
+    },
 
-  // Social Hub Items (Instagram Posts & Reels)
-  const socialItems: GalleryItem[] = [
+    // Instagram Posts & Reels (s1 to s14)
     {
       id: 's1',
       type: 'video',
-      url: 'https://player.vimeo.com/external/384775870.sd.mp4?s=d072b22ec6f70912181bc747e9ad4fa3b073570c&profile_id=165&oauth2_token_id=57447761', // stock video chef plating
-      caption: 'Crafting our signature plates. Watch the artistry that goes into every single Wazwan course.',
+      url: 'https://player.vimeo.com/external/384775870.sd.mp4?s=d072b22ec6f70912181bc747e9ad4fa3b073570c&profile_id=165&oauth2_token_id=57447761',
+      caption: 'Behind the scenes: Chef plating our signature Wazwan delicacies.',
       likes: 432,
       comments: 65,
       instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DYKPVgyJbwN/',
@@ -84,8 +136,8 @@ export const Gallery: React.FC = () => {
     {
       id: 's2',
       type: 'video',
-      url: 'https://player.vimeo.com/external/434045526.sd.mp4?s=c27dbceeddc8085449efcf40074c35e8d89e4726&profile_id=165&oauth2_token_id=57447761', // stock coffee pouring
-      caption: 'Espresso drops and warm milk. Pouring fresh morning energy at our Nursing Garh cafe counter.',
+      url: 'https://player.vimeo.com/external/434045526.sd.mp4?s=c27dbceeddc8085449efcf40074c35e8d89e4726&profile_id=165&oauth2_token_id=57447761',
+      caption: 'Sip the morning brew. Perfect espresso pours at the Balgarden counter.',
       likes: 312,
       comments: 29,
       instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DX_9qy9pXc8/',
@@ -94,7 +146,7 @@ export const Gallery: React.FC = () => {
       id: 's3',
       type: 'image',
       url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
-      caption: 'The fine art of hospitality. Book your private table and family spaces at Amberleaf today.',
+      caption: 'Dine under the warmth of modern emerald lattices. Book your table.',
       likes: 540,
       comments: 78,
       instagramUrl: 'https://www.instagram.com/amberleafsgr/p/DX9ddTkiSz6/',
@@ -102,8 +154,8 @@ export const Gallery: React.FC = () => {
     {
       id: 's4',
       type: 'video',
-      url: 'https://player.vimeo.com/external/517602126.sd.mp4?s=c83ccf24e2300b9573f0896014e7a68a2bf68297&profile_id=165&oauth2_token_id=57447761', // stock cocktail
-      caption: 'Pouring the gold. Saffron Mint Cooler Mocktail bringing refreshing saffron syrup overlays.',
+      url: 'https://player.vimeo.com/external/517602126.sd.mp4?s=c83ccf24e2300b9573f0896014e7a68a2bf68297&profile_id=165&oauth2_token_id=57447761',
+      caption: 'Pouring our Saffron Cooler mocktail. Sparkling mint refreshment.',
       likes: 671,
       comments: 92,
       instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DX1rANyJFqs/',
@@ -111,8 +163,8 @@ export const Gallery: React.FC = () => {
     {
       id: 's5',
       type: 'video',
-      url: 'https://player.vimeo.com/external/454530008.sd.mp4?s=be8e65842881a5a0ebca7780072b05b63bc5a93d&profile_id=165&oauth2_token_id=57447761', // stock grilling
-      caption: 'Sizzling hot charcoal grills. The smoky aroma of our Mutton Seekh Kebabs rising in the tandoor.',
+      url: 'https://player.vimeo.com/external/454530008.sd.mp4?s=be8e65842881a5a0ebca7780072b05b63bc5a93d&profile_id=165&oauth2_token_id=57447761',
+      caption: 'Sizzling charcoal flames roasting our juicy mutton seekhs.',
       likes: 812,
       comments: 110,
       instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXt9PYaiQEe/',
@@ -121,27 +173,94 @@ export const Gallery: React.FC = () => {
       id: 's6',
       type: 'image',
       url: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=800&q=80',
-      caption: 'A spoonful of Zafrani Phirni is all it takes to complete a royal Kashmiri meal.',
+      caption: 'Our royal Zafrani Phirni chilled dessert served in clay kasoras.',
       likes: 398,
       comments: 41,
       instagramUrl: 'https://www.instagram.com/amberleafsgr/p/DXrdiYfCRot/',
     },
+    {
+      id: 's7',
+      type: 'video',
+      url: 'https://player.vimeo.com/external/434045526.sd.mp4?s=c27dbceeddc8085449efcf40074c35e8d89e4726&profile_id=165&oauth2_token_id=57447761',
+      caption: 'Artisan coffee beans ground fresh for every cup.',
+      likes: 245,
+      comments: 15,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXj4Ed7iV2a/',
+    },
+    {
+      id: 's8',
+      type: 'video',
+      url: 'https://player.vimeo.com/external/384775870.sd.mp4?s=d072b22ec6f70912181bc747e9ad4fa3b073570c&profile_id=165&oauth2_token_id=57447761',
+      caption: 'Review by Sarmista Acharya. Tasting the Wazwan courses.',
+      likes: 912,
+      comments: 142,
+      instagramUrl: 'https://www.instagram.com/sarmista_acharya_official/reel/DXjyb8oib49/',
+    },
+    {
+      id: 's9',
+      type: 'image',
+      url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80',
+      caption: 'Our ambient green wood structures. Designed for memorable dates.',
+      likes: 512,
+      comments: 63,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/p/DXecUTcibab/',
+    },
+    {
+      id: 's10',
+      type: 'video',
+      url: 'https://player.vimeo.com/external/517602126.sd.mp4?s=c83ccf24e2300b9573f0896014e7a68a2bf68297&profile_id=165&oauth2_token_id=57447761',
+      caption: 'Pouring traditional saffron mojito over crushed mint.',
+      likes: 432,
+      comments: 31,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXb3kQzias_/',
+    },
+    {
+      id: 's11',
+      type: 'video',
+      url: 'https://player.vimeo.com/external/454530008.sd.mp4?s=be8e65842881a5a0ebca7780072b05b63bc5a93d&profile_id=165&oauth2_token_id=57447761',
+      caption: 'Perfect charcoal tandoor roast. Freshly grilled kebabs.',
+      likes: 567,
+      comments: 48,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXRsKKXj5fB/',
+    },
+    {
+      id: 's12',
+      type: 'image',
+      url: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=800&q=80',
+      caption: 'Authentic presentation. Saffron rice and lamb chops wazwan style.',
+      likes: 412,
+      comments: 36,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/p/DXPIA5OCZpk/',
+    },
+    {
+      id: 's13',
+      type: 'video',
+      url: 'https://player.vimeo.com/external/384775870.sd.mp4?s=d072b22ec6f70912181bc747e9ad4fa3b073570c&profile_id=165&oauth2_token_id=57447761',
+      caption: 'The wazas preparing the famous gushtaba curd gravy.',
+      likes: 721,
+      comments: 84,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXE0hZ7CQFJ/',
+    },
+    {
+      id: 's14',
+      type: 'video',
+      url: 'https://player.vimeo.com/external/434045526.sd.mp4?s=c27dbceeddc8085449efcf40074c35e8d89e4726&profile_id=165&oauth2_token_id=57447761',
+      caption: 'Vibe check: Sarmista Acharya visiting the Balgarden space.',
+      likes: 853,
+      comments: 98,
+      instagramUrl: 'https://www.instagram.com/sarmista_acharya_official/reel/DVD4XrUEh7H/',
+    },
   ];
-
-  // Active items based on tab
-  const activeItems = activeTab === 'vibe' ? vibeItems : socialItems;
 
   // Video refs for scroll play / pause
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
 
   useEffect(() => {
-    if (activeTab !== 'social') return;
-
     // Create Intersection Observer to autoplay videos when scrolled into view
     const observerOptions = {
       root: null,
       rootMargin: '0px',
-      threshold: 0.6, // Trigger play when 60% of video card is visible
+      threshold: 0.5, // Play when 50% of video card is visible
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -164,7 +283,7 @@ export const Gallery: React.FC = () => {
     return () => {
       observer.disconnect();
     };
-  }, [activeTab]);
+  }, []);
 
   // Video hover controls: play unmuted on hover, pause/mute on hover out
   const handleVideoMouseEnter = (id: string) => {
@@ -187,24 +306,24 @@ export const Gallery: React.FC = () => {
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (lightboxIndex === null) return;
-    setLightboxIndex(lightboxIndex === 0 ? activeItems.length - 1 : lightboxIndex - 1);
+    setLightboxIndex(lightboxIndex === 0 ? galleryItems.length - 1 : lightboxIndex - 1);
   };
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (lightboxIndex === null) return;
-    setLightboxIndex(lightboxIndex === activeItems.length - 1 ? 0 : lightboxIndex + 1);
+    setLightboxIndex(lightboxIndex === galleryItems.length - 1 ? 0 : lightboxIndex + 1);
   };
 
   return (
     <div className="page-container">
       <SEO
-        title="Visual Gallery"
-        description="Explore the cozy glassmorphic atmosphere of Amberleaf Restaurant in Srinagar. View our food gallery, Instagram reels, and customer moments in our social hub."
+        title="Gallery Showcase"
+        description="Browse the complete gallery of Amberleaf Restaurant. Check out our real dine-in ambiance, Kashmiri wazwan courses, and guest reviews."
       />
 
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }} className="animate-fade-in">
+      <div style={{ textAlign: 'center', marginBottom: '4rem' }} className="animate-fade-in">
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -214,9 +333,9 @@ export const Gallery: React.FC = () => {
             fontWeight: 700,
           }}
         >
-          Amberleaf Life
+          Visual Showcase
         </span>
-        <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>Atmosphere & Hub</h2>
+        <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>Ambiance & Culinary Gallery</h2>
         <div
           style={{
             width: '60px',
@@ -227,55 +346,9 @@ export const Gallery: React.FC = () => {
         />
       </div>
 
-      {/* Tabs Switcher */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '1rem',
-          marginBottom: '3rem',
-        }}
-      >
-        <button
-          onClick={() => setActiveTab('vibe')}
-          style={{
-            background: activeTab === 'vibe' ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.02)',
-            color: activeTab === 'vibe' ? '#000' : 'var(--text-primary)',
-            border: '1px solid',
-            borderColor: activeTab === 'vibe' ? 'var(--accent-gold)' : 'var(--border-light)',
-            padding: '0.6rem 1.8rem',
-            borderRadius: '8px',
-            fontSize: '0.95rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-          }}
-        >
-          Cafe Vibe
-        </button>
-
-        <button
-          onClick={() => setActiveTab('social')}
-          style={{
-            background: activeTab === 'social' ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.02)',
-            color: activeTab === 'social' ? '#000' : 'var(--text-primary)',
-            border: '1px solid',
-            borderColor: activeTab === 'social' ? 'var(--accent-gold)' : 'var(--border-light)',
-            padding: '0.6rem 1.8rem',
-            borderRadius: '8px',
-            fontSize: '0.95rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-          }}
-        >
-          Social Hub
-        </button>
-      </div>
-
-      {/* Gallery Grid */}
+      {/* Gallery Grid - Displays all 27 Items */}
       <div className="grid-container grid-3" style={{ animation: 'fadeIn 0.8s ease forwards' }}>
-        {activeItems.map((item, index) => (
+        {galleryItems.map((item, index) => (
           <div
             key={item.id}
             className="glass-panel"
@@ -295,7 +368,7 @@ export const Gallery: React.FC = () => {
             <div
               style={{
                 width: '100%',
-                height: activeTab === 'social' && item.type === 'video' ? '380px' : '240px',
+                height: item.type === 'video' ? '360px' : '240px',
                 borderRadius: '12px',
                 overflow: 'hidden',
                 position: 'relative',
@@ -352,8 +425,8 @@ export const Gallery: React.FC = () => {
                 </div>
               )}
 
-              {/* Instagram tag overlay */}
-              {activeTab === 'social' && item.instagramUrl && (
+              {/* Instagram brand colored tag overlay */}
+              {item.instagramUrl && (
                 <a
                   href={item.instagramUrl}
                   target="_blank"
@@ -363,24 +436,31 @@ export const Gallery: React.FC = () => {
                     position: 'absolute',
                     bottom: '1rem',
                     left: '1rem',
-                    backgroundColor: 'rgba(10, 9, 7, 0.85)',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--accent-gold)',
+                    backgroundColor: 'rgba(10, 9, 7, 0.95)',
+                    border: '1px solid rgba(225, 48, 108, 0.25)',
+                    color: '#E1306C', /* Instagram Pink Brand Color */
                     borderRadius: '9999px',
-                    padding: '0.3rem 0.8rem',
-                    fontSize: '0.7rem',
+                    padding: '0.35rem 0.8rem',
+                    fontSize: '0.75rem',
                     textDecoration: 'none',
                     fontWeight: 700,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.3rem',
+                    gap: '0.35rem',
                     zIndex: 4,
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--accent-gold)')}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#fff';
+                    e.currentTarget.style.backgroundColor = '#E1306C';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#E1306C';
+                    e.currentTarget.style.backgroundColor = 'rgba(10, 9, 7, 0.95)';
+                  }}
                 >
+                  {/* Real Instagram SVG Brand Icon */}
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                  Open Link
+                  Instagram Link
                 </a>
               )}
             </div>
@@ -391,7 +471,7 @@ export const Gallery: React.FC = () => {
                 style={{
                   color: 'var(--text-secondary)',
                   fontSize: '0.85rem',
-                  lineHeight: '1.4',
+                  lineHeight: '1.5',
                   marginBottom: '0.75rem',
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
@@ -406,20 +486,20 @@ export const Gallery: React.FC = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '1rem',
+                  gap: '1.25rem',
                   fontSize: '0.8rem',
                   color: 'var(--text-secondary)',
                   borderTop: '1px solid var(--border-light)',
-                  paddingTop: '0.5rem',
+                  paddingTop: '0.6rem',
                 }}
               >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <Heart size={14} style={{ color: 'var(--accent-gold)' }} />
-                  {item.likes} likes
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <Heart size={14} style={{ color: '#E1306C' }} />
+                  {item.likes}
                 </span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                   <MessageCircle size={14} />
-                  {item.comments} comments
+                  {item.comments}
                 </span>
               </div>
             </div>
@@ -436,7 +516,7 @@ export const Gallery: React.FC = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(10, 9, 7, 0.95)',
+            backgroundColor: 'rgba(5, 8, 6, 0.96)',
             backdropFilter: 'blur(15px)',
             zIndex: 9999,
             display: 'flex',
@@ -494,10 +574,10 @@ export const Gallery: React.FC = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {activeItems[lightboxIndex].type === 'image' ? (
+            {galleryItems[lightboxIndex].type === 'image' ? (
               <img
-                src={activeItems[lightboxIndex].url}
-                alt={activeItems[lightboxIndex].caption}
+                src={galleryItems[lightboxIndex].url}
+                alt={galleryItems[lightboxIndex].caption}
                 style={{
                   maxWidth: '100%',
                   maxHeight: '65vh',
@@ -508,7 +588,7 @@ export const Gallery: React.FC = () => {
               />
             ) : (
               <video
-                src={activeItems[lightboxIndex].url}
+                src={galleryItems[lightboxIndex].url}
                 controls
                 autoPlay
                 playsInline
@@ -524,7 +604,7 @@ export const Gallery: React.FC = () => {
             {/* Caption */}
             <p
               style={{
-                color: '#f5f3ef',
+                color: '#f2f7f4',
                 fontSize: '0.95rem',
                 textAlign: 'center',
                 maxWidth: '600px',
@@ -532,7 +612,7 @@ export const Gallery: React.FC = () => {
                 textShadow: '0 1px 5px rgba(0,0,0,0.5)',
               }}
             >
-              {activeItems[lightboxIndex].caption}
+              {galleryItems[lightboxIndex].caption}
             </p>
           </div>
 

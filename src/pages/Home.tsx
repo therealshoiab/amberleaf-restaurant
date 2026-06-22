@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SplineHero } from '../components/SplineHero';
 import { SEO } from '../components/SEO';
 import { ArrowRight, Star, Clock, Utensils, Calendar } from 'lucide-react';
 
 export const Home: React.FC = () => {
+  const [activeImage, setActiveImage] = useState('./images/g1.jpg');
+  const showcaseImages = [
+    './images/g1.jpg',
+    './images/g2.jpg',
+    './images/g3.jpg',
+    './images/g4.jpg',
+    './images/g5.jpg',
+    './images/g6.jpg',
+    './images/g7.jpg',
+  ];
+
   return (
     <div className="page-container">
       <SEO
@@ -167,19 +178,53 @@ export const Home: React.FC = () => {
           animation: 'fadeIn 1s ease forwards',
         }}
       >
-        <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', height: '350px' }}>
-          <img
-            src="./images/amberleaf-vibe.jpg"
-            alt="Amberleaf Restaurant Interior"
+        {/* Large Preview & Thumbnails Container */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', height: '330px', border: '1px solid var(--border-color)' }}>
+            <img
+              src={activeImage}
+              alt="Amberleaf Restaurant Interior"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                borderRadius: '12px',
+                transition: 'all 0.5s ease',
+              }}
+            />
+          </div>
+          {/* Thumbnails Row */}
+          <div
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              border: '1px solid var(--border-color)',
-              borderRadius: '12px',
+              display: 'flex',
+              gap: '0.5rem',
+              overflowX: 'auto',
+              paddingBottom: '0.4rem',
             }}
-          />
+          >
+            {showcaseImages.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveImage(img)}
+                style={{
+                  width: '60px',
+                  height: '45px',
+                  borderRadius: '6px',
+                  overflow: 'hidden',
+                  border: activeImage === img ? '2px solid var(--accent-gold)' : '1px solid var(--border-light)',
+                  padding: 0,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'border-color 0.2s ease',
+                  backgroundColor: '#000',
+                }}
+              >
+                <img src={img} alt={`Thumbnail ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </button>
+            ))}
+          </div>
         </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
             Dine-In Ambiance
@@ -188,7 +233,7 @@ export const Home: React.FC = () => {
             Our Balgarden Sanctuary
           </h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.7' }}>
-            Step into a space where modern glass architecture meets warm, cozy wooden accents. Designed specifically for group gatherings, family dinners, and peaceful solo dining. Every corner is bathed in customized amber-gold lighting to elevate your fine dining experience.
+            Step into a space where modern glass architecture meets warm, cozy wooden accents. Designed specifically for group gatherings, family dinners, and peaceful solo dining. Scroll through our real photo showcase to preview our warm lighting and dining spaces.
           </p>
           <a
             href="#/gallery"
@@ -203,7 +248,7 @@ export const Home: React.FC = () => {
               marginTop: '0.5rem',
             }}
           >
-            Explore Vibe Gallery &rarr;
+            Explore Full Gallery &rarr;
           </a>
         </div>
       </div>
