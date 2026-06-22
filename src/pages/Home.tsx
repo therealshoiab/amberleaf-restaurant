@@ -5,7 +5,7 @@ import { ArrowRight, Star, Clock, Utensils, Calendar } from 'lucide-react';
 
 export const Home: React.FC = () => {
   return (
-    <div className="page-container" style={{ minHeight: 'calc(100vh - 80px)' }}>
+    <div className="page-container">
       <SEO
         title="Home"
         description="Welcome to Amberleaf Restaurant in Srinagar. Enjoy modern fine dining, authentic Kashmiri specialties, and artisanal mocktails in an elegant glassmorphic ambiance."
@@ -16,7 +16,7 @@ export const Home: React.FC = () => {
           display: 'grid',
           gridTemplateColumns: '1fr',
           gap: '3rem',
-          alignItems: 'center',
+          alignItems: 'start',
           flex: 1,
           paddingTop: '2rem',
         }}
