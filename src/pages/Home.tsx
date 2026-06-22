@@ -253,6 +253,137 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
+      {/* Visual Stories - 5 Video Reels Preview */}
+      <div
+        style={{
+          marginTop: '3.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem',
+          animation: 'fadeIn 1s ease forwards',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+              Culinary Motion
+            </span>
+            <h3 style={{ fontSize: '1.8rem', color: 'var(--text-primary)', margin: '0.25rem 0 0 0' }}>
+              Stories from the Kitchen & Lounge
+            </h3>
+          </div>
+          <a
+            href="#/gallery"
+            style={{
+              color: 'var(--accent-gold)',
+              textDecoration: 'none',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+            }}
+          >
+            All Videos &rarr;
+          </a>
+        </div>
+
+        {/* Videos Horizontal Row */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '1rem',
+            overflowX: 'auto',
+            paddingBottom: '1rem',
+            scrollbarWidth: 'thin',
+            width: '100%',
+          }}
+          className="home-videos-row"
+        >
+          {[
+            { id: 's1', url: './images/s1.mp4', caption: 'Chef plating signature Wazwan' },
+            { id: 's2', url: './images/s2.mp4', caption: 'Premium espresso brews' },
+            { id: 's4', url: './images/s4.mp4', caption: 'Saffron Cooler Mocktail' },
+            { id: 's5', url: './images/s5.mp4', caption: 'Mutton seekhs roasting' },
+            { id: 's7', url: './images/s7.mp4', caption: 'Fresh artisan coffee beans' },
+          ].map((vid) => (
+            <div
+              key={vid.id}
+              className="glass-panel"
+              style={{
+                padding: '0.5rem',
+                borderRadius: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem',
+                minWidth: '200px',
+                width: '200px',
+                flexShrink: 0,
+                cursor: 'pointer',
+                position: 'relative',
+              }}
+              onClick={() => { window.location.hash = '#/gallery'; }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  height: '280px',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  backgroundColor: '#000',
+                }}
+              >
+                <video
+                  src={vid.url}
+                  loop
+                  muted
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.play().catch(err => console.log(err)); }}
+                  onMouseLeave={(e) => { e.currentTarget.pause(); }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '0.5rem',
+                    right: '0.5rem',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontSize: '0.7rem',
+                  }}
+                >
+                  ▶
+                </div>
+              </div>
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  color: 'var(--text-secondary)',
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  padding: '0.2rem 0',
+                }}
+              >
+                {vid.caption}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <style>{`
         @media (min-width: 1024px) {
           .hero-grid {

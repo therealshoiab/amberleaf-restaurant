@@ -211,18 +211,22 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
         <div
-          className="glass-panel"
           style={{
             position: 'absolute',
             top: '85px',
             left: '1rem',
             right: '1rem',
-            padding: '1.5rem',
+            padding: '1.8rem',
             display: 'flex',
             flexDirection: 'column',
             gap: '1rem',
             zIndex: 999,
             borderRadius: '12px',
+            backgroundColor: 'rgba(8, 18, 13, 0.97)', /* Extremely opaque for luxury feel */
+            backdropFilter: 'blur(45px)', /* High-end blur */
+            WebkitBackdropFilter: 'blur(45px)',
+            border: '1px solid var(--border-color)',
+            boxShadow: '0 15px 45px rgba(0, 0, 0, 0.75), inset 0 0 15px rgba(197, 160, 89, 0.05)',
             animation: 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
           }}
         >
@@ -261,6 +265,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
           }
         }
         @media (max-width: 767px) {
+          .glass-navbar {
+            padding: 0 1rem !important;
+          }
           .mobile-menu-trigger {
             display: flex !important;
           }

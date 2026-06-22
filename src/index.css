@@ -11,11 +11,11 @@
   --accent-gold-rgb: 197, 160, 89;
   --accent-gold-hover: #d5b36e;
   --accent-amber: #8e6d30; /* Muted Bronze Gold */
-  --border-color: rgba(197, 160, 89, 0.2);
+  --border-color: rgba(197, 160, 89, 0.22);
   --border-light: rgba(255, 255, 255, 0.04);
   --shadow-color: rgba(0, 0, 0, 0.85);
-  --navbar-bg: rgba(4, 9, 6, 0.75);
-  --glass-bg: rgba(8, 18, 13, 0.65);
+  --navbar-bg: rgba(4, 9, 6, 0.94); /* High Opacity to block underlying text */
+  --glass-bg: rgba(8, 18, 13, 0.91); /* High Opacity for luxury panels */
   --glass-glow: rgba(197, 160, 89, 0.02);
 }
 
@@ -33,8 +33,8 @@
   --border-color: rgba(179, 141, 71, 0.22);
   --border-light: rgba(18, 33, 24, 0.05);
   --shadow-color: rgba(18, 33, 24, 0.05);
-  --navbar-bg: rgba(251, 250, 247, 0.75);
-  --glass-bg: rgba(244, 242, 235, 0.75);
+  --navbar-bg: rgba(251, 250, 247, 0.95); /* High Opacity */
+  --glass-bg: rgba(244, 242, 235, 0.92); /* High Opacity */
   --glass-glow: rgba(179, 141, 71, 0.01);
 }
 
@@ -43,6 +43,11 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html, body, #root {
+  overflow-x: hidden;
+  width: 100%;
 }
 
 html {
@@ -93,19 +98,19 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 /* Glassmorphism Styles */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid var(--border-color);
-  box-shadow: 0 8px 32px 0 var(--shadow-color), inset 0 0 12px var(--glass-glow);
+  box-shadow: 0 12px 40px 0 var(--shadow-color), inset 0 0 12px var(--glass-glow);
   border-radius: 16px;
 }
 
 .glass-navbar {
   background: var(--navbar-bg);
-  backdrop-filter: blur(25px) saturate(200%);
-  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
   border-bottom: 1px solid var(--border-color);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
 }
 
 .glass-card {
@@ -188,9 +193,11 @@ h1, h2, h3, h4, h5, h6, .font-serif {
   display: flex;
   flex-direction: column;
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding-left: 20px;
   padding-right: 20px;
+  box-sizing: border-box;
 }
 
 /* Animations */

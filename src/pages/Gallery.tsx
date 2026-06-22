@@ -421,8 +421,9 @@ export const Gallery: React.FC = () => {
       <div
         style={{
           display: 'flex',
+          flexWrap: 'wrap',
           justifyContent: 'center',
-          gap: '1rem',
+          gap: '0.75rem',
           marginBottom: '3rem',
           animation: 'fadeIn 1s ease forwards',
         }}
