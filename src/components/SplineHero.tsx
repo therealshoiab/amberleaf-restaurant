@@ -46,7 +46,7 @@ export const SplineHero: React.FC = () => {
         width: '100%',
         height: '100%',
         position: 'relative',
-        backgroundImage: 'url("./images/amberleaf-storefront.png")',
+        backgroundImage: 'url("./images/amberleaf-vibe.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         borderRadius: '16px',

@@ -154,6 +154,60 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
+      {/* Ambience Showcase Section */}
+      <div
+        className="glass-panel ambience-grid"
+        style={{
+          marginTop: '3.5rem',
+          padding: '2.5rem',
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: '2.5rem',
+          alignItems: 'center',
+          animation: 'fadeIn 1s ease forwards',
+        }}
+      >
+        <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', height: '350px' }}>
+          <img
+            src="./images/amberleaf-vibe.jpg"
+            alt="Amberleaf Restaurant Interior"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              border: '1px solid var(--border-color)',
+              borderRadius: '12px',
+            }}
+          />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+            Dine-In Ambiance
+          </span>
+          <h3 style={{ fontSize: '1.8rem', color: 'var(--text-primary)', margin: 0 }}>
+            Our Balgarden Sanctuary
+          </h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.7' }}>
+            Step into a space where modern glass architecture meets warm, cozy wooden accents. Designed specifically for group gatherings, family dinners, and peaceful solo dining. Every corner is bathed in customized amber-gold lighting to elevate your fine dining experience.
+          </p>
+          <a
+            href="#/gallery"
+            style={{
+              color: 'var(--accent-gold)',
+              textDecoration: 'none',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              marginTop: '0.5rem',
+            }}
+          >
+            Explore Vibe Gallery &rarr;
+          </a>
+        </div>
+      </div>
+
       <style>{`
         @media (min-width: 1024px) {
           .hero-grid {
@@ -161,6 +215,11 @@ export const Home: React.FC = () => {
           }
           .hero-canvas-container {
             height: 550px !important;
+          }
+        }
+        @media (min-width: 768px) {
+          .ambience-grid {
+            grid-template-columns: 1.1fr 0.9fr !important;
           }
         }
       `}</style>

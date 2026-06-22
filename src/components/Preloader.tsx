@@ -55,26 +55,18 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     >
       <div style={{ position: 'relative', marginBottom: '2.5rem' }}>
         {/* SVG Recreated Gold Logo inside Preloader */}
-        <svg width="100" height="100" viewBox="0 0 100 100" style={{ transform: 'scale(1.2)' }}>
-          <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(212, 175, 55, 0.1)" strokeWidth="1" />
-          
-          {/* Outer Laurel Wreath elements */}
-          <path d="M25,50 C25,35 35,25 50,25" fill="none" stroke="#d4af37" strokeWidth="1.5" strokeDasharray="3,3" />
-          <path d="M75,50 C75,35 65,25 50,25" fill="none" stroke="#d4af37" strokeWidth="1.5" strokeDasharray="3,3" />
-          <path d="M25,50 C25,65 35,75 50,75" fill="none" stroke="#d4af37" strokeWidth="1.5" strokeDasharray="3,3" />
-          <path d="M75,50 C75,65 65,75 50,75" fill="none" stroke="#d4af37" strokeWidth="1.5" strokeDasharray="3,3" />
-          
-          {/* Crossed Cutlery */}
-          {/* Fork */}
-          <path d="M43,62 L43,50 M40,50 L46,50 M40,50 L40,43 M46,43 L46,50 M43,41 L43,50" fill="none" stroke="#d4af37" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M43,62 L38,67" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" />
-          {/* Spoon */}
-          <path d="M57,62 L57,48" stroke="#d4af37" strokeWidth="1.5" strokeLinecap="round" />
-          <ellipse cx="57" cy="43" rx="4" ry="6" fill="none" stroke="#d4af37" strokeWidth="1.5" />
-          <path d="M57,62 L62,67" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" />
-          {/* Center line decoration */}
-          <circle cx="50" cy="54" r="2.5" fill="#d4af37" />
-        </svg>
+        <img
+          src="./images/logo.png"
+          alt="Amberleaf Logo"
+          style={{
+            width: '90px',
+            height: '90px',
+            borderRadius: '50%',
+            border: '2px solid var(--accent-gold)',
+            boxShadow: '0 0 20px rgba(212, 175, 55, 0.25)',
+            objectFit: 'cover',
+          }}
+        />
 
         {/* Outer glowing spinner */}
         <div

@@ -73,17 +73,17 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
           textDecoration: 'none',
         }}
       >
-        <svg width="40" height="40" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="46" fill="none" stroke="var(--accent-gold)" strokeWidth="2" />
-          <path d="M25,50 C25,35 35,25 50,25" fill="none" stroke="var(--accent-gold)" strokeWidth="1.5" strokeDasharray="3,3" />
-          <path d="M75,50 C75,35 65,25 50,25" fill="none" stroke="var(--accent-gold)" strokeWidth="1.5" strokeDasharray="3,3" />
-          <path d="M43,62 L43,50 M40,50 L46,50 M40,50 L40,43 M46,43 L46,50 M43,41 L43,50" fill="none" stroke="var(--accent-gold)" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M43,62 L38,67" stroke="var(--accent-gold)" strokeWidth="2" strokeLinecap="round" />
-          <path d="M57,62 L57,48" stroke="var(--accent-gold)" strokeWidth="1.5" strokeLinecap="round" />
-          <ellipse cx="57" cy="43" rx="4" ry="6" fill="none" stroke="var(--accent-gold)" strokeWidth="1.5" />
-          <path d="M57,62 L62,67" stroke="var(--accent-gold)" strokeWidth="2" strokeLinecap="round" />
-          <circle cx="50" cy="54" r="2.5" fill="var(--accent-gold)" />
-        </svg>
+        <img
+          src="./images/logo.png"
+          alt="Amberleaf Logo"
+          style={{
+            width: '45px',
+            height: '45px',
+            borderRadius: '50%',
+            border: '1px solid var(--accent-gold)',
+            objectFit: 'cover',
+          }}
+        />
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <span
             style={{
