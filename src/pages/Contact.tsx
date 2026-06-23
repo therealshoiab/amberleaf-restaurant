@@ -14,10 +14,7 @@ export const Contact: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submittingStep, setSubmittingStep] = useState(0);
   const [formError, setFormError] = useState('');
-  const [bookingRef, setBookingRef] = useState('');
-  const [assignedTable, setAssignedTable] = useState('');
 
   const handleSubmitBooking = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,42 +35,32 @@ export const Contact: React.FC = () => {
 
     setFormError('');
     setIsSubmitting(true);
-    setSubmittingStep(1);
 
-    // Formulate variables
-    const randomRef = 'AMB-' + Math.floor(10000 + Math.random() * 90000) + '-' + date.split('-')[0];
-    const tables = [
-      'Table 4 (Balgarden Balcony View)',
-      'Table 8 (Sanctuary Garden Booth)',
-      'Table 12 (Interior Glass Atrium)',
-      'Table 16 (Family Executive Area)',
-      'Table 2 (Cosy Corner Lounge)',
-    ];
-    const randomTable = tables[Math.floor(Math.random() * tables.length)];
+    const message = `Amberleaf Restaurant Reservation Request:
+• Name: ${name}
+• Phone: ${phone}
+• Guests: ${guests} ${parseInt(guests) === 1 ? 'Person' : 'Persons'}
+• Date: ${date}
+• Time: ${time}
+• Notes: ${notes || 'None'}`;
 
-    setBookingRef(randomRef);
-    setAssignedTable(randomTable);
+    const waUrl = `https://wa.me/917780938743?text=${encodeURIComponent(message)}`;
 
-    // Multi-stage luxury booking progress
-    setTimeout(() => {
-      setSubmittingStep(2);
-      setTimeout(() => {
-        setSubmittingStep(3);
-        setTimeout(() => {
-          setSubmittingStep(4);
-          setTimeout(() => {
-            setIsSubmitting(false);
-            setIsSubmitted(true);
-            // Trigger canvas-confetti
-            confetti({
-              particleCount: 150,
-              spread: 80,
-              origin: { y: 0.6 }
-            });
-          }, 1000);
-        }, 1200);
-      }, 1200);
-    }, 1200);
+    // Popup alert message
+    alert("Reservation request sent!");
+
+    // Redirect to WhatsApp
+    window.open(waUrl, '_blank');
+
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+
+    // Trigger canvas-confetti
+    confetti({
+      particleCount: 150,
+      spread: 80,
+      origin: { y: 0.6 }
+    });
   };
 
   return (
@@ -222,50 +209,6 @@ export const Contact: React.FC = () => {
                   }}
                 />
               </div>
-
-              {/* Progress Text & Stage Detail */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', width: '100%', maxWidth: '320px' }}>
-                <span
-                  style={{
-                    fontSize: '0.75rem',
-                    color: 'var(--accent-gold)',
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                    fontWeight: 700,
-                  }}
-                >
-                  Securing Reservation
-                </span>
-                
-                <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: '1.4' }}>
-                  {submittingStep === 1 && "Connecting to Amberleaf Reservation Engine..."}
-                  {submittingStep === 2 && `Analyzing table availability for ${guests} ${parseInt(guests) === 1 ? 'guest' : 'guests'}...`}
-                  {submittingStep === 3 && "Dispatching reservation directly to desk +91 7780938743..."}
-                  {submittingStep === 4 && "Allocating table and signing your luxury pass..."}
-                </h4>
-
-                {/* Progress Bar Indicator */}
-                <div
-                  style={{
-                    width: '100%',
-                    height: '2px',
-                    backgroundColor: 'var(--border-light)',
-                    borderRadius: '2px',
-                    overflow: 'hidden',
-                    marginTop: '0.5rem',
-                  }}
-                >
-                  <div
-                    style={{
-                      height: '100%',
-                      backgroundColor: 'var(--accent-gold)',
-                      boxShadow: '0 0 10px var(--accent-gold)',
-                      transition: 'width 0.8s ease',
-                      width: `${(submittingStep / 4) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
             </div>
           ) : isSubmitted ? (
             <div
@@ -273,7 +216,9 @@ export const Contact: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                textAlign: 'center',
                 animation: 'fadeIn 0.6s ease forwards',
+                padding: '2rem 1rem',
               }}
             >
               <div
@@ -290,71 +235,36 @@ export const Contact: React.FC = () => {
               >
                 <Check size={32} />
               </div>
-              <h3 style={{ fontSize: '1.5rem', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Booking Confirmed</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-                Your table has been reserved directly at our desk (+91 7780938743).
+              <h3 style={{ fontSize: '1.6rem', color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Reservation Request Sent!</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem', maxWidth: '400px' }}>
+                We have opened WhatsApp to send your details directly to our booking desk at <strong>+91 7780938743</strong>. Please click send in WhatsApp to finalize.
               </p>
 
-              {/* Luxury Ticket Card */}
-              <div
-                className="ticket-glow"
-                style={{
-                  width: '100%',
-                  background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
-                  border: '1px solid var(--accent-gold)',
-                  borderRadius: '12px',
-                  padding: '1.5rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)',
-                }}
-              >
-                {/* Decorative Side Cuts */}
-                <div style={{ position: 'absolute', left: '-10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'var(--bg-secondary)', borderRight: '1px solid var(--border-color)' }} />
-                <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'var(--bg-secondary)', borderLeft: '1px solid var(--border-color)' }} />
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed var(--border-color)', paddingBottom: '0.75rem', fontSize: '0.85rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Reservation Pass</span>
-                  <strong style={{ color: 'var(--accent-gold)', letterSpacing: '0.05em' }}>{bookingRef}</strong>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.9rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Guest Name</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{name}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Guests Count</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{guests} {parseInt(guests) === 1 ? 'Person' : 'Persons'}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Date & Time</span>
-                    <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{date} at {time}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--border-color)', paddingTop: '0.75rem' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Assigned Table</span>
-                    <span style={{ color: 'var(--accent-gold)', fontWeight: 700 }}>{assignedTable}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                <button
-                  onClick={() => setIsSubmitted(false)}
-                  className="btn-secondary"
-                  style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}
-                >
-                  Book Another
-                </button>
-                <button
-                  onClick={() => window.print()}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', width: '100%', maxWidth: '280px' }}>
+                <a
+                  href={`https://wa.me/917780938743?text=${encodeURIComponent(`Amberleaf Restaurant Reservation Request:\n• Name: ${name}\n• Phone: ${phone}\n• Guests: ${guests}\n• Date: ${date}\n• Time: ${time}\n• Notes: ${notes || 'None'}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="btn-primary"
-                  style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}
+                  style={{ gap: '0.5rem', textDecoration: 'none' }}
                 >
-                  Print Ticket
+                  Open WhatsApp Again
+                </a>
+                <button
+                  onClick={() => {
+                    setName('');
+                    setPhone('');
+                    setEmail('');
+                    setGuests('2');
+                    setDate('');
+                    setTime('19:00');
+                    setNotes('');
+                    setIsSubmitted(false);
+                  }}
+                  className="btn-secondary"
+                  style={{ padding: '0.8rem 1.8rem', fontSize: '0.95rem' }}
+                >
+                  Book Another Table
                 </button>
               </div>
             </div>
