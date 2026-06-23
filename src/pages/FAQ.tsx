@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 
@@ -7,7 +8,7 @@ interface FAQItem {
   answer: string;
 }
 
-export const FAQ: React.FC = () => {
+export const FAQ: React.FC = React.memo(() => {
   const [openIndex, setOpenIndex] = useState<number | null>(0); // Open the first item by default
 
   const faqItems: FAQItem[] = [
@@ -45,6 +46,15 @@ export const FAQ: React.FC = () => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const scrollSectionVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
+    }
+  };
+
   return (
     <div className="page-container">
       <SEO
@@ -53,7 +63,12 @@ export const FAQ: React.FC = () => {
       />
 
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '4rem' }} className="animate-fade-in">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        style={{ textAlign: 'center', marginBottom: '4rem' }}
+      >
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -74,17 +89,20 @@ export const FAQ: React.FC = () => {
             margin: '1rem auto 0 auto',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Accordion list */}
-      <div
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
         style={{
           maxWidth: '800px',
           margin: '0 auto',
           display: 'flex',
           flexDirection: 'column',
           gap: '1rem',
-          animation: 'fadeIn 0.8s ease forwards',
         }}
       >
         {faqItems.map((item, index) => {
@@ -158,7 +176,7 @@ export const FAQ: React.FC = () => {
             </div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
-};
+});

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { SplineHero } from '../components/SplineHero';
 import { SEO } from '../components/SEO';
 import { ArrowRight, Star, Clock, Utensils, Calendar } from 'lucide-react';
@@ -88,13 +89,27 @@ export const Home: React.FC = () => {
     };
   }, []);
 
+  // Framer Motion entrance animations for sections
+  const scrollSectionVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
+    }
+  };
+
   return (
-    <div className="page-container">
+    <div className="page-container" style={{ position: 'relative' }}>
       <SEO
         title="Home"
         description="Welcome to Amberleaf Restaurant in Srinagar. Enjoy modern fine dining, authentic Kashmiri specialties, and artisanal mocktails in an elegant glassmorphic ambiance."
       />
       
+      {/* 1. Film Grain Noise Overlay */}
+      <div className="noise-overlay" />
+
+      {/* Hero Section */}
       <div
         style={{
           display: 'grid',
@@ -108,7 +123,6 @@ export const Home: React.FC = () => {
       >
         {/* Left Panel: Content */}
         <div
-          className="animate-fade-in"
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -157,7 +171,11 @@ export const Home: React.FC = () => {
 
           {/* Heading and Tagline */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <h1
+            {/* Cinematic Clippath Reveal Animation */}
+            <motion.h1
+              initial={{ clipPath: 'inset(0 100% 0 0)' }}
+              animate={{ clipPath: 'inset(0 0% 0 0)' }}
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
               style={{
                 fontSize: 'clamp(1.8rem, 5vw, 3.5rem)',
                 lineHeight: 1.1,
@@ -168,7 +186,8 @@ export const Home: React.FC = () => {
               <span className="text-gold" style={{ display: 'inline-block', position: 'relative' }}>
                 Refined Elegance
               </span>
-            </h1>
+            </motion.h1>
+            
             <p
               style={{
                 fontSize: '1.1rem',
@@ -209,6 +228,7 @@ export const Home: React.FC = () => {
               marginTop: '1.5rem',
               borderTop: '1px solid var(--border-light)',
               paddingTop: '1.5rem',
+              width: '100%',
             }}
           >
             <div>
@@ -226,7 +246,7 @@ export const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Panel: 3D Spline Canvas or store fallback */}
+        {/* Right Panel: 3D Spline Canvas */}
         <div
           style={{
             height: '450px',
@@ -239,17 +259,37 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Ambience Showcase Section */}
-      <div
+      {/* 2. Infinite Horizontal Marquee Ticker */}
+      <div className="marquee-container" style={{ margin: '3.5rem 0' }}>
+        <div className="marquee-content">
+          <span className="marquee-item">
+            &bull; EST. 2023 &bull; SRINAGAR, KASHMIR &bull; FINE DINING &bull; ARTISANAL MOCKTAILS &bull; KASHMIRI CUISINE &bull;&nbsp;
+          </span>
+          <span className="marquee-item">
+            &bull; EST. 2023 &bull; SRINAGAR, KASHMIR &bull; FINE DINING &bull; ARTISANAL MOCKTAILS &bull; KASHMIRI CUISINE &bull;&nbsp;
+          </span>
+          <span className="marquee-item">
+            &bull; EST. 2023 &bull; SRINAGAR, KASHMIR &bull; FINE DINING &bull; ARTISANAL MOCKTAILS &bull; KASHMIRI CUISINE &bull;&nbsp;
+          </span>
+          <span className="marquee-item">
+            &bull; EST. 2023 &bull; SRINAGAR, KASHMIR &bull; FINE DINING &bull; ARTISANAL MOCKTAILS &bull; KASHMIRI CUISINE &bull;&nbsp;
+          </span>
+        </div>
+      </div>
+
+      {/* Ambience Showcase Section (Scroll triggered) */}
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
         className="glass-panel ambience-grid"
         style={{
-          marginTop: '3.5rem',
-          padding: 'clamp(1.2rem, 5vw, 2.5rem)', /* Responsive padding to fit small viewports */
+          padding: 'clamp(1.2rem, 5vw, 2.5rem)',
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr)', /* Avoid horizontal grid stretch */
+          gridTemplateColumns: 'minmax(0, 1fr)',
           gap: '2.5rem',
           alignItems: 'center',
-          animation: 'fadeIn 1s ease forwards',
         }}
       >
         {/* Large Preview & Thumbnails Container */}
@@ -258,6 +298,7 @@ export const Home: React.FC = () => {
             <img
               src={activeImage}
               alt="Amberleaf Restaurant Interior"
+              loading="lazy"
               style={{
                 width: '100%',
                 height: '100%',
@@ -293,7 +334,7 @@ export const Home: React.FC = () => {
                   backgroundColor: '#000',
                 }}
               >
-                <img src={img} alt={`Thumbnail ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={img} alt={`Thumbnail ${i+1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </button>
             ))}
           </div>
@@ -325,16 +366,19 @@ export const Home: React.FC = () => {
             Explore Full Gallery &rarr;
           </a>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Visual Stories - 5 Video Reels Preview */}
-      <div
+      {/* Visual Stories - 5 Video Reels Preview (Scroll triggered) */}
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
         style={{
           marginTop: '3.5rem',
           display: 'flex',
           flexDirection: 'column',
           gap: '1.5rem',
-          animation: 'fadeIn 1s ease forwards',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -376,24 +420,23 @@ export const Home: React.FC = () => {
           className="home-videos-row"
         >
           {[
-            { id: 's1', url: './images/s1.mp4', caption: 'Chef plating signature Wazwan' },
-            { id: 's2', url: './images/s2.mp4', caption: 'Premium espresso brews' },
-            { id: 's4', url: './images/s4.mp4', caption: 'Saffron Cooler Mocktail' },
-            { id: 's5', url: './images/s5.mp4', caption: 'Mutton seekhs roasting' },
-            { id: 's7', url: './images/s7.mp4', caption: 'Fresh artisan coffee beans' },
+            { id: 's1', url: './images/s1.mp4' },
+            { id: 's2', url: './images/s2.mp4' },
+            { id: 's4', url: './images/s4.mp4' },
+            { id: 's5', url: './images/s5.mp4' },
+            { id: 's7', url: './images/s7.mp4' },
           ].map((vid) => {
             const isActive = activeVideoId === vid.id;
             return (
               <div
                 key={vid.id}
-                className="glass-panel"
+                className="glass-panel interactive-card"
                 style={{
                   padding: '0.35rem',
                   borderRadius: '14px',
                   minWidth: '200px',
                   width: '200px',
                   flexShrink: 0,
-                  cursor: 'pointer',
                   position: 'relative',
                   border: isActive ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
                   boxShadow: isActive ? '0 8px 24px rgba(197, 160, 89, 0.2)' : 'none',
@@ -457,8 +500,9 @@ export const Home: React.FC = () => {
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
+      {/* Inline media query style overrides */}
       <style>{`
         @media (min-width: 1024px) {
           .hero-grid {

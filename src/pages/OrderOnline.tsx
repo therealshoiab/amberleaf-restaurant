@@ -1,8 +1,18 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { ShoppingBag, PhoneCall, CheckCircle, ExternalLink, MapPin } from 'lucide-react';
 
-export const OrderOnline: React.FC = () => {
+export const OrderOnline: React.FC = React.memo(() => {
+  const scrollSectionVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
+    }
+  };
+
   return (
     <div className="page-container">
       <SEO
@@ -11,7 +21,12 @@ export const OrderOnline: React.FC = () => {
       />
 
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '4rem' }} className="animate-fade-in">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        style={{ textAlign: 'center', marginBottom: '4rem' }}
+      >
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -32,10 +47,14 @@ export const OrderOnline: React.FC = () => {
             margin: '1rem auto 0 auto',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Cards container */}
-      <div
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
@@ -51,7 +70,6 @@ export const OrderOnline: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             gap: '1.5rem',
-            animation: 'fadeIn 0.8s ease forwards',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
@@ -168,7 +186,6 @@ export const OrderOnline: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             gap: '1.5rem',
-            animation: 'fadeIn 0.8s ease forwards',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
@@ -229,7 +246,7 @@ export const OrderOnline: React.FC = () => {
             <span>Curbside pickup coordinates are free from street parking fees.</span>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
-};
+});

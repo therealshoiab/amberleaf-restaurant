@@ -1,8 +1,9 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { Award, Compass, Leaf } from 'lucide-react';
 
-export const About: React.FC = () => {
+export const About: React.FC = React.memo(() => {
   const timelineEvents = [
     {
       year: '2021',
@@ -30,6 +31,15 @@ export const About: React.FC = () => {
       desc: 'Launched our premium online reservation system and expanded our cafe lounge, creating a high-end social hub for travelers and food critics.',
     },
   ];
+
+  const scrollSectionVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
+    }
+  };
 
   return (
     <div className="page-container">
@@ -62,7 +72,11 @@ export const About: React.FC = () => {
       </div>
 
       {/* Culinary Values Cards */}
-      <div
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
@@ -99,11 +113,15 @@ export const About: React.FC = () => {
             A space curated for groups, kids, and solo diners alike. Enjoy premium table service under customized amber lighting.
           </p>
         </div>
-      </div>
+      </motion.div>
 
       {/* History Timeline section */}
       <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
-        <h3
+        <motion.h3
+          variants={scrollSectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
           style={{
             textAlign: 'center',
             fontSize: '1.8rem',
@@ -112,7 +130,7 @@ export const About: React.FC = () => {
           }}
         >
           Our Journey Through Time
-        </h3>
+        </motion.h3>
 
         {/* Central timeline vertical line */}
         <div
@@ -134,8 +152,12 @@ export const About: React.FC = () => {
           {timelineEvents.map((event, index) => {
             const isEven = index % 2 === 0;
             return (
-              <div
+              <motion.div
                 key={event.year}
+                variants={scrollSectionVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -170,7 +192,6 @@ export const About: React.FC = () => {
                     textAlign: isEven ? 'right' : 'left',
                     marginLeft: isEven ? '0' : 'auto',
                     marginRight: isEven ? 'auto' : '0',
-                    animation: 'fadeIn 0.6s ease forwards',
                   }}
                 >
                   <span
@@ -187,7 +208,7 @@ export const About: React.FC = () => {
                   <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem', fontSize: '1.15rem' }}>{event.title}</h4>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.5' }}>{event.desc}</p>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
@@ -216,4 +237,5 @@ export const About: React.FC = () => {
       `}</style>
     </div>
   );
-};
+});
+export default About;

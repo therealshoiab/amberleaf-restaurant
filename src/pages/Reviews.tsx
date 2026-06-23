@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { SEO } from '../components/SEO';
-import { Star, MessageSquare, Send, User } from 'lucide-react';
+import { Star, Send } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface Review {
@@ -13,7 +13,7 @@ interface Review {
   image?: string; // base64 string
 }
 
-export const Reviews: React.FC = () => {
+export const Reviews: React.FC = React.memo(() => {
   const [reviewsList, setReviewsList] = useState<Review[]>(() => {
     // 12 Detailed Primary Reviews
     const primaryReviews: Review[] = [
@@ -115,7 +115,6 @@ export const Reviews: React.FC = () => {
       },
     ];
 
-    // Programmatically generate 40 additional reviews to exceed the 50 reviews requirement
     const localNames = [
       'Showkat', 'Mehak', 'Bilal', 'Ishfaq', 'Sajad', 'Farooq', 'Zahid', 'Nadeem', 'Yasmin', 'Rubeena',
       'Muzaffar', 'Shabir', 'Tanveer', 'Firdous', 'Mushtaq', 'Rayees', 'Jahangir', 'Sameer', 'Aijaz', 'Hilal',
@@ -140,7 +139,7 @@ export const Reviews: React.FC = () => {
     
     const generatedReviews: Review[] = Array.from({ length: 42 }).map((_, index) => {
       const name = localNames[index % localNames.length] + ' ' + (index % 2 === 0 ? 'Bhat' : 'Dar');
-      const rating = index % 5 === 0 ? 4 : 5; // mostly 5 stars, some 4 stars
+      const rating = index % 5 === 0 ? 4 : 5;
       const dateOffsetDays = index + 10;
       const date = new Date(2026, 3, 20 - dateOffsetDays).toLocaleDateString('en-US', {
         month: 'long',
@@ -160,27 +159,63 @@ export const Reviews: React.FC = () => {
       };
     });
 
-    const savedCustom = localStorage.getItem('amberleaf_custom_reviews');
-    const customReviews: Review[] = savedCustom ? JSON.parse(savedCustom) : [];
+    const combined = [...primaryReviews, ...generatedReviews];
 
-    return [...customReviews, ...primaryReviews, ...generatedReviews];
+    // Load any custom reviews saved in localStorage
+    const savedCustom = localStorage.getItem('amberleaf_custom_reviews');
+    if (savedCustom) {
+      try {
+        const parsed = JSON.parse(savedCustom) as Review[];
+        return [...parsed, ...combined];
+      } catch (e) {
+        console.error('Failed parsing custom reviews:', e);
+      }
+    }
+    return combined;
   });
 
-  // Form State
-  const [newAuthor, setNewAuthor] = useState('');
+  const [activeFilter, setActiveFilter] = useState<'All' | 'Family Dining' | 'Solo Dining' | 'Group Outing'>('All');
+  const [newName, setNewName] = useState('');
+  const [newType, setNewType] = useState('Family Dining');
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState('');
-  const [newType, setNewType] = useState('Family Dining');
-  const [newImage, setNewImage] = useState('');
+  const [newImage, setNewImage] = useState(''); // base64 string
   const [formError, setFormError] = useState('');
 
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Auto-scroller carousel effect with pause-on-hover
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let intervalId: number;
+
+    const scroll = () => {
+      if (isPaused) return;
+      container.scrollTop += 0.75; // slow smooth vertical crawl
+      
+      // Wrap around when reaching the bottom
+      if (container.scrollTop + container.clientHeight >= container.scrollHeight - 1) {
+        container.scrollTop = 0;
+      }
+    };
+
+    intervalId = window.setInterval(scroll, 30);
+
+    return () => clearInterval(intervalId);
+  }, [isPaused]);
+
+  // Convert review image attachment to base64
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        setFormError('Image size should be less than 2MB.');
+        setFormError('Image size exceeds 2MB limit.');
         return;
       }
+      setFormError('');
       const reader = new FileReader();
       reader.onloadend = () => {
         setNewImage(reader.result as string);
@@ -189,22 +224,21 @@ export const Reviews: React.FC = () => {
     }
   };
 
-  // Form Submission
   const handleSubmitReview = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!newAuthor.trim()) {
+    if (!newName.trim()) {
       setFormError('Please enter your name.');
       return;
     }
-    if (!newComment.trim() || newComment.length < 10) {
-      setFormError('Please write a review comment (minimum 10 characters).');
+    if (!newComment.trim()) {
+      setFormError('Please enter a review comment.');
       return;
     }
 
-    const newReview: Review = {
-      id: `user-${Date.now()}`,
-      author: newAuthor,
+    const newReviewItem: Review = {
+      id: `custom-${Date.now()}`,
+      author: newName,
       rating: newRating,
       date: new Date().toLocaleDateString('en-US', {
         month: 'long',
@@ -216,43 +250,46 @@ export const Reviews: React.FC = () => {
       image: newImage || undefined,
     };
 
-    const updatedReviews = [newReview, ...reviewsList];
-    setReviewsList(updatedReviews);
-    
-    // Save user custom reviews to local storage
-    const customOnly = updatedReviews.filter(r => r.id.startsWith('user-'));
+    const updated = [newReviewItem, ...reviewsList];
+    setReviewsList(updated);
+
+    // Save custom reviews in localStorage (filter out generated/pre-loaded ones)
+    const customOnly = updated.filter((r) => r.id.startsWith('custom-'));
     localStorage.setItem('amberleaf_custom_reviews', JSON.stringify(customOnly));
 
-    setNewAuthor('');
-    setNewRating(5);
+    // Clear fields
+    setNewName('');
     setNewComment('');
-    setNewType('Family Dining');
+    setNewRating(5);
     setNewImage('');
     setFormError('');
 
-    // Trigger celebration confetti
+    // Confetti blast
     confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
+      particleCount: 120,
+      spread: 60,
+      origin: { y: 0.7 }
     });
   };
 
-  // Stats computation
-  const averageRating = useMemo(() => {
-    const sum = reviewsList.reduce((acc, curr) => acc + curr.rating, 0);
-    return (sum / reviewsList.length).toFixed(1);
-  }, [reviewsList]);
+  // Filter logic
+  const filteredReviews = useMemo(() => {
+    if (activeFilter === 'All') return reviewsList;
+    return reviewsList.filter((r) => r.type === activeFilter);
+  }, [reviewsList, activeFilter]);
 
   return (
-    <div className="page-container">
+    <div className="page-container" style={{ position: 'relative' }}>
       <SEO
         title="Guest Reviews"
-        description="Read what our diners say about Amberleaf Restaurant in Srinagar. Explore over 50 reviews on Kashmiri Wazwan and submit your own feedback."
+        description="Read what our diners say about Amberleaf Restaurant. Read testimonials about our Kashmiri Wazwan, hospitality, and glassmorphic cafe ambiance."
       />
 
+      {/* Film grain noise overlay */}
+      <div className="noise-overlay" />
+
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }} className="animate-fade-in">
+      <div style={{ textAlign: 'center', marginBottom: '3.5rem' }} className="animate-fade-in">
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -262,9 +299,9 @@ export const Reviews: React.FC = () => {
             fontWeight: 700,
           }}
         >
-          Diner Experiences
+          Diner Testimonials
         </span>
-        <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>Guest Reviews</h2>
+        <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>Guest Experience Reviews</h2>
         <div
           style={{
             width: '60px',
@@ -275,83 +312,55 @@ export const Reviews: React.FC = () => {
         />
       </div>
 
-      {/* Stats Summary Board */}
+      {/* Category filters */}
       <div
-        className="glass-panel"
         style={{
-          padding: '2rem',
-          marginBottom: '4rem',
           display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.6rem',
           flexWrap: 'wrap',
-          gap: '2rem',
-          textAlign: 'center',
+          marginBottom: '2.5rem',
         }}
+        className="animate-fade-in"
       >
-        <div>
-          <span style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--accent-gold)', display: 'block', lineHeight: 1 }}>
-            {averageRating}
-          </span>
-          <div style={{ display: 'flex', gap: '0.2rem', justifyContent: 'center', margin: '0.5rem 0' }}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} size={18} fill="var(--accent-gold)" stroke="var(--accent-gold)" />
-            ))}
-          </div>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Based on {reviewsList.length} reviews</span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-start' }} className="stats-bars">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.85rem' }}>
-            <span style={{ width: '50px' }}>5 Star</span>
-            <div style={{ width: '150px', height: '6px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div style={{ width: '90%', height: '100%', backgroundColor: 'var(--accent-gold)' }} />
-            </div>
-            <span>90%</span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.85rem' }}>
-            <span style={{ width: '50px' }}>4 Star</span>
-            <div style={{ width: '150px', height: '6px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div style={{ width: '10%', height: '100%', backgroundColor: 'var(--accent-gold)' }} />
-            </div>
-            <span>10%</span>
-          </div>
-        </div>
+        {['All', 'Family Dining', 'Solo Dining', 'Group Outing'].map((filter) => (
+          <button
+            key={filter}
+            className="gallery-tab-btn"
+            style={{
+              background: activeFilter === filter ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.02)',
+              color: activeFilter === filter ? '#000' : 'var(--text-primary)',
+              borderColor: activeFilter === filter ? 'var(--accent-gold)' : 'var(--border-light)',
+              borderRadius: '8px',
+              padding: '0.4rem 1.2rem',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+            }}
+            onClick={() => setActiveFilter(filter as any)}
+          >
+            {filter}
+          </button>
+        ))}
       </div>
 
+      {/* Two Columns Grid */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr',
           gap: '3rem',
-          alignItems: 'flex-start',
+          alignItems: 'start',
         }}
-        className="reviews-layout"
+        className="reviews-layout animate-fade-in"
       >
-        {/* Left Side: Submit Form */}
-        <div
-          className="glass-panel"
-          style={{
-            padding: '2rem',
-            position: 'sticky',
-            top: '100px',
-            zIndex: 10,
-          }}
-        >
-          <h3
-            style={{
-              fontSize: '1.4rem',
-              color: 'var(--text-primary)',
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-            }}
-          >
-            <MessageSquare size={20} style={{ color: 'var(--accent-gold)' }} />
-            Leave Your Feedback
-          </h3>
+        {/* Left Side: Submit Feedback Form */}
+        <div className="glass-panel" style={{ padding: '2rem' }}>
+          <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Share Your Experience</h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.8rem' }}>
+            We highly value your feedback. Let us know how we can elevate your next dining experience.
+          </p>
 
           <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
             {formError && (
@@ -360,14 +369,14 @@ export const Reviews: React.FC = () => {
               </div>
             )}
 
-            {/* Author Name */}
+            {/* Diner Name */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Full Name</label>
               <input
                 type="text"
-                placeholder="e.g. Aarif Bhat"
-                value={newAuthor}
-                onChange={(e) => setNewAuthor(e.target.value)}
+                placeholder="e.g. Bilal Bhat"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
                 style={{
                   padding: '0.75rem 1rem',
                   borderRadius: '6px',
@@ -382,18 +391,19 @@ export const Reviews: React.FC = () => {
 
             {/* Visit Type */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Dining Setup</label>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Dine-In Type</label>
               <select
                 value={newType}
                 onChange={(e) => setNewType(e.target.value)}
                 style={{
                   padding: '0.75rem 1rem',
                   borderRadius: '6px',
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  backgroundColor: 'rgba(0,0,0,0.5)',
                   border: '1px solid var(--border-color)',
                   color: 'var(--text-primary)',
                   fontSize: '0.9rem',
                   outline: 'none',
+                  cursor: 'pointer',
                 }}
               >
                 <option value="Family Dining">Family Dining</option>
@@ -462,7 +472,6 @@ export const Reviews: React.FC = () => {
                   borderRadius: '6px',
                   backgroundColor: 'rgba(0,0,0,0.1)',
                   position: 'relative',
-                  cursor: 'pointer'
                 }}
               >
                 <input
@@ -533,36 +542,55 @@ export const Reviews: React.FC = () => {
           </form>
         </div>
 
-        {/* Right Side: Reviews Scroll Container */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '750px', overflowY: 'auto', paddingRight: '0.5rem' }} className="reviews-list-container">
-          {reviewsList.map((review) => (
+        {/* Right Side: Luxury Editorial Pull-Quote Auto-scroller carousel */}
+        <div
+          ref={containerRef}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2rem',
+            maxHeight: '750px',
+            overflowY: 'hidden',
+            paddingRight: '0.5rem',
+            cursor: 'grab',
+          }}
+          className="reviews-list-container"
+        >
+          {filteredReviews.map((review) => (
             <div
               key={review.id}
               className="glass-panel"
               style={{
-                padding: '1.5rem',
-                borderWidth: '1px',
+                padding: '2.5rem 2rem',
+                border: '1px solid var(--border-color)',
                 transition: 'all 0.3s ease',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      padding: '0.4rem',
-                      borderRadius: '50%',
-                      display: 'flex',
-                    }}
-                  >
-                    <User size={14} style={{ color: 'var(--accent-gold)' }} />
-                  </div>
-                  <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{review.author}</span>
-                </div>
-              </div>
+              {/* Luxury Large Quote Mark */}
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '0.2rem',
+                  left: '1.2rem',
+                  fontSize: '5rem',
+                  fontFamily: "'Playfair Display', serif",
+                  lineHeight: '1',
+                  color: 'var(--accent-gold)',
+                  opacity: 0.22,
+                  pointerEvents: 'none',
+                }}
+              >
+                &ldquo;
+              </span>
 
               {/* Stars & Context badge */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', zIndex: 1 }}>
                 <div style={{ display: 'flex', gap: '0.1rem' }}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
@@ -589,14 +617,42 @@ export const Reviews: React.FC = () => {
                 </span>
               </div>
 
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.6' }}>
+              {/* Review Comment Quote - playfair Display Italic */}
+              <p
+                style={{
+                  color: 'var(--text-primary)',
+                  fontSize: '1rem',
+                  fontFamily: "'Playfair Display', serif",
+                  fontStyle: 'italic',
+                  lineHeight: '1.7',
+                  margin: '0.4rem 0',
+                  zIndex: 1,
+                }}
+              >
                 {review.comment}
               </p>
+
               {review.image && (
-                <div style={{ marginTop: '0.75rem', borderRadius: '8px', overflow: 'hidden', maxHeight: '200px', width: '100%', backgroundColor: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-light)' }}>
-                  <img src={review.image} alt="Diner food upload" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ zIndex: 1, borderRadius: '8px', overflow: 'hidden', maxHeight: '180px', width: '100%', border: '1px solid var(--border-light)' }}>
+                  <img src={review.image} alt="Diner food upload" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               )}
+
+              {/* Thin gold line & Author name */}
+              <div style={{ zIndex: 1, marginTop: '0.5rem' }}>
+                <div style={{ width: '40px', height: '1px', backgroundColor: 'var(--accent-gold)', marginBottom: '0.6rem', opacity: 0.6 }} />
+                <span
+                  style={{
+                    fontWeight: 700,
+                    color: 'var(--accent-gold)',
+                    fontSize: '0.85rem',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {review.author}
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -605,10 +661,10 @@ export const Reviews: React.FC = () => {
       <style>{`
         @media (min-width: 1024px) {
           .reviews-layout {
-            grid-template-columns: 0.9fr 1.1fr !important;
+            grid-template-columns: 1fr 1.2fr !important;
           }
         }
       `}</style>
     </div>
   );
-};
+});

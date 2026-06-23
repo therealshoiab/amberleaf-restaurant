@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { MapPin, Phone, Clock, Calendar, Check, Send } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export const Contact: React.FC = () => {
+export const Contact: React.FC = React.memo(() => {
   // Form State
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -23,7 +24,7 @@ export const Contact: React.FC = () => {
     if (!name.trim()) {
       setFormError('Please enter your name.');
       return;
-    }
+      }
     if (!phone.trim() || phone.length < 10) {
       setFormError('Please enter a valid phone number.');
       return;
@@ -57,6 +58,15 @@ export const Contact: React.FC = () => {
     });
   };
 
+  const scrollSectionVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
+    }
+  };
+
   return (
     <div className="page-container">
       <SEO
@@ -65,7 +75,12 @@ export const Contact: React.FC = () => {
       />
 
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '4rem' }} className="animate-fade-in">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        style={{ textAlign: 'center', marginBottom: '4rem' }}
+      >
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -86,17 +101,21 @@ export const Contact: React.FC = () => {
             margin: '1rem auto 0 auto',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Grid structure: Left Info & map, Right Form */}
-      <div
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr',
           gap: '3rem',
           alignItems: 'start',
         }}
-        className="contact-layout animate-fade-in"
+        className="contact-layout"
       >
         {/* Left Side: Contact Information & Map */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -362,7 +381,7 @@ export const Contact: React.FC = () => {
             </form>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Success Modal Popup Overlay */}
       {showSuccessModal && (
@@ -437,4 +456,4 @@ export const Contact: React.FC = () => {
       `}</style>
     </div>
   );
-};
+});

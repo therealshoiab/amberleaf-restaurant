@@ -11,9 +11,10 @@ interface MenuItem {
   isPopular?: boolean;
   isSignature?: boolean;
   isVegetarian?: boolean;
+  isChefsPick?: boolean;
 }
 
-export const Menu: React.FC = () => {
+export const Menu: React.FC = React.memo(() => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -37,6 +38,7 @@ export const Menu: React.FC = () => {
       description: 'Slow-cooked tender lamb chunks in a rich aromatic gravy flavored with Kashmiri maval (cockscomb) flowers, fennel, and dry ginger.',
       isPopular: true,
       isVegetarian: false,
+      isChefsPick: true,
     },
     {
       id: 'w2',
@@ -55,6 +57,7 @@ export const Menu: React.FC = () => {
       description: 'Pounded mutton rounds cooked in a rich, velvety curd and cashew gravy flavored with cardamoms and dry mint.',
       isSignature: true,
       isVegetarian: false,
+      isChefsPick: true,
     },
     {
       id: 'w4',
@@ -74,6 +77,7 @@ export const Menu: React.FC = () => {
       description: 'Spiced minced mutton skewered and roasted in a traditional clay tandoor. Served with mint chutney.',
       isPopular: true,
       isVegetarian: false,
+      isChefsPick: true,
     },
     {
       id: 't2',
@@ -126,6 +130,7 @@ export const Menu: React.FC = () => {
       description: 'Long-grain Basmati rice layered with spiced mutton chunks, saffron milk, and fried onions, cooked on dum.',
       isSignature: true,
       isVegetarian: false,
+      isChefsPick: true,
     },
     // Chinese & Starters
     {
@@ -154,6 +159,7 @@ export const Menu: React.FC = () => {
       description: 'Traditional green tea brewed with saffron strands, crushed green cardamoms, cinnamon, and slivered almonds.',
       isSignature: true,
       isVegetarian: true,
+      isChefsPick: true,
     },
     {
       id: 'b2',
@@ -175,25 +181,26 @@ export const Menu: React.FC = () => {
     // Desserts
     {
       id: 'd1',
-      name: 'Zafrani Phirni',
-      category: 'Desserts',
-      price: 150,
-      description: 'Traditional ground rice pudding infused with saffron, cardamom, and rose water, chilled in individual clay pots (kasoras).',
-      isPopular: true,
-      isVegetarian: true,
-    },
-    {
-      id: 'd2',
       name: 'Shahi Tukda Royal',
       category: 'Desserts',
       price: 180,
-      description: 'Golden fried bread slices soaked in saffron cardamon sugar syrup, topped with rich rabri and almond flakes.',
+      description: 'Crispy fried bread slices soaked in saffron sugar syrup and topped with milk rabri, pistachios, and silver leaf.',
       isSignature: true,
+      isVegetarian: true,
+      isChefsPick: true,
+    },
+    {
+      id: 'd2',
+      name: 'Zafrani Kulfi Firdaus',
+      category: 'Desserts',
+      price: 150,
+      description: 'Rich kulfi ice cream flavored with crushed saffron and cardamoms, topped with dynamic almond shavings.',
+      isPopular: true,
       isVegetarian: true,
     },
   ];
 
-  // Search & Filter Logic
+  // Filter logic
   const filteredItems = useMemo(() => {
     return menuItems.filter((item) => {
       const matchesSearch =
@@ -207,12 +214,12 @@ export const Menu: React.FC = () => {
   return (
     <div className="page-container">
       <SEO
-        title="Culinary Menu"
-        description="Browse the complete menu of Amberleaf Restaurant. Order online on Swiggy and Zomato or book a table. Explore our authentic Kashmiri Wazwan and signature desserts."
+        title="Menu"
+        description="Browse the complete menu of Amberleaf Restaurant in Srinagar. Explore our Kashmiri Wazwan, Tandoori starters, main courses, and mocktails."
       />
 
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: 'var(--section-margin)' }} className="animate-fade-in">
+      <div style={{ textAlign: 'center', marginBottom: '3rem' }} className="animate-fade-in">
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -222,9 +229,9 @@ export const Menu: React.FC = () => {
             fontWeight: 700,
           }}
         >
-          Our Offerings
+          Amberleaf Kitchen
         </span>
-        <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>The Culinary Menu</h2>
+        <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>Our Culinary Menu</h2>
         <div
           style={{
             width: '60px',
@@ -235,26 +242,18 @@ export const Menu: React.FC = () => {
         />
       </div>
 
-      {/* Control Panel: Search & Filter Tabs */}
+      {/* Search and Category Filter Bar */}
       <div
-        className="glass-panel"
         style={{
-          padding: 'var(--item-padding, 1.5rem)',
-          marginBottom: 'var(--section-margin)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--control-gap, 1.5rem)',
+          gap: '1.5rem',
+          marginBottom: '2rem',
         }}
+        className="animate-fade-in"
       >
-        {/* Search Bar */}
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: '500px',
-            margin: '0 auto',
-          }}
-        >
+        {/* Search Input Box */}
+        <div style={{ position: 'relative', width: '100%', maxWidth: '500px', margin: '0 auto' }}>
           <Search
             size={18}
             style={{
@@ -267,35 +266,35 @@ export const Menu: React.FC = () => {
           />
           <input
             type="text"
-            placeholder="Search for Rogan Josh, Kahwa, desserts..."
+            placeholder="Search our fine wazwan and beverages..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               width: '100%',
-              padding: '0.8rem 1rem 0.8rem 2.8rem',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(0, 0, 0, 0.2)',
+              padding: '0.75rem 1rem 0.75rem 2.8rem',
+              borderRadius: '9999px',
+              backgroundColor: 'rgba(0,0,0,0.15)',
               border: '1px solid var(--border-color)',
               color: 'var(--text-primary)',
               fontSize: '0.95rem',
               outline: 'none',
               transition: 'border-color 0.3s ease',
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--accent-gold)')}
-            onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-color)')}
+            onFocus={(e) => (e.target.style.borderColor = 'var(--accent-gold)')}
+            onBlur={(e) => (e.target.style.borderColor = 'var(--border-color)')}
           />
         </div>
 
-        {/* Filter Categories Chips */}
+        {/* Categories Carousel */}
         <div className="menu-categories-container">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
+              className="gallery-tab-btn"
               style={{
                 background: selectedCategory === cat ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.02)',
                 color: selectedCategory === cat ? '#000' : 'var(--text-primary)',
-                border: '1px solid',
                 borderColor: selectedCategory === cat ? 'var(--accent-gold)' : 'var(--border-light)',
                 borderRadius: '8px',
                 padding: '0.5rem 1.2rem',
@@ -398,7 +397,7 @@ export const Menu: React.FC = () => {
           {filteredItems.map((item) => (
             <div
               key={item.id}
-              className="glass-panel"
+              className="glass-panel shimmer-card"
               style={{
                 padding: 'var(--item-padding, 2rem)',
                 display: 'flex',
@@ -423,7 +422,26 @@ export const Menu: React.FC = () => {
                     {item.category}
                   </span>
                   
-                  <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                    {item.isChefsPick && (
+                      <span
+                        style={{
+                          backgroundColor: 'rgba(197, 160, 89, 0.15)',
+                          border: '1px solid var(--accent-gold)',
+                          color: 'var(--accent-gold)',
+                          fontSize: '0.65rem',
+                          fontWeight: 700,
+                          padding: '0.2rem 0.5rem',
+                          borderRadius: '4px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.25rem',
+                        }}
+                      >
+                        ✦ Chef's Pick
+                      </span>
+                    )}
+
                     {item.isSignature && (
                       <span
                         style={{
@@ -491,7 +509,7 @@ export const Menu: React.FC = () => {
                   }}
                 >
                   <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)' }}>{item.name}</h3>
-                  <span style={{ fontSize: '1.15rem', color: 'var(--accent-gold)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                  <span className="menu-price" style={{ fontSize: '1.15rem', whiteSpace: 'nowrap' }}>
                     ₹{item.price}
                   </span>
                 </div>
@@ -504,4 +522,4 @@ export const Menu: React.FC = () => {
       )}
     </div>
   );
-};
+});

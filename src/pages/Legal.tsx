@@ -1,8 +1,18 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { Eye, FileText } from 'lucide-react';
 
-export const Legal: React.FC = () => {
+export const Legal: React.FC = React.memo(() => {
+  const scrollSectionVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
+    }
+  };
+
   return (
     <div className="page-container" style={{ maxWidth: '900px' }}>
       <SEO
@@ -11,7 +21,12 @@ export const Legal: React.FC = () => {
       />
 
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '4rem' }} className="animate-fade-in">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        style={{ textAlign: 'center', marginBottom: '4rem' }}
+      >
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -32,9 +47,15 @@ export const Legal: React.FC = () => {
             margin: '1rem auto 0 auto',
           }}
         />
-      </div>
+      </motion.div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }} className="animate-fade-in">
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}
+      >
         {/* Terms of Service Section */}
         <div className="glass-panel" style={{ padding: '2.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
@@ -92,7 +113,7 @@ export const Legal: React.FC = () => {
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '1rem' }}>Last updated: June 22, 2026</p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
-};
+});

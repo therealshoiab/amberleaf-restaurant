@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { SEO } from '../components/SEO';
 import { Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -12,10 +12,11 @@ interface GalleryItem {
   instagramUrl?: string;
 }
 
-export const Gallery: React.FC = () => {
+export const Gallery: React.FC = React.memo(() => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<'all' | 'image' | 'video'>('all');
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
+  const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const lightboxVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const closeLightbox = () => {
@@ -25,29 +26,6 @@ export const Gallery: React.FC = () => {
     }
   };
 
-  // Select video from homepage redirect URL parameter
-  useEffect(() => {
-    const handleHashParam = () => {
-      const hash = window.location.hash;
-      const match = hash.match(/\?video=([\w-]+)/);
-      if (match) {
-        const videoId = match[1];
-        setActiveCategory('video');
-        
-        // Find index in video filter list
-        const videoItems = galleryItems.filter((item) => item.type === 'video');
-        const idx = videoItems.findIndex((item) => item.id === videoId);
-        if (idx !== -1) {
-          setLightboxIndex(idx);
-        }
-      }
-    };
-
-    handleHashParam();
-    window.addEventListener('hashchange', handleHashParam);
-    return () => window.removeEventListener('hashchange', handleHashParam);
-  }, []);
-
   // Unified Gallery Items (13 Google Maps images + 14 Instagram posts/reels)
   const galleryItems: GalleryItem[] = [
     // Google Maps Photos (g1 to g13)
@@ -55,7 +33,7 @@ export const Gallery: React.FC = () => {
       id: 'g1',
       type: 'image',
       url: './images/g1.jpg',
-      caption: 'Sophisticated dining setup featuring custom green wall accents and amber lighting.',
+      caption: 'Sophisticated dining setup featuring custom green wall accents.',
       likes: 184,
       comments: 15,
     },
@@ -79,7 +57,7 @@ export const Gallery: React.FC = () => {
       id: 'g4',
       type: 'image',
       url: './images/g4.jpg',
-      caption: 'Elegant green lattices and comfy seating arrangement for large families.',
+      caption: 'Elegant green lattices and comfy seating arrangement.',
       likes: 253,
       comments: 31,
     },
@@ -95,7 +73,7 @@ export const Gallery: React.FC = () => {
       id: 'g6',
       type: 'image',
       url: './images/g6.jpg',
-      caption: 'Warm wooden panelling and modern architectural arches matching the sanctuary theme.',
+      caption: 'Warm wooden panelling and modern architectural arches.',
       likes: 198,
       comments: 22,
     },
@@ -103,7 +81,7 @@ export const Gallery: React.FC = () => {
       id: 'g7',
       type: 'image',
       url: './images/g7.jpg',
-      caption: 'Table service prepared for group dining and special corporate events.',
+      caption: 'Table service prepared for group dining.',
       likes: 175,
       comments: 19,
     },
@@ -249,161 +227,105 @@ export const Gallery: React.FC = () => {
     },
     {
       id: 's11',
-      type: 'video',
-      url: './images/s11.mp4',
-      caption: 'Perfect charcoal tandoor roast. Freshly grilled kebabs.',
-      likes: 567,
-      comments: 48,
-      instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXRsKKXj5fB/',
+      type: 'image',
+      url: './images/s11.jpg',
+      caption: 'Our aesthetic cafe counter waiting for your afternoon visits.',
+      likes: 412,
+      comments: 29,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/p/DXW5R5nif3v/',
     },
     {
       id: 's12',
-      type: 'image',
-      url: './images/s12.jpg',
-      caption: 'Authentic presentation. Saffron rice and lamb chops wazwan style.',
-      likes: 412,
-      comments: 36,
-      instagramUrl: 'https://www.instagram.com/amberleafsgr/p/DXPIA5OCZpk/',
+      type: 'video',
+      url: './images/s12.mp4',
+      caption: 'Premium dining ambiance preview with guest smiles.',
+      likes: 954,
+      comments: 184,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXV9fW0ih1o/',
     },
     {
       id: 's13',
-      type: 'video',
-      url: './images/s13.mp4',
-      caption: 'The wazas preparing the famous gushtaba curd gravy.',
-      likes: 721,
-      comments: 84,
-      instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXE0hZ7CQFJ/',
+      type: 'image',
+      url: './images/s13.jpg',
+      caption: 'Aesthetic corners. Kashmiri fine dining redefined in Srinagar.',
+      likes: 480,
+      comments: 39,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/p/DXTVbA0iWlB/',
     },
     {
       id: 's14',
       type: 'video',
       url: './images/s14.mp4',
-      caption: 'Vibe check: Sarmista Acharya visiting the Balgarden space.',
-      likes: 853,
-      comments: 98,
-      instagramUrl: 'https://www.instagram.com/sarmista_acharya_official/reel/DVD4XrUEh7H/',
+      caption: 'Steaming Dum Mutton Biryani opened fresh at the guest table.',
+      likes: 1102,
+      comments: 164,
+      instagramUrl: 'https://www.instagram.com/amberleafsgr/reel/DXOC-DNi0fI/',
     },
   ];
 
-  const filteredItems = galleryItems.filter((item) => {
-    if (activeCategory === 'all') return true;
-    return item.type === activeCategory;
-  });
+  // Filter items based on selected category
+  const filteredItems = useMemo(() => {
+    if (activeCategory === 'all') return galleryItems;
+    return galleryItems.filter((item) => item.type === activeCategory);
+  }, [activeCategory]);
 
-  // Video refs for scroll focus & hover autoplay
-  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
-  const isHoveringVideoRef = useRef<boolean>(false);
-
-  // Recalculates which video is closest to the vertical center of the viewport and sets it active
-  const recalculateCenterVideo = () => {
-    if (isHoveringVideoRef.current) return;
-
-    const viewportCenter = window.innerHeight / 2;
-    let closestVideoId: string | null = null;
-    let minDistance = Infinity;
-
-    Object.entries(videoRefs.current).forEach(([id, video]) => {
-      if (video) {
-        const rect = video.getBoundingClientRect();
-        const videoCenter = rect.top + rect.height / 2;
-        const distance = Math.abs(viewportCenter - videoCenter);
-        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-
-        if (isVisible && distance < minDistance) {
-          minDistance = distance;
-          closestVideoId = id;
+  // Select video from homepage redirect URL parameter
+  useEffect(() => {
+    const handleHashParam = () => {
+      const hash = window.location.hash;
+      const match = hash.match(/\?video=([\w-]+)/);
+      if (match) {
+        const videoId = match[1];
+        setActiveCategory('video');
+        
+        // Find index in video list
+        const videoItems = galleryItems.filter((item) => item.type === 'video');
+        const idx = videoItems.findIndex((item) => item.id === videoId);
+        if (idx !== -1) {
+          setLightboxIndex(idx);
         }
       }
-    });
-
-    setActiveVideoId(closestVideoId);
-  };
-
-  // Synchronize play/pause across all videos based on activeVideoId
-  useEffect(() => {
-    Object.entries(videoRefs.current).forEach(([id, video]) => {
-      if (video) {
-        if (id === activeVideoId) {
-          // Play active video (muted by default unless unmuted by hover)
-          video.play().catch((err) => console.log('Autoplay blocked for:', id, err));
-        } else {
-          // Pause all other videos
-          video.pause();
-        }
-      }
-    });
-  }, [activeVideoId]);
-
-  // Monitor scroll stopping to update the center-focused video
-  useEffect(() => {
-    let scrollTimeout: number;
-
-    const handleScroll = () => {
-      window.clearTimeout(scrollTimeout);
-      scrollTimeout = window.setTimeout(() => {
-        recalculateCenterVideo();
-      }, 150);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    
-    // Initial check once items are rendered
-    const initTimeout = setTimeout(recalculateCenterVideo, 250);
+    handleHashParam();
+    window.addEventListener('hashchange', handleHashParam);
+    return () => window.removeEventListener('hashchange', handleHashParam);
+  }, []);
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.clearTimeout(scrollTimeout);
-      clearTimeout(initTimeout);
-    };
-  }, [activeCategory]); // Re-run when active category changes to recalculate visible videos
-
-  // Auto-play the video in the lightbox when it opens
+  // Keyboard navigation & escape listener for Lightbox
   useEffect(() => {
-    if (lightboxIndex !== null) {
-      const item = filteredItems[lightboxIndex];
-      if (item && item.type === 'video') {
-        setTimeout(() => {
-          if (lightboxVideoRef.current) {
-            lightboxVideoRef.current.muted = false;
-            lightboxVideoRef.current.play().catch((err) => {
-              console.log("Lightbox autoplay unmuted blocked, falling back to muted:", err);
-              if (lightboxVideoRef.current) {
-                lightboxVideoRef.current.muted = true;
-                lightboxVideoRef.current.play().catch((e) => console.log("Muted fallback failed:", e));
-              }
-            });
-          }
-        }, 150);
-      }
-    }
-  }, [lightboxIndex]);
+    if (lightboxIndex === null) return;
 
-  // Video hover controls: set as activeVideoId, try to play unmuted
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      } else if (e.key === 'ArrowLeft') {
+        setLightboxIndex((prev) => (prev === null || prev === 0 ? filteredItems.length - 1 : prev - 1));
+      } else if (e.key === 'ArrowRight') {
+        setLightboxIndex((prev) => (prev === null || prev === filteredItems.length - 1 ? 0 : prev + 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIndex, filteredItems.length]);
+
+  // Video hover triggers
   const handleVideoMouseEnter = (id: string) => {
-    isHoveringVideoRef.current = true;
     const video = videoRefs.current[id];
     if (video) {
-      video.muted = false;
-      setActiveVideoId(id);
-      video.play().catch(() => {
-        if (video) {
-          video.muted = true;
-          video.play().catch((e) => console.log("Muted play failed:", e));
-        }
-      });
+      video.muted = true;
+      video.play().catch((e) => console.log("Muted autoplay blocked:", e));
     }
   };
 
   const handleVideoMouseLeave = (id: string) => {
-    isHoveringVideoRef.current = false;
     const video = videoRefs.current[id];
     if (video) {
-      video.muted = true;
+      video.pause();
     }
-    recalculateCenterVideo();
   };
 
-  // Lightbox slideshow navigation
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (lightboxIndex === null) return;
@@ -414,6 +336,34 @@ export const Gallery: React.FC = () => {
     e.stopPropagation();
     if (lightboxIndex === null) return;
     setLightboxIndex(lightboxIndex === filteredItems.length - 1 ? 0 : lightboxIndex + 1);
+  };
+
+  // Parallax 3D tilt effects
+  const handleMouseMoveTilt = (e: React.MouseEvent<HTMLDivElement>, itemId: string) => {
+    const card = cardRefs.current[itemId];
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const normalizedX = (x / rect.width) - 0.5;
+    const normalizedY = (y / rect.height) - 0.5;
+
+    const maxTilt = 8;
+    const rotateX = -normalizedY * maxTilt;
+    const rotateY = normalizedX * maxTilt;
+
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    card.style.boxShadow = '0 15px 35px rgba(197, 160, 89, 0.15)';
+  };
+
+  const handleMouseLeaveTilt = (itemId: string) => {
+    const card = cardRefs.current[itemId];
+    if (!card) return;
+
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    card.style.boxShadow = 'none';
   };
 
   return (
@@ -467,12 +417,15 @@ export const Gallery: React.FC = () => {
         ))}
       </div>
 
-      {/* Gallery Grid - Displays Filtered Items */}
-      <div className="grid-container grid-3" style={{ animation: 'fadeIn 0.8s ease forwards' }}>
+      {/* 6. Masonry Grid - Displays Filtered Items */}
+      <div className="masonry-grid" style={{ animation: 'fadeIn 0.8s ease forwards' }}>
         {filteredItems.map((item, index) => (
           <div
             key={item.id}
-            className="glass-panel"
+            ref={(el) => { cardRefs.current[item.id] = el; }}
+            className="glass-panel masonry-item shimmer-card"
+            onMouseMove={(e) => handleMouseMoveTilt(e, item.id)}
+            onMouseLeave={() => handleMouseLeaveTilt(item.id)}
             style={{
               padding: '0',
               borderRadius: '16px',
@@ -481,7 +434,8 @@ export const Gallery: React.FC = () => {
               display: 'flex',
               flexDirection: 'column',
               gap: '0',
-              transition: 'all 0.3s ease',
+              transition: 'transform 0.1s ease, box-shadow 0.2s ease',
+              position: 'relative',
             }}
             onClick={() => setLightboxIndex(index)}
           >
@@ -489,11 +443,12 @@ export const Gallery: React.FC = () => {
             <div
               style={{
                 width: '100%',
-                height: '380px',
                 borderRadius: '16px',
                 overflow: 'hidden',
                 position: 'relative',
                 backgroundColor: '#000',
+                display: 'flex',
+                alignItems: 'center',
               }}
               onMouseEnter={() => item.type === 'video' && handleVideoMouseEnter(item.id)}
               onMouseLeave={() => item.type === 'video' && handleVideoMouseLeave(item.id)}
@@ -502,33 +457,26 @@ export const Gallery: React.FC = () => {
                 <img
                   src={item.url}
                   alt={item.caption}
+                  loading="lazy"
                   style={{
                     width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
+                    height: 'auto',
+                    display: 'block',
                     transition: 'transform 0.5s ease',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                 />
               ) : (
-                <div style={{ width: '100%', height: '100%' }}>
+                <div style={{ width: '100%', position: 'relative', display: 'flex', alignItems: 'center' }}>
                   <video
-                    ref={(el) => {
-                      if (el) {
-                        videoRefs.current[item.id] = el;
-                      } else {
-                        delete videoRefs.current[item.id];
-                      }
-                    }}
+                    ref={(el) => { videoRefs.current[item.id] = el; }}
                     src={item.url}
                     loop
                     muted
                     playsInline
                     style={{
                       width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
+                      height: 'auto',
+                      display: 'block',
                     }}
                   />
                   {/* Playing indicators */}
@@ -552,7 +500,7 @@ export const Gallery: React.FC = () => {
                 </div>
               )}
 
-              {/* Instagram brand colored tag overlay */}
+              {/* Instagram link overlay if present */}
               {item.instagramUrl && (
                 <a
                   href={item.instagramUrl}
@@ -565,7 +513,7 @@ export const Gallery: React.FC = () => {
                     left: '1rem',
                     backgroundColor: 'rgba(10, 9, 7, 0.95)',
                     border: '1px solid rgba(225, 48, 108, 0.25)',
-                    color: '#E1306C', /* Instagram Pink Brand Color */
+                    color: '#E1306C',
                     borderRadius: '9999px',
                     padding: '0.35rem 0.8rem',
                     fontSize: '0.75rem',
@@ -585,7 +533,6 @@ export const Gallery: React.FC = () => {
                     e.currentTarget.style.backgroundColor = 'rgba(10, 9, 7, 0.95)';
                   }}
                 >
-                  {/* Real Instagram SVG Brand Icon */}
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
                   Instagram Link
                 </a>
@@ -595,7 +542,7 @@ export const Gallery: React.FC = () => {
         ))}
       </div>
 
-      {/* Lightbox Slideshow Modal */}
+      {/* Fullscreen Lightbox Slideshow Modal */}
       {lightboxIndex !== null && (
         <div
           style={{
@@ -668,7 +615,7 @@ export const Gallery: React.FC = () => {
                 alt={filteredItems[lightboxIndex].caption}
                 style={{
                   maxWidth: '100%',
-                  maxHeight: '65vh',
+                  maxHeight: '75vh',
                   objectFit: 'contain',
                   borderRadius: '8px',
                   boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
@@ -683,7 +630,7 @@ export const Gallery: React.FC = () => {
                 playsInline
                 style={{
                   maxWidth: '100%',
-                  maxHeight: '65vh',
+                  maxHeight: '75vh',
                   borderRadius: '8px',
                   boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
                 }}
@@ -712,4 +659,4 @@ export const Gallery: React.FC = () => {
       )}
     </div>
   );
-};
+});

@@ -1,158 +1,262 @@
 import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface PreloaderProps {
   onComplete: () => void;
 }
 
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
-  const [progress, setProgress] = useState(0);
-  const [isFadingOut, setIsFadingOut] = useState(false);
+  const [lineCompleted, setLineCompleted] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+
+  // Restaurant Name split into letters
+  const nameLetters = "AMBERLEAF".split("");
 
   useEffect(() => {
-    const duration = 1800; // 1.8 seconds loading
-    const intervalTime = 30;
-    const steps = duration / intervalTime;
-    const increment = 100 / steps;
+    // 1. Horizontal line draws for 1.2s
+    const lineTimer = setTimeout(() => {
+      setLineCompleted(true);
+    }, 1200);
 
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        const next = prev + increment;
-        if (next >= 100) {
-          clearInterval(timer);
-          setTimeout(() => {
-            setIsFadingOut(true);
-            setTimeout(() => {
-              onComplete();
-            }, 600); // Wait for fade out animation
-          }, 300);
-          return 100;
-        }
-        return next;
-      });
-    }, intervalTime);
+    // 2. Initiate split-panel curtain exit after 3.2s total
+    const exitTimer = setTimeout(() => {
+      setIsExiting(true);
+      // Wait for exit curtains slide transition (0.8s) before calling onComplete
+      setTimeout(() => {
+        onComplete();
+      }, 800);
+    }, 3400);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(lineTimer);
+      clearTimeout(exitTimer);
+    };
   }, [onComplete]);
 
+  // Framer Motion Variants
+  const panelTopVariants = {
+    initial: { translateY: 0 },
+    exit: { translateY: "-100%" }
+  };
+
+  const panelBottomVariants = {
+    initial: { translateY: 0 },
+    exit: { translateY: "100%" }
+  };
+
+  const containerVariants = {
+    initial: { opacity: 1 },
+    exit: { opacity: 0, transition: { duration: 0.3 } }
+  };
+
+  const letterVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.08,
+        duration: 0.6,
+        ease: [0.16, 1, 0.3, 1] as const
+      }
+    })
+  };
+
+  const taglineVariants = {
+    hidden: { opacity: 0, y: 8 },
+    visible: {
+      opacity: 0.9,
+      y: 0,
+      transition: {
+        delay: 0.72, // Fade in right after letters start appearing
+        duration: 0.7,
+        ease: "easeOut" as const
+      }
+    }
+  };
+
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: '#0a0907',
-        zIndex: 99999,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        opacity: isFadingOut ? 0 : 1,
-        transform: isFadingOut ? 'scale(1.05) translateY(-20px)' : 'scale(1) translateY(0)',
-        transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-      }}
-    >
-      <div style={{ position: 'relative', marginBottom: '2.5rem' }}>
-        {/* SVG Recreated Gold Logo inside Preloader */}
-        <img
-          src="./images/logo.png"
-          alt="Amberleaf Logo"
-          style={{
-            width: '90px',
-            height: '90px',
-            borderRadius: '50%',
-            border: '2px solid var(--accent-gold)',
-            boxShadow: '0 0 20px rgba(212, 175, 55, 0.25)',
-            objectFit: 'cover',
-          }}
-        />
-
-        {/* Outer glowing spinner */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '-15px',
-            left: '-15px',
-            right: '-15px',
-            bottom: '-15px',
-            border: '2px solid transparent',
-            borderTop: '2px solid #d4af37',
-            borderRight: '2px solid #d4af37',
-            borderRadius: '50%',
-            animation: 'spin 1.2s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite',
-          }}
-        />
-      </div>
-
-      <h1
-        style={{
-          color: '#f5f3ef',
-          fontFamily: "'Playfair Display', serif",
-          fontSize: '2rem',
-          letterSpacing: '0.15em',
-          fontWeight: 500,
-          textTransform: 'uppercase',
-          marginBottom: '0.5rem',
-          textAlign: 'center',
-        }}
-      >
-        Amberleaf
-      </h1>
-      <p
-        style={{
-          color: '#d4af37',
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
-          fontSize: '0.8rem',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          marginBottom: '2rem',
-          opacity: 0.8,
-        }}
-      >
-        Fine Dine & Cafe
-      </p>
-
-      {/* Progress Bar Container */}
+    <AnimatePresence>
       <div
         style={{
-          width: '240px',
-          height: '2px',
-          backgroundColor: 'rgba(255, 255, 255, 0.08)',
-          borderRadius: '2px',
-          position: 'relative',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 99999,
           overflow: 'hidden',
+          pointerEvents: 'none',
         }}
       >
-        <div
+        {/* Top Panel Curtain */}
+        <motion.div
+          variants={panelTopVariants}
+          initial="initial"
+          animate={isExiting ? "exit" : "initial"}
+          transition={{ duration: 0.8, ease: [0.85, 0, 0.15, 1] }}
           style={{
-            width: `${progress}%`,
-            height: '100%',
-            background: 'linear-gradient(90deg, #d4af37, #d97706)',
-            boxShadow: '0 0 8px #d4af37',
-            transition: 'width 0.1s linear',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '50vh',
+            backgroundColor: '#040906',
+            borderBottom: '1px solid rgba(197, 160, 89, 0.08)',
+            zIndex: 99999,
+            pointerEvents: 'auto',
           }}
         />
+
+        {/* Bottom Panel Curtain */}
+        <motion.div
+          variants={panelBottomVariants}
+          initial="initial"
+          animate={isExiting ? "exit" : "initial"}
+          transition={{ duration: 0.8, ease: [0.85, 0, 0.15, 1] }}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            height: '50vh',
+            backgroundColor: '#040906',
+            borderTop: '1px solid rgba(197, 160, 89, 0.08)',
+            zIndex: 99999,
+            pointerEvents: 'auto',
+          }}
+        />
+
+        {/* Central Content Area (Fades out just before curtain splits) */}
+        {!isExiting && (
+          <motion.div
+            variants={containerVariants}
+            initial="initial"
+            animate="initial"
+            exit="exit"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 100000,
+              pointerEvents: 'auto',
+            }}
+          >
+            {/* SVG Logo Mark - Glowing & Premium */}
+            <div style={{ position: 'relative', marginBottom: '2.5rem' }}>
+              <img
+                src="./images/logo.png"
+                alt="Amberleaf Logo"
+                style={{
+                  width: '90px',
+                  height: '90px',
+                  borderRadius: '50%',
+                  border: '1px solid var(--accent-gold)',
+                  boxShadow: '0 0 25px rgba(197, 160, 89, 0.2)',
+                  objectFit: 'cover',
+                  opacity: 0.95,
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-10px',
+                  left: '-10px',
+                  right: '-10px',
+                  bottom: '-10px',
+                  border: '1px solid transparent',
+                  borderTop: '1.5px solid var(--accent-gold)',
+                  borderRight: '1.5px solid var(--accent-gold)',
+                  borderRadius: '50%',
+                  animation: 'spinLoader 3s linear infinite',
+                }}
+              />
+            </div>
+
+            {/* Horizontal Gold Line - Draws Left to Right */}
+            <div style={{ width: '260px', height: '2px', position: 'relative', marginBottom: '2.5rem' }}>
+              <svg width="260" height="2" viewBox="0 0 260 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <motion.line
+                  x1="0"
+                  y1="1"
+                  x2="260"
+                  y2="1"
+                  stroke="url(#preloaderGoldGradient)"
+                  strokeWidth="2"
+                  initial={{ strokeDasharray: 260, strokeDashoffset: 260 }}
+                  animate={{ strokeDashoffset: 0 }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
+                />
+                <defs>
+                  <linearGradient id="preloaderGoldGradient" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#c5a059" />
+                    <stop offset="0.5" stopColor="#f0d080" />
+                    <stop offset="1" stopColor="#c5a059" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            {/* Staggered Letter-by-Letter Text Reveal */}
+            {lineCompleted && (
+              <div style={{ display: 'flex', gap: '0.15em', justifyContent: 'center' }}>
+                {nameLetters.map((letter, idx) => (
+                  <motion.span
+                    key={idx}
+                    custom={idx}
+                    variants={letterVariants}
+                    initial="hidden"
+                    animate="visible"
+                    style={{
+                      color: '#f5f3ef',
+                      fontFamily: "'Playfair Display', serif",
+                      fontSize: '2.5rem',
+                      letterSpacing: '0.1em',
+                      fontWeight: 400,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {letter}
+                  </motion.span>
+                ))}
+              </div>
+            )}
+
+            {/* Tagline Reveal */}
+            {lineCompleted && (
+              <motion.p
+                variants={taglineVariants}
+                initial="hidden"
+                animate="visible"
+                style={{
+                  marginTop: '0.85rem',
+                  color: 'var(--accent-gold)',
+                  fontFamily: "'Playfair Display', serif",
+                  fontStyle: 'italic',
+                  fontSize: '0.85rem',
+                  letterSpacing: '0.25em',
+                  textAlign: 'center',
+                }}
+              >
+                Fine Dining &middot; Srinagar
+              </motion.p>
+            )}
+          </motion.div>
+        )}
       </div>
 
-      <span
-        style={{
-          marginTop: '0.8rem',
-          color: 'rgba(245, 243, 239, 0.4)',
-          fontSize: '0.75rem',
-          fontFamily: 'monospace',
-        }}
-      >
-        {Math.round(progress)}%
-      </span>
-
-      {/* Inject custom spin animation directly in style */}
       <style>{`
-        @keyframes spin {
+        @keyframes spinLoader {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
       `}</style>
-    </div>
+    </AnimatePresence>
   );
 };

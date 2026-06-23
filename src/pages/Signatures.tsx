@@ -14,7 +14,7 @@ interface SignatureDish {
   category: string;
 }
 
-export const Signatures: React.FC = () => {
+export const Signatures: React.FC = React.memo(() => {
   const signatureDishes: SignatureDish[] = [
     {
       id: 'sig1',
@@ -99,7 +99,7 @@ export const Signatures: React.FC = () => {
           return (
             <div
               key={dish.id}
-              className="glass-panel signature-card-grid"
+              className="glass-panel signature-card-grid shimmer-card"
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr',
@@ -150,7 +150,7 @@ export const Signatures: React.FC = () => {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '1rem' }}>
                   <h3 style={{ fontSize: '1.8rem', color: 'var(--text-primary)', margin: 0 }}>{dish.name}</h3>
-                  <span style={{ fontSize: '1.6rem', color: 'var(--accent-gold)', fontWeight: 800 }}>₹{dish.price}</span>
+                  <span className="menu-price" style={{ fontSize: '1.6rem', fontWeight: 800 }}>₹{dish.price}</span>
                 </div>
 
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.7' }}>
@@ -226,4 +226,4 @@ export const Signatures: React.FC = () => {
       `}</style>
     </div>
   );
-};
+});
