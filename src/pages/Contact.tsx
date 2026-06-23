@@ -14,6 +14,7 @@ export const Contact: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [formError, setFormError] = useState('');
+  const [pendingWaUrl, setPendingWaUrl] = useState('');
 
   const handleSubmitBooking = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,12 +44,10 @@ export const Contact: React.FC = () => {
 • Notes: ${notes || 'None'}`;
 
     const waUrl = `https://wa.me/917780938743?text=${encodeURIComponent(message)}`;
+    setPendingWaUrl(waUrl);
 
     // Show popup success modal overlay
     setShowSuccessModal(true);
-
-    // Redirect to WhatsApp automatically (will launch app on mobile without pop-up blocking)
-    window.location.href = waUrl;
 
     // Trigger canvas-confetti
     confetti({
@@ -406,7 +405,12 @@ export const Contact: React.FC = () => {
             <h3 style={{ fontSize: '1.5rem', color: 'var(--text-primary)', margin: 0 }}>Reservation Request Sent!</h3>
             <button
               onClick={() => {
+                // Redirect to WhatsApp on user confirmation click
+                if (pendingWaUrl) {
+                  window.location.href = pendingWaUrl;
+                }
                 setShowSuccessModal(false);
+                setPendingWaUrl('');
                 setName('');
                 setPhone('');
                 setEmail('');
