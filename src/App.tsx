@@ -51,80 +51,6 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // Custom Cursor mouse listener with RequestAnimationFrame interpolation
-  useEffect(() => {
-    // Check if device supports hover (desktop mouse cursor device)
-    const hasMouse = window.matchMedia('(hover: hover)').matches;
-    if (!hasMouse) return;
-
-    const dot = document.getElementById('custom-cursor-dot');
-    const ring = document.getElementById('custom-cursor-ring');
-    
-    if (!dot || !ring) return;
-
-    let mouseX = 0;
-    let mouseY = 0;
-    let dotX = 0;
-    let dotY = 0;
-    let ringX = 0;
-    let ringY = 0;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
-    // Hover state trackers
-    const addHoverClass = () => document.body.classList.add('cursor-hover');
-    const removeHoverClass = () => document.body.classList.remove('cursor-hover');
-
-    const updateCursorHoverState = () => {
-      const interactives = document.querySelectorAll('a, button, select, input, textarea, [role="button"], .interactive-card');
-      interactives.forEach((el) => {
-        el.addEventListener('mouseenter', addHoverClass);
-        el.addEventListener('mouseleave', removeHoverClass);
-      });
-    };
-
-    // Update hover states on initial render
-    updateCursorHoverState();
-    
-    // Watch for DOM changes to attach mouse hover state handlers dynamically
-    const observer = new MutationObserver(updateCursorHoverState);
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    let animationFrameId: number;
-    const tick = () => {
-      // 100ms lag interpolation
-      dotX += (mouseX - dotX) * 0.25;
-      dotY += (mouseY - dotY) * 0.25;
-
-      // 200ms lag interpolation
-      ringX += (mouseX - ringX) * 0.12;
-      ringY += (mouseY - ringY) * 0.12;
-
-      dot.style.transform = `translate3d(${dotX}px, ${dotY}px, 0)`;
-      ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
-
-      animationFrameId = requestAnimationFrame(tick);
-    };
-
-    animationFrameId = requestAnimationFrame(tick);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animationFrameId);
-      observer.disconnect();
-      const interactives = document.querySelectorAll('a, button, select, input, textarea, [role="button"], .interactive-card');
-      interactives.forEach((el) => {
-        el.removeEventListener('mouseenter', addHoverClass);
-        el.removeEventListener('mouseleave', removeHoverClass);
-      });
-    };
-  }, [loading]);
-
   // Helper to render the active page based on the current hash
   const renderActivePage = () => {
     const cleanHash = currentHash.split('?')[0];
@@ -162,10 +88,6 @@ export const App: React.FC = () => {
         <Preloader onComplete={() => setLoading(false)} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          {/* Custom Luxury Cursor Element overlays */}
-          <div id="custom-cursor-dot" className="custom-cursor-dot" />
-          <div id="custom-cursor-ring" className="custom-cursor-ring" />
-
           {/* Floating Navigation Header */}
           <Navbar currentHash={currentHash} />
 

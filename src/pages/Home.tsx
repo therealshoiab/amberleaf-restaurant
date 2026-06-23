@@ -220,17 +220,7 @@ export const Home: React.FC = () => {
           </div>
 
           {/* Micro-Features grid */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-              gap: '1.5rem',
-              marginTop: '1.5rem',
-              borderTop: '1px solid var(--border-light)',
-              paddingTop: '1.5rem',
-              width: '100%',
-            }}
-          >
+          <div className="hero-features-grid">
             <div>
               <span style={{ display: 'block', fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent-gold)' }}>100%</span>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Halal Ingredients</span>

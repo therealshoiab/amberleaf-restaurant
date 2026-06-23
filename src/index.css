@@ -411,57 +411,6 @@ h1, h2, h3, h4, h5, h6, .font-serif {
    LUXURY FINE DINING SYSTEM - ADDED STYLES
    ---------------------------------------------------- */
 
-/* 1. Custom Luxury Cursor */
-@media (min-width: 1024px) {
-  body, a, button, select, input, textarea, [role="button"] {
-    cursor: none !important;
-  }
-  
-  .custom-cursor-dot {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 8px;
-    height: 8px;
-    background-color: var(--accent-gold);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 999999;
-    transform: translate(-50%, -50%);
-    transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease;
-  }
-
-  .custom-cursor-ring {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 30px;
-    height: 30px;
-    border: 1px solid var(--accent-gold);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 999998;
-    transform: translate(-50%, -50%);
-    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                height 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  /* Hover states for interactive elements */
-  body.cursor-hover .custom-cursor-dot {
-    width: 4px;
-    height: 4px;
-    background-color: #fff;
-  }
-
-  body.cursor-hover .custom-cursor-ring {
-    width: 50px;
-    height: 50px;
-    border-color: rgba(255, 255, 255, 0.8);
-    background-color: rgba(197, 160, 89, 0.1);
-  }
-}
 
 /* 2. Cinematic Film Grain Overlay */
 .noise-overlay {
@@ -571,9 +520,9 @@ h1, h2, h3, h4, h5, h6, .font-serif {
   white-space: nowrap;
   width: 100%;
   display: flex;
-  background: rgba(8, 18, 13, 0.4);
-  border-top: 1px solid var(--border-light);
-  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   padding: 1rem 0;
 }
 
@@ -596,5 +545,22 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 @keyframes marquee {
   0% { transform: translate3d(0, 0, 0); }
   100% { transform: translate3d(-100%, 0, 0); }
+}
+
+.hero-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border-light);
+  padding-top: 1.5rem;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .hero-features-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
 }
 
