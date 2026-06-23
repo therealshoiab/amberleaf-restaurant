@@ -227,8 +227,8 @@ export const Gallery: React.FC = React.memo(() => {
     },
     {
       id: 's11',
-      type: 'image',
-      url: './images/s11.jpg',
+      type: 'video',
+      url: './images/s11.mp4',
       caption: 'Our aesthetic cafe counter waiting for your afternoon visits.',
       likes: 412,
       comments: 29,
@@ -236,8 +236,8 @@ export const Gallery: React.FC = React.memo(() => {
     },
     {
       id: 's12',
-      type: 'video',
-      url: './images/s12.mp4',
+      type: 'image',
+      url: './images/s12.jpg',
       caption: 'Premium dining ambiance preview with guest smiles.',
       likes: 954,
       comments: 184,
@@ -245,8 +245,8 @@ export const Gallery: React.FC = React.memo(() => {
     },
     {
       id: 's13',
-      type: 'image',
-      url: './images/s13.jpg',
+      type: 'video',
+      url: './images/s13.mp4',
       caption: 'Aesthetic corners. Kashmiri fine dining redefined in Srinagar.',
       likes: 480,
       comments: 39,
