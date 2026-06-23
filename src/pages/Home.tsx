@@ -113,11 +113,12 @@ export const Home: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             gap: '1.5rem',
-            textAlign: 'left',
+            textAlign: 'center',
+            alignItems: 'center',
           }}
         >
           {/* Badges Container */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem', justifyContent: 'center' }}>
             <div
               className="glass-card"
               style={{
@@ -158,7 +159,7 @@ export const Home: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <h1
               style={{
-                fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                fontSize: 'clamp(1.8rem, 5vw, 3.5rem)',
                 lineHeight: 1.1,
                 color: 'var(--text-primary)',
               }}
@@ -187,7 +188,7 @@ export const Home: React.FC = () => {
           </p>
 
           {/* Call to Actions */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
             <a href="#/menu" className="btn-primary" style={{ gap: '0.5rem' }}>
               <Utensils size={18} />
               Explore Menu
@@ -270,7 +271,7 @@ export const Home: React.FC = () => {
           <div
             style={{
               display: 'flex',
-              gap: '0.5rem',
+              gap: '0.6rem',
               overflowX: 'auto',
               paddingBottom: '0.4rem',
             }}
@@ -280,9 +281,9 @@ export const Home: React.FC = () => {
                 key={i}
                 onClick={() => setActiveImage(img)}
                 style={{
-                  width: '60px',
-                  height: '45px',
-                  borderRadius: '6px',
+                  width: '100px',
+                  height: '75px',
+                  borderRadius: '8px',
                   overflow: 'hidden',
                   border: activeImage === img ? '2px solid var(--accent-gold)' : '1px solid var(--border-light)',
                   padding: 0,

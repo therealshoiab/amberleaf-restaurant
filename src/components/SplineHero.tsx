@@ -102,8 +102,21 @@ export const SplineHero: React.FC = () => {
     </div>
   );
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile viewports to prevent loading heavy 3D canvas on phones
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Mobi|Android|iPhone/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Timeout handler: if spline hasn't loaded in 6 seconds, assume timeout and show fallback
   useEffect(() => {
+    if (isMobile) return;
     const timeout = setTimeout(() => {
       if (loading) {
         console.warn("Spline loading timed out, switching to storefront image fallback.");
@@ -113,7 +126,7 @@ export const SplineHero: React.FC = () => {
     }, 6000);
 
     return () => clearTimeout(timeout);
-  }, [loading]);
+  }, [loading, isMobile]);
 
   const handleSplineLoad = () => {
     setLoading(false);
@@ -125,7 +138,7 @@ export const SplineHero: React.FC = () => {
     setLoading(false);
   };
 
-  if (loadError) {
+  if (isMobile || loadError) {
     return <FallbackView />;
   }
 

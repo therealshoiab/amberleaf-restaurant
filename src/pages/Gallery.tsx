@@ -477,13 +477,13 @@ export const Gallery: React.FC = () => {
             key={item.id}
             className="glass-panel"
             style={{
-              padding: '0.75rem',
+              padding: item.type === 'video' ? '0' : '0.75rem',
               borderRadius: '16px',
               cursor: 'pointer',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
-              gap: '0.75rem',
+              gap: item.type === 'video' ? '0' : '0.75rem',
               transition: 'all 0.3s ease',
             }}
             onClick={() => setLightboxIndex(index)}
@@ -492,8 +492,8 @@ export const Gallery: React.FC = () => {
             <div
               style={{
                 width: '100%',
-                height: item.type === 'video' ? '360px' : '240px',
-                borderRadius: '12px',
+                height: '380px',
+                borderRadius: item.type === 'video' ? '16px' : '12px',
                 overflow: 'hidden',
                 position: 'relative',
                 backgroundColor: '#000',
@@ -595,44 +595,46 @@ export const Gallery: React.FC = () => {
               )}
             </div>
 
-            {/* Interaction details */}
-            <div style={{ padding: '0 0.5rem 0.5rem 0.5rem' }}>
-              <p
-                style={{
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.85rem',
-                  lineHeight: '1.5',
-                  marginBottom: '0.75rem',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                }}
-              >
-                {item.caption}
-              </p>
-              
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1.25rem',
-                  fontSize: '0.8rem',
-                  color: 'var(--text-secondary)',
-                  borderTop: '1px solid var(--border-light)',
-                  paddingTop: '0.6rem',
-                }}
-              >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <Heart size={14} style={{ color: '#E1306C' }} />
-                  {item.likes}
-                </span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <MessageCircle size={14} />
-                  {item.comments}
-                </span>
+            {/* Interaction details (only visible for images) */}
+            {item.type !== 'video' && (
+              <div style={{ padding: '0 0.5rem 0.5rem 0.5rem' }}>
+                <p
+                  style={{
+                    color: 'var(--text-secondary)',
+                    fontSize: '0.85rem',
+                    lineHeight: '1.5',
+                    marginBottom: '0.75rem',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {item.caption}
+                </p>
+                
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1.25rem',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-secondary)',
+                    borderTop: '1px solid var(--border-light)',
+                    paddingTop: '0.6rem',
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <Heart size={14} style={{ color: '#E1306C' }} />
+                    {item.likes}
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <MessageCircle size={14} />
+                    {item.comments}
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ))}
       </div>

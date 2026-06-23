@@ -454,7 +454,6 @@ export const Reviews: React.FC = () => {
                   </div>
                   <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{review.author}</span>
                 </div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{review.date}</span>
               </div>
 
               {/* Stars & Context badge */}
