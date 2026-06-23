@@ -163,20 +163,6 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                   opacity: 0.95,
                 }}
               />
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  left: '-10px',
-                  right: '-10px',
-                  bottom: '-10px',
-                  border: '1px solid transparent',
-                  borderTop: '1.5px solid var(--accent-gold)',
-                  borderRight: '1.5px solid var(--accent-gold)',
-                  borderRadius: '50%',
-                  animation: 'spinLoader 3s linear infinite',
-                }}
-              />
             </div>
 
             {/* Horizontal Gold Line - Draws Left to Right */}

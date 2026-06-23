@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { SEO } from '../components/SEO';
 import { Star, Send } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -174,38 +174,12 @@ export const Reviews: React.FC = React.memo(() => {
     return combined;
   });
 
-  const [activeFilter, setActiveFilter] = useState<'All' | 'Family Dining' | 'Solo Dining' | 'Group Outing'>('All');
   const [newName, setNewName] = useState('');
   const [newType, setNewType] = useState('Family Dining');
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState('');
   const [newImage, setNewImage] = useState(''); // base64 string
   const [formError, setFormError] = useState('');
-
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [isPaused, setIsPaused] = useState(false);
-
-  // Auto-scroller carousel effect with pause-on-hover
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    let intervalId: number;
-
-    const scroll = () => {
-      if (isPaused) return;
-      container.scrollTop += 0.75; // slow smooth vertical crawl
-      
-      // Wrap around when reaching the bottom
-      if (container.scrollTop + container.clientHeight >= container.scrollHeight - 1) {
-        container.scrollTop = 0;
-      }
-    };
-
-    intervalId = window.setInterval(scroll, 30);
-
-    return () => clearInterval(intervalId);
-  }, [isPaused]);
 
   // Convert review image attachment to base64
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -272,12 +246,6 @@ export const Reviews: React.FC = React.memo(() => {
     });
   };
 
-  // Filter logic
-  const filteredReviews = useMemo(() => {
-    if (activeFilter === 'All') return reviewsList;
-    return reviewsList.filter((r) => r.type === activeFilter);
-  }, [reviewsList, activeFilter]);
-
   return (
     <div className="page-container" style={{ position: 'relative' }}>
       <SEO
@@ -310,39 +278,6 @@ export const Reviews: React.FC = React.memo(() => {
             margin: '1rem auto 0 auto',
           }}
         />
-      </div>
-
-      {/* Category filters */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '0.6rem',
-          flexWrap: 'wrap',
-          marginBottom: '2.5rem',
-        }}
-        className="animate-fade-in"
-      >
-        {['All', 'Family Dining', 'Solo Dining', 'Group Outing'].map((filter) => (
-          <button
-            key={filter}
-            className="gallery-tab-btn"
-            style={{
-              background: activeFilter === filter ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.02)',
-              color: activeFilter === filter ? '#000' : 'var(--text-primary)',
-              borderColor: activeFilter === filter ? 'var(--accent-gold)' : 'var(--border-light)',
-              borderRadius: '8px',
-              padding: '0.4rem 1.2rem',
-              fontSize: '0.85rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-            }}
-            onClick={() => setActiveFilter(filter as any)}
-          >
-            {filter}
-          </button>
-        ))}
       </div>
 
       {/* Two Columns Grid */}
@@ -542,23 +477,19 @@ export const Reviews: React.FC = React.memo(() => {
           </form>
         </div>
 
-        {/* Right Side: Luxury Editorial Pull-Quote Auto-scroller carousel */}
+        {/* Right Side: Luxury Editorial Pull-Quotes List */}
         <div
-          ref={containerRef}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
           style={{
             display: 'flex',
             flexDirection: 'column',
             gap: '2rem',
             maxHeight: '750px',
-            overflowY: 'hidden',
+            overflowY: 'auto',
             paddingRight: '0.5rem',
-            cursor: 'grab',
           }}
           className="reviews-list-container"
         >
-          {filteredReviews.map((review) => (
+          {reviewsList.map((review) => (
             <div
               key={review.id}
               className="glass-panel"
