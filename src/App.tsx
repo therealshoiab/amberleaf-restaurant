@@ -39,7 +39,8 @@ export const App: React.FC = () => {
 
   // Helper to render the active page based on the current hash
   const renderActivePage = () => {
-    switch (currentHash) {
+    const cleanHash = currentHash.split('?')[0];
+    switch (cleanHash) {
       case '#/home':
       case '':
         return <Home />;

@@ -10,6 +10,7 @@ interface Review {
   date: string;
   comment: string;
   type: string; // "Family", "Solo", "Group", etc.
+  image?: string; // base64 string
 }
 
 export const Reviews: React.FC = () => {
@@ -159,7 +160,10 @@ export const Reviews: React.FC = () => {
       };
     });
 
-    return [...primaryReviews, ...generatedReviews];
+    const savedCustom = localStorage.getItem('amberleaf_custom_reviews');
+    const customReviews: Review[] = savedCustom ? JSON.parse(savedCustom) : [];
+
+    return [...customReviews, ...primaryReviews, ...generatedReviews];
   });
 
   // Form State
@@ -167,7 +171,23 @@ export const Reviews: React.FC = () => {
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState('');
   const [newType, setNewType] = useState('Family Dining');
+  const [newImage, setNewImage] = useState('');
   const [formError, setFormError] = useState('');
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        setFormError('Image size should be less than 2MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Form Submission
   const handleSubmitReview = (e: React.FormEvent) => {
@@ -193,13 +213,21 @@ export const Reviews: React.FC = () => {
       }),
       comment: newComment,
       type: newType,
+      image: newImage || undefined,
     };
 
-    setReviewsList([newReview, ...reviewsList]);
+    const updatedReviews = [newReview, ...reviewsList];
+    setReviewsList(updatedReviews);
+    
+    // Save user custom reviews to local storage
+    const customOnly = updatedReviews.filter(r => r.id.startsWith('user-'));
+    localStorage.setItem('amberleaf_custom_reviews', JSON.stringify(customOnly));
+
     setNewAuthor('');
     setNewRating(5);
     setNewComment('');
     setNewType('Family Dining');
+    setNewImage('');
     setFormError('');
 
     // Trigger celebration confetti
@@ -421,6 +449,83 @@ export const Reviews: React.FC = () => {
               />
             </div>
 
+            {/* Photo Attachment (Optional) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Attach a Photo (Optional)</label>
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '1rem',
+                  border: '1px dashed var(--border-color)',
+                  padding: '0.75rem',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(0,0,0,0.1)',
+                  position: 'relative',
+                  cursor: 'pointer'
+                }}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    opacity: 0,
+                    cursor: 'pointer',
+                    zIndex: 2,
+                  }}
+                />
+                <div style={{
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  zIndex: 1,
+                }}>
+                  {newImage ? (
+                    <img src={newImage} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ fontSize: '1.2rem', color: 'var(--accent-gold)' }}>+</span>
+                  )}
+                </div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  {newImage ? 'Image attached successfully' : 'Upload food or table photo'}
+                </span>
+                {newImage && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setNewImage('');
+                    }}
+                    style={{
+                      marginLeft: 'auto',
+                      background: 'none',
+                      border: 'none',
+                      color: '#dc2626',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      position: 'relative',
+                      zIndex: 3,
+                    }}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            </div>
+
             <button type="submit" className="btn-primary" style={{ gap: '0.5rem', width: '100%' }}>
               <Send size={16} />
               Submit Review
@@ -487,6 +592,11 @@ export const Reviews: React.FC = () => {
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.6' }}>
                 {review.comment}
               </p>
+              {review.image && (
+                <div style={{ marginTop: '0.75rem', borderRadius: '8px', overflow: 'hidden', maxHeight: '200px', width: '100%', backgroundColor: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-light)' }}>
+                  <img src={review.image} alt="Diner food upload" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              )}
             </div>
           ))}
         </div>

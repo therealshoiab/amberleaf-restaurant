@@ -18,6 +18,9 @@
   --glass-bg: rgba(8, 18, 13, 0.95); /* High opacity for solid luxury panels */
   --glass-glow: rgba(197, 160, 89, 0.02);
   --mobile-menu-bg: rgba(4, 9, 6, 0.99); /* Maximum opacity for mobile drawer */
+  --section-margin: 3rem;
+  --item-padding: 2rem;
+  --control-gap: 1.5rem;
 }
 
 :root.light-theme {
@@ -38,6 +41,9 @@
   --glass-bg: rgba(244, 242, 235, 0.96); /* High opacity */
   --glass-glow: rgba(179, 141, 71, 0.01);
   --mobile-menu-bg: rgba(251, 250, 247, 0.99); /* Maximum opacity */
+  --section-margin: 3rem;
+  --item-padding: 2rem;
+  --control-gap: 1.5rem;
 }
 
 /* Global Reset & Base */
@@ -251,5 +257,146 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 @media (min-width: 1024px) {
   .grid-4 {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Brand Delivery Buttons */
+.btn-swiggy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fc8019 0%, #ff9e00 100%);
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(252, 128, 25, 0.25);
+}
+
+.btn-swiggy:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(252, 128, 25, 0.4);
+  filter: brightness(1.1);
+}
+
+.btn-zomato {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #cb202d 0%, #ef4f5f 100%);
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(203, 32, 45, 0.25);
+}
+
+.btn-zomato:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(203, 32, 45, 0.4);
+  filter: brightness(1.1);
+}
+
+/* Menu Categories Scroll & Responsive overrides */
+.menu-categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* Gallery Tab Container & Buttons */
+.gallery-tab-container {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: var(--section-margin);
+  animation: fadeIn 1s ease forwards;
+}
+
+.gallery-tab-btn {
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  padding: 0.6rem 1.8rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gallery-tab-btn.active {
+  background: var(--accent-gold);
+  color: #000;
+  border-color: var(--accent-gold);
+  box-shadow: 0 4px 15px rgba(var(--accent-gold-rgb), 0.2);
+}
+
+.gallery-tab-btn:hover:not(.active) {
+  border-color: var(--accent-gold);
+  background: rgba(var(--accent-gold-rgb), 0.05);
+}
+
+/* Mobile & Tablet optimizations to reduce wasted space and allow horizontal swipe controls */
+@media (max-width: 768px) {
+  :root {
+    --section-margin: 1.5rem;
+    --item-padding: 1.25rem;
+    --control-gap: 1rem;
+  }
+
+  .page-container {
+    padding-top: 80px !important;
+    padding-bottom: 40px !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+
+  .menu-categories-container {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    justify-content: flex-start !important;
+    padding: 0.5rem 0.2rem !important;
+    scrollbar-width: none !important; /* Firefox */
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+
+  .menu-categories-container::-webkit-scrollbar {
+    display: none !important; /* Chrome, Safari, Opera */
+  }
+
+  .menu-categories-container button {
+    flex-shrink: 0 !important;
+  }
+
+  .gallery-tab-container {
+    gap: 0.5rem !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    justify-content: space-between !important;
+    width: 100%;
+    scrollbar-width: none !important;
+  }
+
+  .gallery-tab-container::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .gallery-tab-btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.85rem !important;
+    flex: 1 !important;
+    text-align: center;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
   }
 }

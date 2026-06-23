@@ -388,11 +388,8 @@ export const Home: React.FC = () => {
                 key={vid.id}
                 className="glass-panel"
                 style={{
-                  padding: '0.5rem',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.5rem',
+                  padding: '0.35rem',
+                  borderRadius: '14px',
                   minWidth: '200px',
                   width: '200px',
                   flexShrink: 0,
@@ -402,13 +399,13 @@ export const Home: React.FC = () => {
                   boxShadow: isActive ? '0 8px 24px rgba(197, 160, 89, 0.2)' : 'none',
                   transition: 'all 0.3s ease',
                 }}
-                onClick={() => { window.location.hash = '#/gallery'; }}
+                onClick={() => { window.location.hash = `#/gallery?video=${vid.id}`; }}
               >
                 <div
                   style={{
                     width: '100%',
                     height: '280px',
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     overflow: 'hidden',
                     position: 'relative',
                     backgroundColor: '#000',
@@ -424,6 +421,7 @@ export const Home: React.FC = () => {
                       width: '100%',
                       height: '100%',
                       objectFit: 'cover',
+                      display: 'block',
                     }}
                     onMouseEnter={() => {
                       isHovering.current = true;
@@ -449,25 +447,12 @@ export const Home: React.FC = () => {
                       color: '#fff',
                       fontSize: '0.7rem',
                       boxShadow: isActive ? '0 0 10px var(--accent-gold)' : 'none',
+                      pointerEvents: 'none',
                     }}
                   >
                     {isActive ? '⏸' : '▶'}
                   </div>
                 </div>
-                <span
-                  style={{
-                    fontSize: '0.75rem',
-                    color: isActive ? 'var(--accent-gold)' : 'var(--text-secondary)',
-                    textAlign: 'center',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    padding: '0.2rem 0',
-                    fontWeight: isActive ? 600 : 400,
-                  }}
-                >
-                  {vid.caption}
-                </span>
               </div>
             );
           })}

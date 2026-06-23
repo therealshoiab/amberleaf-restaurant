@@ -76,27 +76,39 @@ export const OrderOnline: React.FC = () => {
                 justifyContent: 'space-between',
                 padding: '1.2rem',
                 borderRadius: '10px',
-                border: '1px solid var(--border-light)',
-                backgroundColor: 'rgba(220, 38, 38, 0.03)',
+                border: '1px solid rgba(203, 32, 45, 0.2)',
+                backgroundColor: 'rgba(203, 32, 45, 0.03)',
                 color: 'var(--text-primary)',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-gold)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.backgroundColor = 'rgba(var(--accent-gold-rgb), 0.05)';
+                e.currentTarget.style.borderColor = '#cb202d';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.backgroundColor = '#cb202d';
+                const title = e.currentTarget.querySelector('.brand-title') as HTMLElement;
+                if (title) title.style.color = '#ffffff';
+                const desc = e.currentTarget.querySelector('.brand-desc') as HTMLElement;
+                if (desc) desc.style.color = 'rgba(255, 255, 255, 0.8)';
+                const icon = e.currentTarget.querySelector('.brand-icon') as HTMLElement;
+                if (icon) icon.style.color = '#ffffff';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border-light)';
+                e.currentTarget.style.borderColor = 'rgba(203, 32, 45, 0.2)';
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.03)';
+                e.currentTarget.style.backgroundColor = 'rgba(203, 32, 45, 0.03)';
+                const title = e.currentTarget.querySelector('.brand-title') as HTMLElement;
+                if (title) title.style.color = '#cb202d';
+                const desc = e.currentTarget.querySelector('.brand-desc') as HTMLElement;
+                if (desc) desc.style.color = 'var(--text-secondary)';
+                const icon = e.currentTarget.querySelector('.brand-icon') as HTMLElement;
+                if (icon) icon.style.color = 'var(--text-secondary)';
               }}
             >
               <div>
-                <span style={{ display: 'block', fontWeight: 700, fontSize: '1.05rem', color: '#dc2626' }}>Zomato Order</span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Delivering in 30-45 minutes</span>
+                <span className="brand-title" style={{ display: 'block', fontWeight: 700, fontSize: '1.05rem', color: '#cb202d', transition: 'color 0.3s ease' }}>Zomato Order</span>
+                <span className="brand-desc" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', transition: 'color 0.3s ease' }}>Delivering in 30-45 minutes</span>
               </div>
-              <ExternalLink size={18} style={{ color: 'var(--text-secondary)' }} />
+              <ExternalLink className="brand-icon" size={18} style={{ color: 'var(--text-secondary)', transition: 'color 0.3s ease' }} />
             </a>
 
             {/* Swiggy Button Card */}
@@ -111,27 +123,39 @@ export const OrderOnline: React.FC = () => {
                 justifyContent: 'space-between',
                 padding: '1.2rem',
                 borderRadius: '10px',
-                border: '1px solid var(--border-light)',
-                backgroundColor: 'rgba(249, 115, 22, 0.03)',
+                border: '1px solid rgba(252, 128, 25, 0.2)',
+                backgroundColor: 'rgba(252, 128, 25, 0.03)',
                 color: 'var(--text-primary)',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-gold)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.backgroundColor = 'rgba(var(--accent-gold-rgb), 0.05)';
+                e.currentTarget.style.borderColor = '#fc8019';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.backgroundColor = '#fc8019';
+                const title = e.currentTarget.querySelector('.brand-title') as HTMLElement;
+                if (title) title.style.color = '#ffffff';
+                const desc = e.currentTarget.querySelector('.brand-desc') as HTMLElement;
+                if (desc) desc.style.color = 'rgba(255, 255, 255, 0.8)';
+                const icon = e.currentTarget.querySelector('.brand-icon') as HTMLElement;
+                if (icon) icon.style.color = '#ffffff';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border-light)';
+                e.currentTarget.style.borderColor = 'rgba(252, 128, 25, 0.2)';
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.03)';
+                e.currentTarget.style.backgroundColor = 'rgba(252, 128, 25, 0.03)';
+                const title = e.currentTarget.querySelector('.brand-title') as HTMLElement;
+                if (title) title.style.color = '#fc8019';
+                const desc = e.currentTarget.querySelector('.brand-desc') as HTMLElement;
+                if (desc) desc.style.color = 'var(--text-secondary)';
+                const icon = e.currentTarget.querySelector('.brand-icon') as HTMLElement;
+                if (icon) icon.style.color = 'var(--text-secondary)';
               }}
             >
               <div>
-                <span style={{ display: 'block', fontWeight: 700, fontSize: '1.05rem', color: '#f97316' }}>Swiggy Order</span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Free delivery on select ranges</span>
+                <span className="brand-title" style={{ display: 'block', fontWeight: 700, fontSize: '1.05rem', color: '#fc8019', transition: 'color 0.3s ease' }}>Swiggy Order</span>
+                <span className="brand-desc" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', transition: 'color 0.3s ease' }}>Free delivery on select ranges</span>
               </div>
-              <ExternalLink size={18} style={{ color: 'var(--text-secondary)' }} />
+              <ExternalLink className="brand-icon" size={18} style={{ color: 'var(--text-secondary)', transition: 'color 0.3s ease' }} />
             </a>
           </div>
         </div>

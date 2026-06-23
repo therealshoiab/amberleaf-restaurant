@@ -212,7 +212,7 @@ export const Menu: React.FC = () => {
       />
 
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }} className="animate-fade-in">
+      <div style={{ textAlign: 'center', marginBottom: 'var(--section-margin)' }} className="animate-fade-in">
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -239,11 +239,11 @@ export const Menu: React.FC = () => {
       <div
         className="glass-panel"
         style={{
-          padding: '1.5rem',
-          marginBottom: '3rem',
+          padding: 'var(--item-padding, 1.5rem)',
+          marginBottom: 'var(--section-margin)',
           display: 'flex',
           flexDirection: 'column',
-          gap: '1.5rem',
+          gap: 'var(--control-gap, 1.5rem)',
         }}
       >
         {/* Search Bar */}
@@ -287,14 +287,7 @@ export const Menu: React.FC = () => {
         </div>
 
         {/* Filter Categories Chips */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.6rem',
-            justifyContent: 'center',
-          }}
-        >
+        <div className="menu-categories-container">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -310,6 +303,7 @@ export const Menu: React.FC = () => {
                 fontWeight: 600,
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
+                flexShrink: 0,
               }}
               onMouseEnter={(e) => {
                 if (selectedCategory !== cat) {
@@ -338,14 +332,14 @@ export const Menu: React.FC = () => {
           gap: '1rem',
           justifyContent: 'center',
           alignItems: 'center',
-          marginBottom: '3rem',
+          marginBottom: 'var(--section-margin)',
         }}
       >
         <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Prefer delivery? Order via:</span>
         <div style={{ display: 'flex', gap: '0.8rem' }}>
           <a
             href="#/order"
-            className="btn-primary"
+            className="btn-swiggy"
             style={{
               padding: '0.6rem 1.2rem',
               fontSize: '0.85rem',
@@ -358,14 +352,14 @@ export const Menu: React.FC = () => {
           </a>
           <a
             href="#/order"
-            className="btn-secondary"
+            className="btn-zomato"
             style={{
               padding: '0.6rem 1.2rem',
               fontSize: '0.85rem',
               gap: '0.4rem',
             }}
           >
-            <ShoppingBag size={14} style={{ color: 'var(--accent-gold)' }} />
+            <ShoppingBag size={14} />
             Zomato Order
             <ExternalLink size={12} />
           </a>
@@ -406,7 +400,7 @@ export const Menu: React.FC = () => {
               key={item.id}
               className="glass-panel"
               style={{
-                padding: '2rem',
+                padding: 'var(--item-padding, 2rem)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',

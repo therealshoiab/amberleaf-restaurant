@@ -18,6 +18,36 @@ export const Gallery: React.FC = () => {
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const lightboxVideoRef = useRef<HTMLVideoElement | null>(null);
 
+  const closeLightbox = () => {
+    setLightboxIndex(null);
+    if (window.location.hash.includes('?video=')) {
+      window.location.hash = '#/gallery';
+    }
+  };
+
+  // Select video from homepage redirect URL parameter
+  useEffect(() => {
+    const handleHashParam = () => {
+      const hash = window.location.hash;
+      const match = hash.match(/\?video=([\w-]+)/);
+      if (match) {
+        const videoId = match[1];
+        setActiveCategory('video');
+        
+        // Find index in video filter list
+        const videoItems = galleryItems.filter((item) => item.type === 'video');
+        const idx = videoItems.findIndex((item) => item.id === videoId);
+        if (idx !== -1) {
+          setLightboxIndex(idx);
+        }
+      }
+    };
+
+    handleHashParam();
+    window.addEventListener('hashchange', handleHashParam);
+    return () => window.removeEventListener('hashchange', handleHashParam);
+  }, []);
+
   // Unified Gallery Items (13 Google Maps images + 14 Instagram posts/reels)
   const galleryItems: GalleryItem[] = [
     // Google Maps Photos (g1 to g13)
@@ -418,16 +448,7 @@ export const Gallery: React.FC = () => {
       </div>
 
       {/* Category Tabs */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: '0.75rem',
-          marginBottom: '3rem',
-          animation: 'fadeIn 1s ease forwards',
-        }}
-      >
+      <div className="gallery-tab-container">
         {[
           { id: 'all', label: 'All Media' },
           { id: 'image', label: 'Photos' },
@@ -435,34 +456,10 @@ export const Gallery: React.FC = () => {
         ].map((tab) => (
           <button
             key={tab.id}
+            className={`gallery-tab-btn ${activeCategory === tab.id ? 'active' : ''}`}
             onClick={() => {
               setActiveCategory(tab.id as any);
-              setLightboxIndex(null); // Close lightbox on filter change
-            }}
-            style={{
-              background: activeCategory === tab.id ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.02)',
-              color: activeCategory === tab.id ? '#000' : 'var(--text-primary)',
-              border: '1px solid',
-              borderColor: activeCategory === tab.id ? 'var(--accent-gold)' : 'var(--border-light)',
-              padding: '0.6rem 1.8rem',
-              borderRadius: '8px',
-              fontSize: '0.95rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: activeCategory === tab.id ? '0 4px 15px rgba(var(--accent-gold-rgb), 0.2)' : 'none',
-            }}
-            onMouseEnter={(e) => {
-              if (activeCategory !== tab.id) {
-                e.currentTarget.style.borderColor = 'var(--accent-gold)';
-                e.currentTarget.style.background = 'rgba(var(--accent-gold-rgb), 0.05)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeCategory !== tab.id) {
-                e.currentTarget.style.borderColor = 'var(--border-light)';
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
-              }
+              closeLightbox();
             }}
           >
             {tab.label}
@@ -655,11 +652,11 @@ export const Gallery: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          onClick={() => setLightboxIndex(null)}
+          onClick={closeLightbox}
         >
           {/* Close Trigger */}
           <button
-            onClick={() => setLightboxIndex(null)}
+            onClick={closeLightbox}
             style={{
               position: 'absolute',
               top: '2rem',
@@ -734,19 +731,21 @@ export const Gallery: React.FC = () => {
               />
             )}
             
-            {/* Caption */}
-            <p
-              style={{
-                color: '#f2f7f4',
-                fontSize: '0.95rem',
-                textAlign: 'center',
-                maxWidth: '600px',
-                lineHeight: '1.6',
-                textShadow: '0 1px 5px rgba(0,0,0,0.5)',
-              }}
-            >
-              {filteredItems[lightboxIndex].caption}
-            </p>
+            {/* Caption (Images only) */}
+            {filteredItems[lightboxIndex].type === 'image' && (
+              <p
+                style={{
+                  color: '#f2f7f4',
+                  fontSize: '0.95rem',
+                  textAlign: 'center',
+                  maxWidth: '600px',
+                  lineHeight: '1.6',
+                  textShadow: '0 1px 5px rgba(0,0,0,0.5)',
+                }}
+              >
+                {filteredItems[lightboxIndex].caption}
+              </p>
+            )}
           </div>
 
           {/* Right Arrow */}
