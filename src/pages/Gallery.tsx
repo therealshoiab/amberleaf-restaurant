@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SEO } from '../components/SEO';
-import { Heart, MessageCircle, Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface GalleryItem {
   id: string;
@@ -474,13 +474,13 @@ export const Gallery: React.FC = () => {
             key={item.id}
             className="glass-panel"
             style={{
-              padding: item.type === 'video' ? '0' : '0.75rem',
+              padding: '0',
               borderRadius: '16px',
               cursor: 'pointer',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
-              gap: item.type === 'video' ? '0' : '0.75rem',
+              gap: '0',
               transition: 'all 0.3s ease',
             }}
             onClick={() => setLightboxIndex(index)}
@@ -490,7 +490,7 @@ export const Gallery: React.FC = () => {
               style={{
                 width: '100%',
                 height: '380px',
-                borderRadius: item.type === 'video' ? '16px' : '12px',
+                borderRadius: '16px',
                 overflow: 'hidden',
                 position: 'relative',
                 backgroundColor: '#000',
@@ -591,47 +591,6 @@ export const Gallery: React.FC = () => {
                 </a>
               )}
             </div>
-
-            {/* Interaction details (only visible for images) */}
-            {item.type !== 'video' && (
-              <div style={{ padding: '0 0.5rem 0.5rem 0.5rem' }}>
-                <p
-                  style={{
-                    color: 'var(--text-secondary)',
-                    fontSize: '0.85rem',
-                    lineHeight: '1.5',
-                    marginBottom: '0.75rem',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {item.caption}
-                </p>
-                
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1.25rem',
-                    fontSize: '0.8rem',
-                    color: 'var(--text-secondary)',
-                    borderTop: '1px solid var(--border-light)',
-                    paddingTop: '0.6rem',
-                  }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <Heart size={14} style={{ color: '#E1306C' }} />
-                    {item.likes}
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <MessageCircle size={14} />
-                    {item.comments}
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
         ))}
       </div>
@@ -729,22 +688,6 @@ export const Gallery: React.FC = () => {
                   boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
                 }}
               />
-            )}
-            
-            {/* Caption (Images only) */}
-            {filteredItems[lightboxIndex].type === 'image' && (
-              <p
-                style={{
-                  color: '#f2f7f4',
-                  fontSize: '0.95rem',
-                  textAlign: 'center',
-                  maxWidth: '600px',
-                  lineHeight: '1.6',
-                  textShadow: '0 1px 5px rgba(0,0,0,0.5)',
-                }}
-              >
-                {filteredItems[lightboxIndex].caption}
-              </p>
             )}
           </div>
 
