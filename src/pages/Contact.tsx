@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SEO } from '../components/SEO';
-import { MapPin, Phone, MessageSquare, Clock, Calendar, Check, Send } from 'lucide-react';
+import { MapPin, Phone, Clock, Calendar, Check, Send } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export const Contact: React.FC = () => {
@@ -12,8 +12,7 @@ export const Contact: React.FC = () => {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('19:00');
   const [notes, setNotes] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [formError, setFormError] = useState('');
 
   const handleSubmitBooking = (e: React.FormEvent) => {
@@ -34,7 +33,6 @@ export const Contact: React.FC = () => {
     }
 
     setFormError('');
-    setIsSubmitting(true);
 
     const message = `Amberleaf Restaurant Reservation Request:
 • Name: ${name}
@@ -46,14 +44,11 @@ export const Contact: React.FC = () => {
 
     const waUrl = `https://wa.me/917780938743?text=${encodeURIComponent(message)}`;
 
-    // Popup alert message
-    alert("Reservation request sent!");
+    // Show popup success modal overlay
+    setShowSuccessModal(true);
 
-    // Redirect to WhatsApp
-    window.open(waUrl, '_blank');
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    // Redirect to WhatsApp automatically (will launch app on mobile without pop-up blocking)
+    window.location.href = waUrl;
 
     // Trigger canvas-confetti
     confetti({
@@ -67,7 +62,7 @@ export const Contact: React.FC = () => {
     <div className="page-container">
       <SEO
         title="Contact & Bookings"
-        description="Book a table at Amberleaf Restaurant in Srinagar. Submit our reservation form to secure instant table allocation and print your luxury pass."
+        description="Book a table at Amberleaf Restaurant in Srinagar. Submit our reservation form to secure instant table allocation."
       />
 
       {/* Page Header */}
@@ -94,6 +89,7 @@ export const Contact: React.FC = () => {
         />
       </div>
 
+      {/* Grid structure: Left Info & map, Right Form */}
       <div
         style={{
           display: 'grid',
@@ -101,50 +97,46 @@ export const Contact: React.FC = () => {
           gap: '3rem',
           alignItems: 'start',
         }}
-        className="contact-layout"
+        className="contact-layout animate-fade-in"
       >
-        {/* Left Side: Contact Information & Google Maps Iframe */}
+        {/* Left Side: Contact Information & Map */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div
             className="glass-panel"
             style={{
-              padding: '2rem',
-              display: 'grid',
-              gridTemplateColumns: '1fr',
+              padding: '2.5rem',
+              display: 'flex',
+              flexDirection: 'column',
               gap: '1.5rem',
             }}
           >
-            <h3 style={{ fontSize: '1.3rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Restaurant Location</h3>
-            
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', fontSize: '0.9rem' }}>
-              <MapPin size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
-              <div>
-                <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>Street Address</strong>
-                <span style={{ lineHeight: '1.5' }}>310, Balgarden - Nursing garh Rd, Balgarden, Srinagar, Jammu and Kashmir 190010</span>
-              </div>
-            </div>
+            <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Restaurant Location</h3>
 
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', fontSize: '0.9rem' }}>
-              <Phone size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
-              <div>
-                <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>Call Booking</strong>
-                <span>+91 6006379610</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                <MapPin size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
+                <div>
+                  <h4 style={{ fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Address</h4>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                    Amberleaf Restaurant, Balgarden, Nursing Garh, Srinagar, Jammu and Kashmir 190010
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', fontSize: '0.9rem' }}>
-              <MessageSquare size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
-              <div>
-                <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>WhatsApp Booking</strong>
-                <span>+91 7780938743</span>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                <Phone size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
+                <div>
+                  <h4 style={{ fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Phone</h4>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>+91 7780938743</p>
+                </div>
               </div>
-            </div>
 
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', fontSize: '0.9rem' }}>
-              <Clock size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
-              <div>
-                <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>Opening Hours</strong>
-                <span>Open Daily: 09:00am to 10:30pm</span>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                <Clock size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
+                <div>
+                  <h4 style={{ fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Timings</h4>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Open Daily: 09:00 AM - 10:30 PM</p>
+                </div>
               </div>
             </div>
           </div>
@@ -174,135 +166,69 @@ export const Contact: React.FC = () => {
 
         {/* Right Side: Table Reservation Form */}
         <div className="glass-panel" style={{ padding: 'clamp(1.5rem, 5vw, 2.5rem)', position: 'relative', overflow: 'hidden' }}>
-          {isSubmitting ? (
-            <div
+          <div>
+            <h3
               style={{
+                fontSize: '1.4rem',
+                color: 'var(--text-primary)',
+                marginBottom: '0.5rem',
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '420px',
-                textAlign: 'center',
-                gap: '2.5rem',
-                animation: 'fadeIn 0.5s ease forwards',
+                gap: '0.5rem',
               }}
             >
-              {/* Luxury Gold Spinner */}
-              <div style={{ position: 'relative', width: '80px', height: '80px' }}>
-                <div
+              <Calendar size={20} style={{ color: 'var(--accent-gold)' }} />
+              Table Reservation Form
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '2rem' }}>
+              Fill in the reservation details below. Table allocations are processed instantly.
+            </p>
+
+            <form onSubmit={handleSubmitBooking} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              {formError && (
+                <div style={{ color: '#dc2626', fontSize: '0.85rem', fontWeight: 600 }}>
+                  {formError}
+                </div>
+              )}
+
+              {/* Name */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   style={{
-                    position: 'absolute',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    border: '3px solid rgba(197, 160, 89, 0.1)',
-                    borderTop: '3px solid var(--accent-gold)',
-                    borderRadius: '50%',
-                    animation: 'spin 1.2s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite',
-                  }}
-                />
-                <div
-                  className="luxury-pulse"
-                  style={{
-                    position: 'absolute',
-                    top: '15px', left: '15px', right: '15px', bottom: '15px',
-                    backgroundColor: 'rgba(197, 160, 89, 0.08)',
-                    borderRadius: '50%',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(0,0,0,0.15)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.9rem',
+                    outline: 'none',
                   }}
                 />
               </div>
-            </div>
-          ) : isSubmitted ? (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                animation: 'fadeIn 0.6s ease forwards',
-                padding: '2rem 1rem',
-              }}
-            >
+
+              {/* Grid fields */}
               <div
                 style={{
-                  backgroundColor: 'rgba(197, 160, 89, 0.15)',
-                  border: '1px solid var(--accent-gold)',
-                  borderRadius: '50%',
-                  padding: '1rem',
-                  display: 'inline-flex',
-                  color: 'var(--accent-gold)',
-                  marginBottom: '1.25rem',
-                  boxShadow: '0 0 15px rgba(197, 160, 89, 0.15)',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                  gap: '1rem',
                 }}
               >
-                <Check size={32} />
-              </div>
-              <h3 style={{ fontSize: '1.6rem', color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Reservation Request Sent!</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem', maxWidth: '400px' }}>
-                We have opened WhatsApp to send your details directly to our booking desk at <strong>+91 7780938743</strong>. Please click send in WhatsApp to finalize.
-              </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', width: '100%', maxWidth: '280px' }}>
-                <a
-                  href={`https://wa.me/917780938743?text=${encodeURIComponent(`Amberleaf Restaurant Reservation Request:\n• Name: ${name}\n• Phone: ${phone}\n• Guests: ${guests}\n• Date: ${date}\n• Time: ${time}\n• Notes: ${notes || 'None'}`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary"
-                  style={{ gap: '0.5rem', textDecoration: 'none' }}
-                >
-                  Open WhatsApp Again
-                </a>
-                <button
-                  onClick={() => {
-                    setName('');
-                    setPhone('');
-                    setEmail('');
-                    setGuests('2');
-                    setDate('');
-                    setTime('19:00');
-                    setNotes('');
-                    setIsSubmitted(false);
-                  }}
-                  className="btn-secondary"
-                  style={{ padding: '0.8rem 1.8rem', fontSize: '0.95rem' }}
-                >
-                  Book Another Table
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <h3
-                style={{
-                  fontSize: '1.4rem',
-                  color: 'var(--text-primary)',
-                  marginBottom: '0.5rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                <Calendar size={20} style={{ color: 'var(--accent-gold)' }} />
-                Table Reservation Form
-              </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '2rem' }}>
-                Fill in the reservation details below. Table allocations are processed instantly.
-              </p>
-
-              <form onSubmit={handleSubmitBooking} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                {formError && (
-                  <div style={{ color: '#dc2626', fontSize: '0.85rem', fontWeight: 600 }}>
-                    {formError}
-                  </div>
-                )}
-
-                {/* Name */}
+                {/* Phone */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Full Name *</label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Phone Number *</label>
                   <input
-                    type="text"
+                    type="tel"
                     required
-                    placeholder="e.g. John Doe"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. +91 9999999999"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     style={{
                       padding: '0.75rem 1rem',
                       borderRadius: '6px',
@@ -315,117 +241,47 @@ export const Contact: React.FC = () => {
                   />
                 </div>
 
-                {/* Grid fields */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                    gap: '1rem',
-                  }}
-                >
-                  {/* Phone */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Phone Number *</label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="e.g. +91 9999999999"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      style={{
-                        padding: '0.75rem 1rem',
-                        borderRadius: '6px',
-                        backgroundColor: 'rgba(0,0,0,0.15)',
-                        border: '1px solid var(--border-color)',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.9rem',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-
-                  {/* Guests */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Guests Count</label>
-                    <select
-                      value={guests}
-                      onChange={(e) => setGuests(e.target.value)}
-                      style={{
-                        padding: '0.75rem 1rem',
-                        borderRadius: '6px',
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        border: '1px solid var(--border-color)',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.9rem',
-                        outline: 'none',
-                      }}
-                    >
-                      <option value="1">1 Person</option>
-                      <option value="2">2 Persons</option>
-                      <option value="3">3 Persons</option>
-                      <option value="4">4 Persons</option>
-                      <option value="5">5 Persons</option>
-                      <option value="6">6+ Persons (Family)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                    gap: '1rem',
-                  }}
-                >
-                  {/* Date */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Date *</label>
-                    <input
-                      type="date"
-                      required
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      style={{
-                        padding: '0.75rem 1rem',
-                        borderRadius: '6px',
-                        backgroundColor: 'rgba(0,0,0,0.15)',
-                        border: '1px solid var(--border-color)',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.9rem',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-
-                  {/* Time */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Time</label>
-                    <input
-                      type="time"
-                      required
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                      style={{
-                        padding: '0.75rem 1rem',
-                        borderRadius: '6px',
-                        backgroundColor: 'rgba(0,0,0,0.15)',
-                        border: '1px solid var(--border-color)',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.9rem',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Email */}
+                {/* Guests */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Email (Optional)</label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Guests Count</label>
+                  <select
+                    value={guests}
+                    onChange={(e) => setGuests(e.target.value)}
+                    style={{
+                      padding: '0.75rem 1rem',
+                      borderRadius: '6px',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.9rem',
+                      outline: 'none',
+                    }}
+                  >
+                    <option value="1">1 Person</option>
+                    <option value="2">2 Persons</option>
+                    <option value="3">3 Persons</option>
+                    <option value="4">4 Persons</option>
+                    <option value="5">5 Persons</option>
+                    <option value="6">6+ Persons (Family)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                  gap: '1rem',
+                }}
+              >
+                {/* Date */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Date *</label>
                   <input
-                    type="email"
-                    placeholder="e.g. name@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type="date"
+                    required
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
                     style={{
                       padding: '0.75rem 1rem',
                       borderRadius: '6px',
@@ -438,14 +294,14 @@ export const Contact: React.FC = () => {
                   />
                 </div>
 
-                {/* Special Notes */}
+                {/* Time */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Special Requests (Optional)</label>
-                  <textarea
-                    rows={3}
-                    placeholder="e.g. Window table, kid highchair, birthday celebration..."
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Time</label>
+                  <input
+                    type="time"
+                    required
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
                     style={{
                       padding: '0.75rem 1rem',
                       borderRadius: '6px',
@@ -454,20 +310,119 @@ export const Contact: React.FC = () => {
                       color: 'var(--text-primary)',
                       fontSize: '0.9rem',
                       outline: 'none',
-                      resize: 'none',
                     }}
                   />
                 </div>
+              </div>
 
-                <button type="submit" className="btn-primary" style={{ gap: '0.5rem', width: '100%', marginTop: '0.5rem' }}>
-                  <Send size={16} />
-                  Confirm Table Reservation
-                </button>
-              </form>
-            </div>
-          )}
+              {/* Email */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Email (Optional)</label>
+                <input
+                  type="email"
+                  placeholder="e.g. name@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  style={{
+                    padding: '0.75rem 1rem',
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(0,0,0,0.15)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              {/* Special Notes */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Special Requests (Optional)</label>
+                <textarea
+                  rows={3}
+                  placeholder="e.g. Window table, kid highchair, birthday celebration..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  style={{
+                    padding: '0.75rem 1rem',
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(0,0,0,0.15)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                    resize: 'none',
+                  }}
+                />
+              </div>
+
+              <button type="submit" className="btn-primary" style={{ gap: '0.5rem', width: '100%', marginTop: '0.5rem' }}>
+                <Send size={16} />
+                Confirm Table Reservation
+              </button>
+            </form>
+          </div>
         </div>
       </div>
+
+      {/* Success Modal Popup Overlay */}
+      {showSuccessModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(4, 9, 6, 0.85)',
+          backdropFilter: 'blur(10px)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+        }}>
+          <div className="glass-panel animate-fade-in" style={{
+            padding: '2.5rem 2rem',
+            maxWidth: '350px',
+            width: '100%',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1.25rem',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+          }}>
+            <div style={{
+              backgroundColor: 'rgba(197, 160, 89, 0.15)',
+              border: '1px solid var(--accent-gold)',
+              borderRadius: '50%',
+              padding: '0.8rem',
+              display: 'inline-flex',
+              color: 'var(--accent-gold)',
+              boxShadow: '0 0 15px rgba(197, 160, 89, 0.15)',
+            }}>
+              <Check size={28} />
+            </div>
+            <h3 style={{ fontSize: '1.5rem', color: 'var(--text-primary)', margin: 0 }}>Reservation Request Sent!</h3>
+            <button
+              onClick={() => {
+                setShowSuccessModal(false);
+                setName('');
+                setPhone('');
+                setEmail('');
+                setGuests('2');
+                setDate('');
+                setTime('19:00');
+                setNotes('');
+              }}
+              className="btn-primary"
+              style={{ width: '100%', padding: '0.7rem 1.4rem', fontSize: '0.9rem', marginTop: '0.5rem' }}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @media (min-width: 1024px) {
