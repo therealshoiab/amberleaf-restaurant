@@ -439,31 +439,7 @@ export const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Scroll Down Indicator - Meydani Style */}
-        <a
-          href="#marquee-anchor"
-          style={{
-            position: 'absolute',
-            bottom: '1rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '0.2rem',
-            textDecoration: 'none',
-            color: 'rgba(255, 255, 255, 0.8)',
-            fontSize: '0.72rem',
-            fontWeight: 700,
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            zIndex: 10,
-            transition: 'color 0.3s ease',
-          }}
-        >
-          <span>EXPLORE MORE</span>
-          <ChevronDown size={18} className="bounce-chevron" style={{ color: 'var(--accent-gold)' }} />
-        </a>
+
       </section>
 
       {/* =========================================================================
