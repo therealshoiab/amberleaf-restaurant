@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, MessageSquare, MapPin, Clock } from 'lucide-react';
+import { Phone, MessageSquare, MapPin, Clock, Lock } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -190,6 +190,12 @@ export const Footer: React.FC = () => {
                 Book a Table
               </a>
             </li>
+            <li>
+              <a href="#/admin" style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}>
+                <Lock size={12} />
+                Admin Portal
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -239,12 +245,16 @@ export const Footer: React.FC = () => {
         }}
       >
         <span>&copy; {new Date().getFullYear()} Amberleaf Restaurant. All rights reserved.</span>
-        <div style={{ display: 'flex', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
           <a href="#/legal" style={{ color: 'inherit', textDecoration: 'none' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}>
             Terms of Service
           </a>
           <a href="#/legal" style={{ color: 'inherit', textDecoration: 'none' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}>
             Privacy Policy
+          </a>
+          <a href="#/admin" style={{ color: 'var(--text-secondary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>
+            <Lock size={12} />
+            Admin
           </a>
         </div>
       </div>

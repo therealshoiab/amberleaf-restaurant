@@ -1,204 +1,30 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { SEO } from '../components/SEO';
 import { Search, Flame, Award, ShoppingBag, ExternalLink } from 'lucide-react';
-
-interface MenuItem {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  description: string;
-  isPopular?: boolean;
-  isSignature?: boolean;
-  isVegetarian?: boolean;
-  isChefsPick?: boolean;
-}
+import { menuService } from '../services/menuService';
+import { MENU_CATEGORIES } from '../data/defaultMenu';
+import type { MenuItem } from '../data/defaultMenu';
 
 export const Menu: React.FC = React.memo(() => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(() => menuService.getMenuItems());
 
-  const categories = [
-    'All',
-    'Kashmiri Wazwan',
-    'Tandoor & Grills',
-    'Main Course',
-    'Chinese & Starters',
-    'Beverages',
-    'Desserts',
-  ];
+  useEffect(() => {
+    const handleUpdate = () => {
+      setMenuItems(menuService.getMenuItems());
+    };
 
-  const menuItems: MenuItem[] = [
-    // Kashmiri Wazwan
-    {
-      id: 'w1',
-      name: 'Mutton Rogan Josh',
-      category: 'Kashmiri Wazwan',
-      price: 520,
-      description: 'Slow-cooked tender lamb chunks in a rich aromatic gravy flavored with Kashmiri maval (cockscomb) flowers, fennel, and dry ginger.',
-      isPopular: true,
-      isVegetarian: false,
-      isChefsPick: true,
-    },
-    {
-      id: 'w2',
-      name: 'Kashmiri Rista',
-      category: 'Kashmiri Wazwan',
-      price: 490,
-      description: 'Velvety mutton balls hand-hammered on stone blocks, simmered in a spiced red gravy infused with aromatic saffron.',
-      isSignature: true,
-      isVegetarian: false,
-    },
-    {
-      id: 'w3',
-      name: 'Mutton Gushtaba',
-      category: 'Kashmiri Wazwan',
-      price: 540,
-      description: 'Pounded mutton rounds cooked in a rich, velvety curd and cashew gravy flavored with cardamoms and dry mint.',
-      isSignature: true,
-      isVegetarian: false,
-      isChefsPick: true,
-    },
-    {
-      id: 'w4',
-      name: 'Tabak Maaz',
-      category: 'Kashmiri Wazwan',
-      price: 450,
-      description: 'Succulent lamb ribs parboiled in spices and pan-fried in clarified butter (ghee) until golden and crispy.',
-      isPopular: true,
-      isVegetarian: false,
-    },
-    // Tandoor & Grills
-    {
-      id: 't1',
-      name: 'Mutton Seekh Kebab',
-      category: 'Tandoor & Grills',
-      price: 380,
-      description: 'Spiced minced mutton skewered and roasted in a traditional clay tandoor. Served with mint chutney.',
-      isPopular: true,
-      isVegetarian: false,
-      isChefsPick: true,
-    },
-    {
-      id: 't2',
-      name: 'Paneer Tikka Lal Qila',
-      category: 'Tandoor & Grills',
-      price: 290,
-      description: 'Fresh cottage cheese cubes marinated in pickling tandoori spices and cooked over hot charcoal grills.',
-      isVegetarian: true,
-    },
-    {
-      id: 't3',
-      name: 'Tandoori Chicken Platter',
-      category: 'Tandoor & Grills',
-      price: 480,
-      description: 'Assorted chicken cuts marinated in yogurt and red chillies, grilled to smoky tenderness.',
-      isPopular: true,
-      isVegetarian: false,
-    },
-    // Main Course
-    {
-      id: 'm1',
-      name: 'Butter Chicken Amberleaf',
-      category: 'Main Course',
-      price: 420,
-      description: 'Tandoori chicken shreds cooked in our signature sweet-and-savory cashew-tomato gravy, loaded with fresh butter and cream.',
-      isPopular: true,
-      isVegetarian: false,
-    },
-    {
-      id: 'm2',
-      name: 'Kadhai Paneer Special',
-      category: 'Main Course',
-      price: 340,
-      description: 'Paneer blocks cooked with thick bell peppers, onions, and freshly crushed coriander seeds in a spicy tomato-onion base.',
-      isVegetarian: true,
-    },
-    {
-      id: 'm3',
-      name: 'Dal Makhani Shahi',
-      category: 'Main Course',
-      price: 280,
-      description: 'Creamy black lentils slow-cooked overnight with fresh cream, tomatoes, and home-churned butter.',
-      isVegetarian: true,
-    },
-    {
-      id: 'm4',
-      name: 'Dum Mutton Biryani',
-      category: 'Main Course',
-      price: 460,
-      description: 'Long-grain Basmati rice layered with spiced mutton chunks, saffron milk, and fried onions, cooked on dum.',
-      isSignature: true,
-      isVegetarian: false,
-      isChefsPick: true,
-    },
-    // Chinese & Starters
-    {
-      id: 'c1',
-      name: 'Chilli Chicken Dry',
-      category: 'Chinese & Starters',
-      price: 320,
-      description: 'Boneless chicken cubes wok-tossed with capsicum, garlic, spring onions, and a spicy soy chilli glaze.',
-      isPopular: true,
-      isVegetarian: false,
-    },
-    {
-      id: 'c2',
-      name: 'Veg Spring Rolls',
-      category: 'Chinese & Starters',
-      price: 220,
-      description: 'Crunchy golden shells stuffed with shredded stir-fry vegetables and glass noodles. Served with sweet chilli dip.',
-      isVegetarian: true,
-    },
-    // Beverages
-    {
-      id: 'b1',
-      name: 'Authentic Kashmiri Kahwa',
-      category: 'Beverages',
-      price: 110,
-      description: 'Traditional green tea brewed with saffron strands, crushed green cardamoms, cinnamon, and slivered almonds.',
-      isSignature: true,
-      isVegetarian: true,
-      isChefsPick: true,
-    },
-    {
-      id: 'b2',
-      name: 'Saffron Mint Cooler',
-      category: 'Beverages',
-      price: 160,
-      description: 'A refreshing fizzy drink made with fresh mint sprigs, lemon juice, and a sweet saffron syrup overlay.',
-      isPopular: true,
-      isVegetarian: true,
-    },
-    {
-      id: 'b3',
-      name: 'Amberleaf French Press',
-      category: 'Beverages',
-      price: 140,
-      description: 'Rich freshly ground dark-roast arabica coffee beans, steeped and pressed. Served black or with hot milk.',
-      isVegetarian: true,
-    },
-    // Desserts
-    {
-      id: 'd1',
-      name: 'Shahi Tukda Royal',
-      category: 'Desserts',
-      price: 180,
-      description: 'Crispy fried bread slices soaked in saffron sugar syrup and topped with milk rabri, pistachios, and silver leaf.',
-      isSignature: true,
-      isVegetarian: true,
-      isChefsPick: true,
-    },
-    {
-      id: 'd2',
-      name: 'Zafrani Kulfi Firdaus',
-      category: 'Desserts',
-      price: 150,
-      description: 'Rich kulfi ice cream flavored with crushed saffron and cardamoms, topped with dynamic almond shavings.',
-      isPopular: true,
-      isVegetarian: true,
-    },
-  ];
+    window.addEventListener('amberleaf:menu_updated', handleUpdate);
+    return () => window.removeEventListener('amberleaf:menu_updated', handleUpdate);
+  }, []);
+
+  // Compute active categories dynamically from items
+  const categories = useMemo(() => {
+    const itemCategories = Array.from(new Set(menuItems.map((i) => i.category))).filter(Boolean);
+    const combined = Array.from(new Set([...MENU_CATEGORIES, ...itemCategories]));
+    return combined;
+  }, [menuItems]);
 
   // Filter logic
   const filteredItems = useMemo(() => {
@@ -209,7 +35,7 @@ export const Menu: React.FC = React.memo(() => {
       const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [menuItems, searchQuery, selectedCategory]);
 
   return (
     <div className="page-container">
@@ -399,15 +225,40 @@ export const Menu: React.FC = React.memo(() => {
               key={item.id}
               className="glass-panel shimmer-card"
               style={{
-                padding: 'var(--item-padding, 2rem)',
+                borderRadius: '16px',
+                overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                gap: '1rem',
                 transition: 'all 0.3s ease',
               }}
             >
-              <div>
+              {/* Optional Photo Thumbnail */}
+              {item.image && (
+                <div style={{ width: '100%', height: '180px', position: 'relative', backgroundColor: 'rgba(0,0,0,0.3)', overflow: 'hidden' }}>
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    loading="lazy"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: '50px',
+                      background: 'linear-gradient(to top, var(--glass-bg), transparent)',
+                    }}
+                  />
+                </div>
+              )}
+
+              <div style={{ padding: 'var(--item-padding, 1.75rem)', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                 {/* Badge Row */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                   <span
@@ -421,7 +272,7 @@ export const Menu: React.FC = React.memo(() => {
                   >
                     {item.category}
                   </span>
-                  
+
                   <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                     {item.isChefsPick && (
                       <span

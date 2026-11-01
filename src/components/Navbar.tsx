@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavbarProps {
   currentHash: string;
+  hasBanner?: boolean;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }) => {
   const [isThemeLight, setIsThemeLight] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -14,7 +15,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-    
+
     if (savedTheme === 'light' || (!savedTheme && systemPrefersLight)) {
       setIsThemeLight(true);
       document.documentElement.classList.add('light-theme');
@@ -52,7 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
       className="glass-navbar"
       style={{
         position: 'fixed',
-        top: 0,
+        top: hasBanner ? '36px' : 0,
         left: 0,
         right: 0,
         height: '80px',
@@ -120,6 +121,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
         style={{
           display: 'none',
           alignItems: 'center',
+          gap: '1.25rem',
         }}
         className="desktop-menu-container"
       >
@@ -129,73 +131,118 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
             <React.Fragment key={item.hash}>
               <a
                 href={item.hash}
-                className="nav-hover-link"
+                className="luxury-nav-link"
                 style={{
-                  color: isActive ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                  color: isActive ? 'var(--accent-gold)' : 'var(--text-primary)',
                   textDecoration: 'none',
-                  fontSize: '0.85rem',
+                  fontSize: '0.88rem',
                   fontWeight: 600,
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.03em',
+                  padding: '0.3rem 0',
                   position: 'relative',
-                  padding: '0.25rem 0',
-                  textTransform: 'uppercase',
+                  transition: 'color 0.3s ease',
                 }}
               >
                 {item.label}
-                {isActive && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      bottom: '-4px',
-                      left: 0,
-                      right: 0,
-                      height: '1px',
-                      backgroundColor: 'var(--accent-gold)',
-                      boxShadow: '0 0 8px rgba(var(--accent-gold-rgb), 0.6)',
-                    }}
-                  />
-                )}
+                <span
+                  className="nav-gold-underline"
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '1.5px',
+                    backgroundColor: 'var(--accent-gold)',
+                    transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
+                    transformOrigin: 'left',
+                    transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                />
               </a>
+
+              {/* Subtle Gold Dot separator between nav items on desktop */}
               {index < navItems.length - 1 && (
-                <span style={{ margin: '0 0.8rem', color: 'var(--accent-gold)', opacity: 0.5, fontSize: '0.8rem' }}>&bull;</span>
+                <span
+                  style={{
+                    color: 'var(--accent-gold)',
+                    opacity: 0.4,
+                    fontSize: '0.7rem',
+                    userSelect: 'none',
+                  }}
+                >
+                  &bull;
+                </span>
               )}
             </React.Fragment>
           );
         })}
       </div>
 
-      {/* Action Controls (CTA button + Theme Switcher + Custom Mobile Trigger) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-        {/* Reserve Table CTA (Desktop only) */}
+      {/* Controls Container */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        {/* Reserve a Table CTA Button */}
         <a
           href="#/contact"
           className="btn-reserve-nav"
           style={{
             border: '1px solid var(--accent-gold)',
-            background: 'transparent',
+            backgroundColor: 'transparent',
             color: 'var(--accent-gold)',
-            padding: '0.5rem 1.25rem',
-            borderRadius: '4px',
+            padding: '0.55rem 1.25rem',
+            borderRadius: '9999px',
             fontSize: '0.85rem',
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
+            fontWeight: 600,
+            letterSpacing: '0.05em',
             textDecoration: 'none',
+            textTransform: 'uppercase',
             transition: 'all 0.3s ease',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
             e.currentTarget.style.color = '#000';
+            e.currentTarget.style.boxShadow = '0 0 15px rgba(var(--accent-gold-rgb), 0.3)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
             e.currentTarget.style.color = 'var(--accent-gold)';
+            e.currentTarget.style.boxShadow = 'none';
           }}
         >
           Reserve a Table
         </a>
 
-        {/* Theme Toggle */}
+        {/* Admin Quick Access Button */}
+        <a
+          href="#/admin"
+          aria-label="Admin Portal"
+          title="Admin Portal"
+          style={{
+            background: 'none',
+            border: 'none',
+            color: currentHash === '#/admin' ? 'var(--accent-gold)' : 'var(--text-secondary)',
+            cursor: 'pointer',
+            padding: '0.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%',
+            backgroundColor: currentHash === '#/admin' ? 'rgba(197, 160, 89, 0.15)' : 'var(--border-light)',
+            transition: 'background-color 0.3s ease, color 0.3s ease, transform 0.3s ease',
+            textDecoration: 'none',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--accent-gold)';
+            e.currentTarget.style.transform = 'scale(1.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = currentHash === '#/admin' ? 'var(--accent-gold)' : 'var(--text-secondary)';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <Lock size={17} />
+        </a>
+
+        {/* Theme Toggle Button */}
         <button
           onClick={toggleTheme}
           aria-label="Toggle Theme"
@@ -240,7 +287,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
         >
           <motion.div
             animate={isMobileMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             style={{ width: '22px', height: '2px', backgroundColor: 'var(--text-primary)' }}
           />
           <motion.div
@@ -250,7 +297,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
           />
           <motion.div
             animate={isMobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             style={{ width: '22px', height: '2px', backgroundColor: 'var(--text-primary)' }}
           />
         </button>
@@ -272,7 +319,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
               padding: '1.8rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '1rem',
+              gap: '0.85rem',
               zIndex: 999,
               borderRadius: '12px',
               backgroundColor: 'var(--mobile-menu-bg)',
@@ -306,6 +353,25 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash }) => {
                 </a>
               );
             })}
+
+            {/* Mobile Admin Link */}
+            <a
+              href="#/admin"
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{
+                color: currentHash === '#/admin' ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                textDecoration: 'none',
+                fontSize: '0.95rem',
+                fontWeight: 600,
+                padding: '0.5rem 0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <Lock size={15} />
+              <span>Admin Management Portal</span>
+            </a>
           </motion.div>
         )}
       </AnimatePresence>
