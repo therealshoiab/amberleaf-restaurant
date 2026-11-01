@@ -1,76 +1,90 @@
 import React from 'react';
 import { SEO } from '../components/SEO';
-import { Award, Star, Compass } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 
-interface SignatureDish {
+interface SignatureDishItem {
   id: string;
   name: string;
   price: number;
-  rating: number;
-  reviewsCount: number;
+  badge: string;
+  image: string;
   description: string;
-  ingredients: string[];
-  chefNote: string;
-  category: string;
 }
 
 export const Signatures: React.FC = React.memo(() => {
-  const signatureDishes: SignatureDish[] = [
+  const signatureDishes: SignatureDishItem[] = [
     {
-      id: 'sig1',
-      name: 'Mutton Rista Wazwan Special',
-      price: 490,
-      rating: 4.9,
-      reviewsCount: 42,
-      category: 'Wazwan Specialty',
-      description: 'A masterpiece of Kashmiri Wazwan. Hand-hammered minced mutton meatballs are pounded on wooden logs, formed into perfectly smooth spheres, and simmered in a red gravy spiced with dried cockscomb flowers (maval) and pure Pampore saffron.',
-      ingredients: ['Hand-pounded minced mutton', 'Organic Pampore saffron', 'Dried cockscomb (maval) extract', 'Fennel seed powder', 'Clarified butter (ghee)', 'Kashmiri shallot paste'],
-      chefNote: 'Pounded continuously for 45 minutes to achieve its legendary velvet texture. Absolutely no binders or fillers used.',
+      id: 'sig-1',
+      name: 'Signature Mutton Rista',
+      price: 380,
+      badge: "# CHEF'S SPECIAL",
+      image: './images/g2.jpg',
+      description:
+        'Hand-pounded mutton meatballs cooked in a luscious, aromatic saffron gravy. A true Kashmiri wazwan masterpiece.',
     },
     {
-      id: 'sig2',
-      name: 'Mutton Gushtaba',
-      price: 540,
-      rating: 5.0,
-      reviewsCount: 58,
-      category: 'Wazwan Specialty',
-      description: 'Known traditionally as the "King of Wazwan," Gushtaba is served as the final meat dish in a standard Wazwan feast. These large mutton balls are cooked in a smooth, mildly sour curd-based gravy enriched with cardamoms and dry mint.',
-      ingredients: ['Finely pounded lamb meat', 'Thick curd', 'Cashew nut paste', 'Green cardamoms', 'Dried mint leaves', 'Saffron solution'],
-      chefNote: 'Traditionally served at the very end of the meal. The mild yogurt gravy serves to cool down the palate after the spicy courses.',
-    },
-    {
-      id: 'sig3',
-      name: 'Authentic Kashmiri Kahwa',
-      price: 110,
-      rating: 4.8,
-      reviewsCount: 95,
-      category: 'Artisanal Brew',
-      description: 'Saffron-infused Kashmiri green tea brewed in a traditional copper samovar. Sweetened with honey or rock sugar and garnished with crushed green cardamoms, cinnamon bark, and fine slivers of blanched almonds.',
-      ingredients: ['Organic green tea leaves', 'Pampore saffron strands', 'Cardamom pods', 'Cinnamon bark', 'Raw honey', 'Slivered almonds'],
-      chefNote: 'Brewed using pure mountain spring water. A perfect digestif and warm companion to the chilly Srinagar evening.',
-    },
-    {
-      id: 'sig4',
-      name: 'Shahi Tukda Royal',
+      id: 'sig-2',
+      name: 'Kurkure Chicken Momos',
       price: 180,
-      rating: 4.9,
-      reviewsCount: 37,
-      category: 'Gourmet Dessert',
-      description: 'An indulgent dessert made by deep-frying white bread triangles in pure ghee, soaking them in a warm saffron and green cardamom syrup, and layering them with double-thick reduced milk rabri and edible silver leaf.',
-      ingredients: ['Ghee-fried premium bread', 'Slow-cooked milk rabri', 'Saffron strands', 'Cardamom pods', 'Pistachios & almonds', 'Edible silver leaf (Vark)'],
-      chefNote: 'Our rabri is simmered for six hours until it reduces to a third of its volume, giving it an unmatched richness.',
+      badge: '# BEST SELLER',
+      image: './images/g8.jpg',
+      description:
+        'Crispy, crunchy outer coating with a juicy, perfectly seasoned minced chicken filling, served with a fiery schezwan dip.',
+    },
+    {
+      id: 'sig-3',
+      name: 'Amberleaf Special Mutton Dum Biryani',
+      price: 420,
+      badge: '# PREMIUM DELIGHT',
+      image: './images/g11.jpg',
+      description:
+        'Fragrant long-grain basmati rice layered with tender mutton chunks, caramelized onions, and our secret spice blend, slow-cooked in traditional dum style.',
+    },
+    {
+      id: 'sig-4',
+      name: 'Kashmiri Kahwa',
+      price: 90,
+      badge: '# AUTHENTIC LOCAL',
+      image: './images/amberleaf-vibe.jpg',
+      description:
+        'Traditional green tea infused with saffron strands, crushed almonds, cinnamon, and cardamom. Perfectly soothing.',
+    },
+    {
+      id: 'sig-5',
+      name: 'Mutton Gushtaba Wazwan',
+      price: 440,
+      badge: '# ROYAL FEAST',
+      image: './images/g3.jpg',
+      description:
+        'Known as the King of Wazwan, finely hammered velvety mutton spheres poached slowly in a delicately tempered yogurt and mint broth.',
+    },
+    {
+      id: 'sig-6',
+      name: 'Amberleaf Rogan Josh',
+      price: 410,
+      badge: "# CHEF'S SPECIAL",
+      image: './images/g1.jpg',
+      description:
+        'Prime tender lamb cuts slow-braised with authentic Kashmiri chili and aromatic whole spices until falling off the bone.',
     },
   ];
 
+  const handleOrder = (dishName: string, price: number) => {
+    const text = encodeURIComponent(
+      `Hello Amberleaf Fine Dine! I would like to order your signature dish: ${dishName} (₹${price}). Please confirm table / delivery.`
+    );
+    window.open(`https://wa.me/917006579018?text=${text}`, '_blank', 'noopener,noreferrer');
+  };
+
   return (
-    <div className="page-container">
+    <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto', padding: '2rem 1.5rem 5rem 1.5rem' }}>
       <SEO
         title="Signatures"
-        description="Explore the signature dishes of Amberleaf Restaurant in Srinagar. Read about Mutton Rista, Gushtaba, Shahi Tukda, and Kashmiri Kahwa, complete with chef notes and ingredients."
+        description="Explore the signature dishes of Amberleaf Restaurant in Srinagar. Discover our Signature Mutton Rista, Kurkure Momos, Dum Biryani, and Kashmiri Kahwa."
       />
 
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '4rem' }} className="animate-fade-in">
+      <div style={{ textAlign: 'center', marginBottom: '3.5rem' }} className="animate-fade-in">
         <span
           style={{
             color: 'var(--accent-gold)',
@@ -80,150 +94,223 @@ export const Signatures: React.FC = React.memo(() => {
             fontWeight: 700,
           }}
         >
-          Chef's Special
+          Chef's Special Selection
         </span>
-        <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>Signature Masterpieces</h2>
+        <h1
+          style={{
+            fontSize: 'clamp(2rem, 4vw, 2.75rem)',
+            marginTop: '0.5rem',
+            color: 'var(--text-primary)',
+            fontFamily: "'Playfair Display', serif",
+            fontWeight: 700,
+          }}
+        >
+          Signature Masterpieces
+        </h1>
         <div
           style={{
             width: '60px',
             height: '2px',
             backgroundColor: 'var(--accent-gold)',
-            margin: '1rem auto 0 auto',
+            margin: '0.85rem auto 0 auto',
           }}
         />
       </div>
 
-      {/* Signatures List Column */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
-        {signatureDishes.map((dish) => {
-          return (
+      {/* 2-Column Horizontal Cards Grid matching Reference Design */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
+          gap: '2rem',
+        }}
+        className="signatures-horizontal-grid"
+      >
+        {signatureDishes.map((dish) => (
+          <div
+            key={dish.id}
+            className="glass-panel"
+            style={{
+              borderRadius: '18px',
+              border: '1px solid var(--border-color)',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'row',
+              backgroundColor: 'var(--card-bg)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+              transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+              position: 'relative',
+              minHeight: '190px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.boxShadow = '0 10px 30px rgba(197, 160, 89, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.06)';
+            }}
+          >
+            {/* Left Column: Dish Image with Top-Left Gold Badge */}
             <div
-              key={dish.id}
-              className="glass-panel signature-card-grid shimmer-card"
               style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr',
-                gap: '2.5rem',
-                padding: '2.5rem',
+                width: '195px',
+                minWidth: '195px',
                 position: 'relative',
+                backgroundColor: '#181512',
                 overflow: 'hidden',
-                animation: 'fadeIn 0.8s ease forwards',
               }}
+              className="signatures-card-image-wrapper"
             >
-              {/* Gold glowing accent */}
-              <div
+              <img
+                src={dish.image}
+                alt={dish.name}
+                loading="lazy"
                 style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '5px',
+                  width: '100%',
                   height: '100%',
-                  background: 'linear-gradient(to bottom, var(--accent-gold), var(--accent-amber))',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = './images/g1.jpg';
                 }}
               />
 
-              {/* Detail Content */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                  <span
-                    style={{
-                      fontSize: '0.75rem',
-                      color: 'var(--accent-gold)',
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.15em',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                    }}
-                  >
-                    <Award size={14} />
-                    {dish.category}
-                  </span>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem' }}>
-                    <Star size={14} fill="var(--accent-gold)" stroke="var(--accent-gold)" />
-                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{dish.rating}</span>
-                    <span style={{ color: 'var(--text-secondary)' }}>({dish.reviewsCount} reviews)</span>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '1rem' }}>
-                  <h3 style={{ fontSize: '1.8rem', color: 'var(--text-primary)', margin: 0 }}>{dish.name}</h3>
-                  <span className="menu-price" style={{ fontSize: '1.6rem', fontWeight: 800 }}>₹{dish.price}</span>
-                </div>
-
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.7' }}>
-                  {dish.description}
-                </p>
-
-                {/* Ingredients section */}
-                <div>
-                  <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Core Ingredients:
-                  </span>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {dish.ingredients.map((ing) => (
-                      <span
-                        key={ing}
-                        className="glass-card"
-                        style={{
-                          fontSize: '0.75rem',
-                          color: 'var(--text-secondary)',
-                          padding: '0.3rem 0.8rem',
-                          borderRadius: '4px',
-                          border: '1px solid var(--border-light)',
-                        }}
-                      >
-                        {ing}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Chef's Note Box */}
-                <div
-                  style={{
-                    backgroundColor: 'rgba(var(--accent-gold-rgb), 0.04)',
-                    borderLeft: '2px solid var(--accent-gold)',
-                    padding: '1rem',
-                    borderRadius: '0 8px 8px 0',
-                    marginTop: '0.5rem',
-                  }}
-                >
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      color: 'var(--accent-gold)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      marginBottom: '0.25rem',
-                    }}
-                  >
-                    <Compass size={12} />
-                    Chef's Crafting Note
-                  </span>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', lineHeight: '1.5' }}>
-                    "{dish.chefNote}"
-                  </p>
-                </div>
+              {/* Gold Pill Badge over Image */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '12px',
+                  left: '12px',
+                  backgroundColor: '#c5a059',
+                  color: '#1a1405',
+                  fontSize: '0.66rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '9999px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  zIndex: 2,
+                }}
+              >
+                {dish.badge}
               </div>
             </div>
-          );
-        })}
-      </div>
 
-      <style>{`
-        @media (min-width: 1024px) {
-          .signature-card-grid {
-            padding: 3rem !important;
-          }
-        }
-      `}</style>
+            {/* Right Column: SIGNATURE CULINARY ART, Title, Price, Description, ORDER NOW */}
+            <div
+              style={{
+                padding: '1.5rem 1.75rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                flexGrow: 1,
+                gap: '0.5rem',
+              }}
+            >
+              <div>
+                {/* Over-title */}
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-secondary)',
+                    fontWeight: 700,
+                    display: 'block',
+                    marginBottom: '0.35rem',
+                  }}
+                >
+                  SIGNATURE CULINARY ART
+                </span>
+
+                {/* Title */}
+                <h3
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: '1.38rem',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    margin: '0 0 0.35rem 0',
+                    lineHeight: 1.25,
+                  }}
+                >
+                  {dish.name}
+                </h3>
+
+                {/* Price in Gold Serif */}
+                <div
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: '1.35rem',
+                    fontWeight: 700,
+                    color: 'var(--accent-gold)',
+                    marginBottom: '0.65rem',
+                  }}
+                >
+                  ₹{dish.price}
+                </div>
+
+                {/* Description */}
+                <p
+                  style={{
+                    color: 'var(--text-secondary)',
+                    fontSize: '0.87rem',
+                    lineHeight: '1.55',
+                    margin: 0,
+                  }}
+                >
+                  {dish.description}
+                </p>
+              </div>
+
+              {/* Bottom Row with Divider: ORDER NOW */}
+              <div
+                style={{
+                  marginTop: '1rem',
+                  paddingTop: '0.75rem',
+                  borderTop: '1px solid var(--border-light)',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <button
+                  onClick={() => handleOrder(dish.name, dish.price)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--accent-gold)',
+                    fontSize: '0.84rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    padding: 0,
+                    transition: 'color 0.2s ease, transform 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--accent-gold-light)';
+                    e.currentTarget.style.transform = 'translateX(2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--accent-gold)';
+                    e.currentTarget.style.transform = 'translateX(0)';
+                  }}
+                >
+                  <ShoppingBag size={15} />
+                  ORDER NOW
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 });

@@ -1,7 +1,7 @@
 import { DEFAULT_MENU_ITEMS, DEFAULT_BROADCAST_BANNER } from '../data/defaultMenu';
 import type { MenuItem, BroadcastBannerData } from '../data/defaultMenu';
 
-const STORAGE_KEY_MENU = 'amberleaf_restaurant_menu_items_v1';
+const STORAGE_KEY_MENU = 'amberleaf_restaurant_menu_items_v2';
 const STORAGE_KEY_BANNER = 'amberleaf_restaurant_broadcast_banner_v1';
 const STORAGE_KEY_PASSCODE = 'amberleaf_restaurant_admin_passcode_v1';
 const STORAGE_KEY_API = 'amberleaf_restaurant_api_endpoint_v1';

@@ -6,29 +6,22 @@ interface PreloaderProps {
 }
 
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
-  const [lineCompleted, setLineCompleted] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
   // Restaurant Name split into letters
   const nameLetters = "AMBERLEAF".split("");
 
   useEffect(() => {
-    // 1. Horizontal line draws for 1.2s
-    const lineTimer = setTimeout(() => {
-      setLineCompleted(true);
-    }, 1200);
-
-    // 2. Initiate split-panel curtain exit after 3.2s total
+    // Synchronous luxury reveal: line and name animate together immediately
     const exitTimer = setTimeout(() => {
       setIsExiting(true);
-      // Wait for exit curtains slide transition (0.8s) before calling onComplete
+      // Wait for exit curtains slide transition (0.7s) before calling onComplete
       setTimeout(() => {
         onComplete();
-      }, 800);
-    }, 3400);
+      }, 700);
+    }, 2200);
 
     return () => {
-      clearTimeout(lineTimer);
       clearTimeout(exitTimer);
     };
   }, [onComplete]);
@@ -46,17 +39,19 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
   const containerVariants = {
     initial: { opacity: 1 },
-    exit: { opacity: 0, transition: { duration: 0.3 } }
+    exit: { opacity: 0, transition: { duration: 0.25 } }
   };
 
+  // Synchronized letter reveal: starts immediately alongside the gold line
   const letterVariants = {
-    hidden: { opacity: 0, y: 12 },
+    hidden: { opacity: 0, y: 14, scale: 0.95 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
+      scale: 1,
       transition: {
-        delay: i * 0.08,
-        duration: 0.6,
+        delay: 0.15 + i * 0.07, // Staggered synchronous reveal as the line draws
+        duration: 0.55,
         ease: [0.16, 1, 0.3, 1] as const
       }
     })
@@ -68,8 +63,8 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       opacity: 0.9,
       y: 0,
       transition: {
-        delay: 0.72, // Fade in right after letters start appearing
-        duration: 0.7,
+        delay: 0.75, // Fades in smoothly as the letters and line complete
+        duration: 0.6,
         ease: "easeOut" as const
       }
     }
@@ -189,50 +184,46 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
               </svg>
             </div>
 
-            {/* Staggered Letter-by-Letter Text Reveal */}
-            {lineCompleted && (
-              <div style={{ display: 'flex', gap: '0.15em', justifyContent: 'center' }}>
-                {nameLetters.map((letter, idx) => (
-                  <motion.span
-                    key={idx}
-                    custom={idx}
-                    variants={letterVariants}
-                    initial="hidden"
-                    animate="visible"
-                    style={{
-                      color: '#f5f3ef',
-                      fontFamily: "'Playfair Display', serif",
-                      fontSize: '2.5rem',
-                      letterSpacing: '0.1em',
-                      fontWeight: 400,
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
-              </div>
-            )}
+            {/* Staggered Letter-by-Letter Text Reveal - animates in sync with the line */}
+            <div style={{ display: 'flex', gap: '0.15em', justifyContent: 'center' }}>
+              {nameLetters.map((letter, idx) => (
+                <motion.span
+                  key={idx}
+                  custom={idx}
+                  variants={letterVariants}
+                  initial="hidden"
+                  animate="visible"
+                  style={{
+                    color: '#f5f3ef',
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: '2.5rem',
+                    letterSpacing: '0.1em',
+                    fontWeight: 400,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {letter}
+                </motion.span>
+              ))}
+            </div>
 
             {/* Tagline Reveal */}
-            {lineCompleted && (
-              <motion.p
-                variants={taglineVariants}
-                initial="hidden"
-                animate="visible"
-                style={{
-                  marginTop: '0.85rem',
-                  color: 'var(--accent-gold)',
-                  fontFamily: "'Playfair Display', serif",
-                  fontStyle: 'italic',
-                  fontSize: '0.85rem',
-                  letterSpacing: '0.25em',
-                  textAlign: 'center',
-                }}
-              >
-                Fine Dining &middot; Srinagar
-              </motion.p>
-            )}
+            <motion.p
+              variants={taglineVariants}
+              initial="hidden"
+              animate="visible"
+              style={{
+                marginTop: '0.85rem',
+                color: 'var(--accent-gold)',
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: 'italic',
+                fontSize: '0.85rem',
+                letterSpacing: '0.25em',
+                textAlign: 'center',
+              }}
+            >
+              Fine Dining &middot; Srinagar
+            </motion.p>
           </motion.div>
         )}
       </div>

@@ -12,17 +12,12 @@ import {
   Send,
   Volume2,
   VolumeX,
+  CheckCircle2,
+  PenTool,
+  X,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-
-interface Review {
-  id: string;
-  author: string;
-  rating: number;
-  date: string;
-  comment: string;
-  type: string;
-}
+import { KASHMIRI_REVIEWS, type GuestReview } from '../data/reviewsData';
 
 interface FAQItem {
   question: string;
@@ -116,60 +111,25 @@ export const Home: React.FC = () => {
     },
   ];
 
-  // --- 4. REVIEWS & TESTIMONIALS STATE ---
-  const [reviewsList, setReviewsList] = useState<Review[]>([
-    {
-      id: 'r1',
-      author: 'Arshid Ahmad',
-      rating: 5,
-      date: 'June 18, 2026',
-      comment: 'Best Rista in Srinagar! The meat is so tender and cooked to perfection. The glassmorphic design and the warm lighting make it look like a high-end luxury resort cafe. Highly recommend!',
-      type: 'Family Dining',
-    },
-    {
-      id: 'r2',
-      author: 'Sarmista Acharya',
-      rating: 5,
-      date: 'June 12, 2026',
-      comment: 'Amazing place! We came here for lunch and the hospitality was unmatched. The Saffron Cooler mocktail is out of this world. Will definitely return with friends.',
-      type: 'Group Outing',
-    },
-    {
-      id: 'r3',
-      author: 'Basit Ali',
-      rating: 5,
-      date: 'May 30, 2026',
-      comment: 'Very cozy environment. I often visit for solo dining, especially for their French Press coffee and Butter Chicken. Staff is exceptionally polite.',
-      type: 'Solo Dining',
-    },
-    {
-      id: 'r4',
-      author: 'Mehak Jan',
-      rating: 5,
-      date: 'May 28, 2026',
-      comment: 'We booked a private room for a small family gathering. The Wazwan platter was delicious. Dal Makhani was also quite rich. 4.9 stars is well-deserved!',
-      type: 'Family Dining',
-    },
-    {
-      id: 'r5',
-      author: 'Ishfaq Bhat',
-      rating: 5,
-      date: 'May 24, 2026',
-      comment: 'Hands down the most premium restaurant in Balgarden. The tandoori platter had a nice smoky flavor. Fast service and clean restrooms.',
-      type: 'Group Outing',
-    },
-    {
-      id: 'r6',
-      author: 'Aditi Sharma',
-      rating: 5,
-      date: 'May 15, 2026',
-      comment: 'A true gem in Srinagar. The glassmorphic panel design gives a luxury vibe. Loved the Shahi Tukda and hot Kashmiri Kahwa!',
-      type: 'Solo Dining',
-    },
-  ]);
+  // --- 4. REVIEWS & TESTIMONIALS STATE (50+ Kashmiri Reviews & Modal) ---
+  const [reviewsList, setReviewsList] = useState<GuestReview[]>(() => {
+    try {
+      const saved = localStorage.getItem('amberleaf_kashmiri_reviews_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 50) return parsed;
+      }
+    } catch {}
+    return KASHMIRI_REVIEWS;
+  });
+
+  const [selectedReviewCategory, setSelectedReviewCategory] = useState<string>('All');
+  const [visibleReviewCount, setVisibleReviewCount] = useState<number>(8);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
 
   const [newName, setNewName] = useState('');
-  const [newType, setNewType] = useState('Family Dining');
+  const [newType, setNewType] = useState('Dine-In');
+  const [newCategory, setNewCategory] = useState<'Wazwan' | 'Starters' | 'Biryani' | 'Beverages' | 'Ambiance'>('Wazwan');
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState('');
   const [reviewSuccess, setReviewSuccess] = useState(false);
@@ -178,27 +138,37 @@ export const Home: React.FC = () => {
     e.preventDefault();
     if (!newName.trim() || !newComment.trim()) return;
 
-    const newRev: Review = {
+    const newRev: GuestReview = {
       id: `rev_${Date.now()}`,
-      author: newName.trim(),
-      type: newType,
+      name: newName.trim(),
+      diningType: newType,
+      category: newCategory,
       rating: newRating,
       comment: newComment.trim(),
       date: 'Just now',
+      verified: true,
     };
 
-    setReviewsList([newRev, ...reviewsList]);
+    const updated = [newRev, ...reviewsList];
+    setReviewsList(updated);
+    try {
+      localStorage.setItem('amberleaf_kashmiri_reviews_v1', JSON.stringify(updated));
+    } catch {}
+
     setReviewSuccess(true);
     setNewName('');
     setNewComment('');
 
     confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
+      particleCount: 120,
+      spread: 80,
+      origin: { y: 0.5 },
     });
 
-    setTimeout(() => setReviewSuccess(false), 4500);
+    setTimeout(() => {
+      setReviewSuccess(false);
+      setIsReviewModalOpen(false);
+    }, 2200);
   };
 
   const scrollSectionVariants = {
@@ -433,40 +403,6 @@ export const Home: React.FC = () => {
             </p>
           </div>
 
-          {/* Headline & Luxury Subtitles */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginTop: '0.25rem' }}>
-            <h2
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: 'clamp(1.75rem, 3.8vw, 2.6rem)',
-                lineHeight: 1.2,
-                color: '#ffffff',
-                margin: 0,
-                fontWeight: 600,
-                textShadow: '0 3px 20px rgba(0,0,0,0.9)',
-              }}
-            >
-              Where Taste Meets{' '}
-              <span className="text-gold" style={{ display: 'inline-block' }}>
-                Refined Elegance
-              </span>
-            </h2>
-
-            <p
-              style={{
-                fontSize: 'clamp(1rem, 2.2vw, 1.3rem)',
-                fontFamily: "'Playfair Display', serif",
-                fontStyle: 'italic',
-                color: 'var(--accent-gold)',
-                letterSpacing: '0.04em',
-                fontWeight: 600,
-                margin: 0,
-                textShadow: '0 2px 10px rgba(0,0,0,0.85)',
-              }}
-            >
-              Elevating Kashmiri Hospitality &amp; Culinary Artistry
-            </p>
-          </div>
 
           {/* Description */}
           <p
@@ -840,322 +776,620 @@ export const Home: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* =========================================================================
-          COMBINED SECTION 2: GUEST REVIEWS & EPICUREAN TESTIMONIALS
-      ========================================================================= */}
-      <motion.div
-        id="reviews"
-        variants={scrollSectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-100px' }}
-        style={{
-          marginTop: '6rem',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%',
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <span
-            style={{
-              color: 'var(--accent-gold)',
-              fontSize: '0.8rem',
-              letterSpacing: '0.25em',
-              textTransform: 'uppercase',
-              fontWeight: 700,
-            }}
-          >
-            Guest Voices
-          </span>
-          <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>
-            Epicurean Testimonials
-          </h2>
-          <div
-            style={{
-              width: '60px',
-              height: '2px',
-              backgroundColor: 'var(--accent-gold)',
-              margin: '1rem auto 0 auto',
-            }}
-          />
-        </div>
 
-        {/* Rating Summary Pill */}
-        <div
-          className="glass-panel"
+        {/* =========================================================================
+            COMBINED SECTION 2: GUEST EXPERIENCES & REVIEWS (MATCHING REFERENCE IMAGE 3)
+        ========================================================================= */}
+        <motion.div
+          id="reviews"
+          variants={scrollSectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-100px' }}
           style={{
-            padding: '1rem 2rem',
-            borderRadius: '9999px',
-            marginBottom: '3rem',
-            display: 'inline-flex',
+            marginTop: '6rem',
+            display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: '1rem',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <div style={{ display: 'flex', gap: '0.2rem' }}>
-            {[1, 2, 3, 4, 5].map((s) => (
-              <Star key={s} size={18} fill="var(--accent-gold)" color="var(--accent-gold)" />
-            ))}
-          </div>
-          <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>
-            4.9 out of 5 Stars
-          </span>
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-            (250+ Verified Guest Ratings)
-          </span>
-        </div>
-
-        {/* Reviews Layout: 2 Columns (Left: Form, Right: Scrollable Reviews List) */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1.3fr',
-            gap: '2.5rem',
             width: '100%',
-            alignItems: 'start',
           }}
-          className="home-reviews-layout"
         >
-          {/* Left Column: Submit a Review Form */}
-          <div
-            className="glass-panel"
-            style={{
-              padding: '2rem',
-              borderRadius: '20px',
-              border: '1px solid var(--border-color)',
-            }}
-          >
-            <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-              Share Your Experience
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-              Dined with us recently? We would love to hear your feedback about our Kashmiri Wazwan, grills, and ambiance.
-            </p>
-
-            {reviewSuccess && (
-              <div
-                style={{
-                  padding: '0.85rem 1.25rem',
-                  backgroundColor: 'rgba(34, 197, 94, 0.12)',
-                  border: '1px solid #22c55e',
-                  color: '#22c55e',
-                  borderRadius: '10px',
-                  marginBottom: '1.25rem',
-                  fontWeight: 600,
-                  fontSize: '0.9rem',
-                }}
-              >
-                🎉 Thank you! Your review has been added to our guestbook.
-              </div>
-            )}
-
-            <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              <div>
-                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '0.35rem' }}>
-                  Your Name *
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Farooq Mir"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border-color)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.15)',
-                    color: 'var(--text-primary)',
-                    fontSize: '0.92rem',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '0.35rem' }}>
-                  Dining Type
-                </label>
-                <select
-                  value={newType}
-                  onChange={(e) => setNewType(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border-color)',
-                    backgroundColor: 'var(--bg-secondary)',
-                    color: 'var(--text-primary)',
-                    fontSize: '0.92rem',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <option value="Family Dining">Family Dining</option>
-                  <option value="Group Outing">Group Outing</option>
-                  <option value="Solo Dining">Solo Dining</option>
-                  <option value="Special Celebration">Special Celebration</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '0.35rem' }}>
-                  Rating
-                </label>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setNewRating(star)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: '0.2rem',
-                      }}
-                    >
-                      <Star
-                        size={24}
-                        fill={star <= newRating ? 'var(--accent-gold)' : 'none'}
-                        color="var(--accent-gold)"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '0.35rem' }}>
-                  Your Review *
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Tell us about the flavors, service, or atmosphere..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border-color)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.15)',
-                    color: 'var(--text-primary)',
-                    fontSize: '0.92rem',
-                    boxSizing: 'border-box',
-                    resize: 'vertical',
-                  }}
-                />
-              </div>
-
-              <button type="submit" className="btn-primary" style={{ padding: '0.85rem', gap: '0.5rem', width: '100%', marginTop: '0.5rem' }}>
-                <Send size={16} />
-                Submit Review
-              </button>
-            </form>
+          {/* Section Heading */}
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <span
+              style={{
+                color: 'var(--accent-gold)',
+                fontSize: '0.8rem',
+                letterSpacing: '0.25em',
+                textTransform: 'uppercase',
+                fontWeight: 700,
+              }}
+            >
+              Guest Voices
+            </span>
+            <h2
+              style={{
+                fontSize: 'clamp(2rem, 3.5vw, 2.6rem)',
+                marginTop: '0.5rem',
+                color: 'var(--text-primary)',
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 700,
+              }}
+            >
+              Epicurean Testimonials
+            </h2>
+            <div
+              style={{
+                width: '60px',
+                height: '2px',
+                backgroundColor: 'var(--accent-gold)',
+                margin: '1rem auto 0 auto',
+              }}
+            />
           </div>
 
-          {/* Right Column: Scrollable List of Guest Reviews */}
+          {/* Rating Summary & Unique "Write a Review" Action Bar */}
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1.25rem',
+              marginBottom: '2rem',
+              padding: '1.25rem 2rem',
+              borderRadius: '20px',
+              backgroundColor: 'var(--card-bg)',
+              border: '1px solid var(--border-color)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+            }}
+            className="home-reviews-header-bar"
+          >
+            {/* Left: Overall Rating Stats */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '0.2rem' }}>
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star key={s} size={18} fill="#16a34a" color="#16a34a" />
+                ))}
+              </div>
+              <div>
+                <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-primary)' }}>
+                  4.9 / 5 Guest Rating
+                </span>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginLeft: '0.5rem' }}>
+                  ({reviewsList.length}+ Verified Kashmiri Foodies)
+                </span>
+              </div>
+            </div>
+
+            {/* Right: Unique Luxury Write a Review Button */}
+            <button
+              onClick={() => setIsReviewModalOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                backgroundColor: 'var(--accent-gold)',
+                color: '#121008',
+                border: 'none',
+                padding: '0.65rem 1.4rem',
+                borderRadius: '9999px',
+                fontWeight: 700,
+                fontSize: '0.88rem',
+                letterSpacing: '0.04em',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(197, 160, 89, 0.3)',
+                transition: 'all 0.25s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(197, 160, 89, 0.45)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(197, 160, 89, 0.3)';
+              }}
+            >
+              <PenTool size={16} />
+              <span>&lowast; Write a Review</span>
+            </button>
+          </div>
+
+          {/* Category Filter Pills */}
           <div
             style={{
               display: 'flex',
-              flexDirection: 'column',
-              gap: '1.25rem',
-              maxHeight: '620px',
-              overflowY: 'auto',
-              paddingRight: '0.5rem',
+              gap: '0.6rem',
+              overflowX: 'auto',
+              width: '100%',
+              paddingBottom: '0.75rem',
+              marginBottom: '2rem',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
             }}
           >
-            {reviewsList.map((rev) => (
-              <div
-                key={rev.id}
-                className="glass-panel"
-                style={{
-                  padding: '1.75rem',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border-color)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.75rem',
-                  position: 'relative',
-                }}
-              >
-                {/* Decorative quote mark */}
-                <span
+            {['All', 'Wazwan', 'Starters', 'Biryani', 'Beverages', 'Ambiance'].map((cat) => {
+              const isSelected = selectedReviewCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    setSelectedReviewCategory(cat);
+                    setVisibleReviewCount(8);
+                  }}
                   style={{
-                    position: 'absolute',
-                    top: '1rem',
-                    right: '1.5rem',
-                    fontSize: '3.5rem',
-                    fontFamily: "'Playfair Display', serif",
-                    color: 'var(--accent-gold)',
-                    opacity: 0.18,
-                    lineHeight: 1,
-                    userSelect: 'none',
+                    background: isSelected ? 'var(--accent-gold)' : 'var(--bg-secondary)',
+                    color: isSelected ? '#121008' : 'var(--text-primary)',
+                    borderColor: isSelected ? 'var(--accent-gold)' : 'var(--border-color)',
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderRadius: '9999px',
+                    padding: '0.38rem 1.1rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.25s ease',
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  &ldquo;
-                </span>
+                  {cat === 'All' ? `All Reviews (${reviewsList.length})` : cat}
+                </button>
+              );
+            })}
+          </div>
 
-                {/* Stars and Type */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', gap: '0.15rem' }}>
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} size={15} fill="var(--accent-gold)" color="var(--accent-gold)" />
-                    ))}
-                  </div>
-                  <span
+          {/* 2-Column Reviews Grid Matching Reference Image 3 */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))',
+              gap: '1.75rem',
+              width: '100%',
+            }}
+            className="reviews-2col-grid"
+          >
+            {reviewsList
+              .filter((rev) => {
+                if (selectedReviewCategory === 'All') return true;
+                return rev.category === selectedReviewCategory;
+              })
+              .slice(0, visibleReviewCount)
+              .map((rev) => (
+                <div
+                  key={rev.id}
+                  className="glass-panel"
+                  style={{
+                    borderRadius: '18px',
+                    border: '1px solid var(--border-color)',
+                    padding: '2rem 2.25rem',
+                    backgroundColor: 'var(--card-bg)',
+                    boxShadow: '0 4px 18px rgba(0, 0, 0, 0.05)',
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(197, 160, 89, 0.12)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 18px rgba(0, 0, 0, 0.05)';
+                  }}
+                >
+                  {/* Top Row: Solid Green Stars on Left + Big Faint Quotation Mark on Right */}
+                  <div
                     style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      color: 'var(--accent-gold)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      marginBottom: '1rem',
                     }}
                   >
-                    {rev.type}
-                  </span>
-                </div>
+                    {/* 5 Green Stars (matches image 3) */}
+                    <div style={{ display: 'flex', gap: '0.2rem' }}>
+                      {[1, 2, 3, 4, 5].map((starIdx) => (
+                        <Star
+                          key={starIdx}
+                          size={18}
+                          fill={starIdx <= rev.rating ? '#16a34a' : 'none'}
+                          color={starIdx <= rev.rating ? '#16a34a' : 'rgba(120, 120, 120, 0.4)'}
+                          strokeWidth={1.5}
+                        />
+                      ))}
+                    </div>
 
-                {/* Review Text */}
-                <p
-                  style={{
-                    fontFamily: "'Playfair Display', serif",
-                    fontStyle: 'italic',
-                    color: 'var(--text-primary)',
-                    fontSize: '1.02rem',
-                    lineHeight: '1.65',
-                    margin: '0.25rem 0',
-                    zIndex: 2,
-                  }}
-                >
-                  &ldquo;{rev.comment}&rdquo;
-                </p>
+                    {/* Decorative Faint Quote Mark */}
+                    <span
+                      style={{
+                        fontFamily: "'Playfair Display', serif",
+                        fontSize: '3.2rem',
+                        lineHeight: 0.8,
+                        color: 'rgba(197, 160, 89, 0.28)',
+                        userSelect: 'none',
+                        marginTop: '-0.3rem',
+                      }}
+                    >
+                      &#8221;
+                    </span>
+                  </div>
 
-                {/* Author and Date */}
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    borderTop: '1px solid var(--border-light)',
-                    paddingTop: '0.65rem',
-                    marginTop: '0.25rem',
-                    fontSize: '0.85rem',
-                  }}
-                >
-                  <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{rev.author}</span>
-                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{rev.date}</span>
+                  {/* Middle: Italicized Quote Text */}
+                  <p
+                    style={{
+                      fontStyle: 'italic',
+                      color: 'var(--text-secondary)',
+                      fontSize: '0.94rem',
+                      lineHeight: '1.68',
+                      margin: '0 0 1.25rem 0',
+                    }}
+                  >
+                    &ldquo;{rev.comment}&rdquo;
+                  </p>
+
+                  {/* Thin Horizontal Divider Line */}
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '1px',
+                      backgroundColor: 'var(--border-light)',
+                      margin: '0.5rem 0 1rem 0',
+                    }}
+                  />
+
+                  {/* Bottom Row: Author + Date on Left & ✓ VERIFIED on Right */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <h4
+                        style={{
+                          fontFamily: "'Playfair Display', serif",
+                          fontWeight: 700,
+                          fontSize: '1.05rem',
+                          color: 'var(--text-primary)',
+                          margin: 0,
+                        }}
+                      >
+                        {rev.name}
+                      </h4>
+                      <span
+                        style={{
+                          fontSize: '0.8rem',
+                          color: 'var(--text-muted)',
+                          marginTop: '0.15rem',
+                          display: 'block',
+                        }}
+                      >
+                        {rev.date}
+                      </span>
+                    </div>
+
+                    {/* Verified Badge */}
+                    {rev.verified && (
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                          backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                          border: '1px solid #16a34a',
+                          color: '#16a34a',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          padding: '0.28rem 0.75rem',
+                          borderRadius: '9999px',
+                          letterSpacing: '0.04em',
+                        }}
+                      >
+                        <CheckCircle2 size={13} color="#16a34a" />
+                        <span>VERIFIED</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
-        </div>
-      </motion.div>
+
+          {/* Load More Button */}
+          {visibleReviewCount <
+            reviewsList.filter((rev) => {
+              if (selectedReviewCategory === 'All') return true;
+              return rev.category === selectedReviewCategory;
+            }).length && (
+            <div style={{ marginTop: '2.5rem', textAlign: 'center' }}>
+              <button
+                onClick={() => setVisibleReviewCount((prev) => prev + 8)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--accent-gold)',
+                  color: 'var(--accent-gold)',
+                  padding: '0.75rem 2rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
+                  e.currentTarget.style.color = '#121008';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--accent-gold)';
+                }}
+              >
+                Show More Guest Reviews (
+                {reviewsList.filter((rev) => {
+                  if (selectedReviewCategory === 'All') return true;
+                  return rev.category === selectedReviewCategory;
+                }).length - visibleReviewCount}{' '}
+                remaining) &darr;
+              </button>
+            </div>
+          )}
+
+          {/* Interactive "Write a Review" Modal */}
+          {isReviewModalOpen && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                backdropFilter: 'blur(8px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 99999,
+                padding: '1.5rem',
+                boxSizing: 'border-box',
+              }}
+              onClick={() => setIsReviewModalOpen(false)}
+            >
+              <div
+                className="glass-panel"
+                style={{
+                  backgroundColor: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '24px',
+                  maxWidth: '540px',
+                  width: '100%',
+                  padding: '2.25rem',
+                  boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)',
+                  position: 'relative',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsReviewModalOpen(false)}
+                  style={{
+                    position: 'absolute',
+                    top: '1.25rem',
+                    right: '1.25rem',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    padding: '0.4rem',
+                  }}
+                >
+                  <X size={20} />
+                </button>
+
+                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                  <span
+                    style={{
+                      color: 'var(--accent-gold)',
+                      fontSize: '0.75rem',
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      fontWeight: 700,
+                    }}
+                  >
+                    Amberleaf Guestbook
+                  </span>
+                  <h3
+                    style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontSize: '1.6rem',
+                      color: 'var(--text-primary)',
+                      margin: '0.35rem 0 0 0',
+                    }}
+                  >
+                    Share Your Dining Experience
+                  </h3>
+                </div>
+
+                {reviewSuccess ? (
+                  <div
+                    style={{
+                      padding: '2rem 1.5rem',
+                      textAlign: 'center',
+                      backgroundColor: 'rgba(22, 163, 74, 0.12)',
+                      border: '1px solid #16a34a',
+                      borderRadius: '16px',
+                      color: '#16a34a',
+                    }}
+                  >
+                    <CheckCircle2 size={42} style={{ margin: '0 auto 0.75rem auto', display: 'block' }} />
+                    <h4 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700 }}>Thank You for Your Feedback!</h4>
+                    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                      Your review has been verified and added to the Amberleaf guest testimonials.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+                    {/* Star Rating Selector */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+                        Overall Rating *
+                      </label>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setNewRating(star)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '0.2rem',
+                            }}
+                          >
+                            <Star
+                              size={28}
+                              fill={star <= newRating ? '#16a34a' : 'none'}
+                              color={star <= newRating ? '#16a34a' : 'rgba(120, 120, 120, 0.4)'}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Name Input */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+                        Your Name *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Farooq Mir"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 1rem',
+                          borderRadius: '10px',
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--card-bg)',
+                          color: 'var(--text-primary)',
+                          fontSize: '0.92rem',
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+
+                    {/* Dining Category and Type */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+                          Category
+                        </label>
+                        <select
+                          value={newCategory}
+                          onChange={(e) => setNewCategory(e.target.value as any)}
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem 1rem',
+                            borderRadius: '10px',
+                            border: '1px solid var(--border-color)',
+                            backgroundColor: 'var(--card-bg)',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.92rem',
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <option value="Wazwan">Kashmiri Wazwan</option>
+                          <option value="Starters">Starters & Momos</option>
+                          <option value="Biryani">Dum Biryani</option>
+                          <option value="Beverages">Kahwa & Drinks</option>
+                          <option value="Ambiance">Ambiance & Service</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+                          Dining Experience
+                        </label>
+                        <select
+                          value={newType}
+                          onChange={(e) => setNewType(e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem 1rem',
+                            borderRadius: '10px',
+                            border: '1px solid var(--border-color)',
+                            backgroundColor: 'var(--card-bg)',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.92rem',
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <option value="Dine-In">Dine-In</option>
+                          <option value="Family Feast">Family Feast</option>
+                          <option value="Takeaway">Takeaway</option>
+                          <option value="Delivery">Delivery</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Comment */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+                        Your Review *
+                      </label>
+                      <textarea
+                        rows={3}
+                        placeholder="Tell us what you enjoyed most about the flavors, presentation, and ambiance..."
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 1rem',
+                          borderRadius: '10px',
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--card-bg)',
+                          color: 'var(--text-primary)',
+                          fontSize: '0.92rem',
+                          boxSizing: 'border-box',
+                          resize: 'vertical',
+                        }}
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      style={{
+                        marginTop: '0.5rem',
+                        padding: '0.85rem',
+                        backgroundColor: 'var(--accent-gold)',
+                        color: '#121008',
+                        border: 'none',
+                        borderRadius: '10px',
+                        fontWeight: 700,
+                        fontSize: '0.95rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                      }}
+                    >
+                      <Send size={16} />
+                      Publish Verified Review
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
+          )}
+        </motion.div>
       </div>
 
       {/* Responsive Styles */}
