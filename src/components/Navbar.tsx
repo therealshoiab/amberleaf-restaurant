@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Lock } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavbarProps {
@@ -55,6 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
     { label: 'Signatures', hash: '#/signatures' },
     { label: 'Gallery', hash: '#/gallery' },
     { label: 'Contact', hash: '#/contact' },
+    { label: 'Admin', hash: '#/admin' },
   ];
 
   // Meydani Cafe style: Floating transparent navbar directly over hero on Home
@@ -241,37 +242,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
           Reserve Table
         </a>
 
-        {/* Admin Quick Access Button */}
-        <a
-          href="#/admin"
-          aria-label="Admin Portal"
-          title="Admin Portal"
-          style={{
-            background: 'none',
-            border: isTransparentOverHero ? '1px solid rgba(255, 255, 255, 0.25)' : 'none',
-            color: currentHash === '#/admin' ? 'var(--accent-gold)' : (isTransparentOverHero ? '#ffffff' : 'var(--text-secondary)'),
-            cursor: 'pointer',
-            padding: '0.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '50%',
-            backgroundColor: currentHash === '#/admin' ? 'rgba(197, 160, 89, 0.25)' : (isTransparentOverHero ? 'rgba(0, 0, 0, 0.3)' : 'var(--border-light)'),
-            transition: 'background-color 0.3s ease, color 0.3s ease, transform 0.3s ease',
-            textDecoration: 'none',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.1)';
-            e.currentTarget.style.color = 'var(--accent-gold)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.color = currentHash === '#/admin' ? 'var(--accent-gold)' : (isTransparentOverHero ? '#ffffff' : 'var(--text-secondary)');
-          }}
-        >
-          <Lock size={16} />
-        </a>
-
         {/* Theme Toggle Button */}
         <button
           onClick={toggleTheme}
@@ -384,25 +354,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
                 </a>
               );
             })}
-
-            {/* Mobile Admin Link */}
-            <a
-              href="#/admin"
-              onClick={() => setIsMobileMenuOpen(false)}
-              style={{
-                color: currentHash === '#/admin' ? 'var(--accent-gold)' : 'var(--text-secondary)',
-                textDecoration: 'none',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                padding: '0.5rem 0',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}
-            >
-              <Lock size={15} />
-              <span>Admin Management Portal</span>
-            </a>
           </motion.div>
         )}
       </AnimatePresence>
