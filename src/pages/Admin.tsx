@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { menuService } from '../services/menuService';
 import { MENU_CATEGORIES } from '../data/defaultMenu';
-import type { MenuItem, BroadcastBannerData } from '../data/defaultMenu';
+import type { MenuItem, BroadcastBannerData, SignatureDishItem } from '../data/defaultMenu';
 import { SEO } from '../components/SEO';
 import {
   Lock,
@@ -31,7 +31,7 @@ export const Admin: React.FC = () => {
   const [loginError, setLoginError] = useState('');
 
   // Dashboard Tab state
-  const [activeTab, setActiveTab] = useState<'manage' | 'add' | 'broadcast' | 'settings'>('manage');
+  const [activeTab, setActiveTab] = useState<'manage' | 'signatures' | 'add' | 'broadcast' | 'settings'>('manage');
 
   // Menu Items State
   const [items, setItems] = useState<MenuItem[]>(() => menuService.getMenuItems());
@@ -40,6 +40,23 @@ export const Admin: React.FC = () => {
     const unique = Array.from(new Set(list.map((i) => i.category))).filter(Boolean);
     return Array.from(new Set([...MENU_CATEGORIES.filter((c) => c !== 'All'), ...unique]));
   });
+
+  // Signatures State
+  const [signatures, setSignatures] = useState<SignatureDishItem[]>(() => menuService.getSignatures());
+  const [isAddingSignature, setIsAddingSignature] = useState(false);
+  const [editingSignature, setEditingSignature] = useState<SignatureDishItem | null>(null);
+  const [sigFormData, setSigFormData] = useState({
+    overtitle: '',
+    name: '',
+    ratingText: '4.9 ★ (300+ ratings)',
+    price: '',
+    description: '',
+    ingredientsStr: '',
+    image: '',
+  });
+  const [sigImagePreview, setSigImagePreview] = useState('');
+  const [sigSuccess, setSigSuccess] = useState('');
+  const [sigError, setSigError] = useState('');
 
   // Search & Filter in Manage Tab
   const [searchQuery, setSearchQuery] = useState('');
@@ -92,13 +109,16 @@ export const Admin: React.FC = () => {
   useEffect(() => {
     const handleMenuUpdate = () => refreshMenuData();
     const handleBannerUpdate = () => setBannerConfig(menuService.getBroadcastBanner());
+    const handleSigUpdate = () => setSignatures(menuService.getSignatures());
 
     window.addEventListener('amberleaf:menu_updated', handleMenuUpdate);
     window.addEventListener('amberleaf:broadcast_updated', handleBannerUpdate);
+    window.addEventListener('amberleaf:signatures_updated', handleSigUpdate);
 
     return () => {
       window.removeEventListener('amberleaf:menu_updated', handleMenuUpdate);
       window.removeEventListener('amberleaf:broadcast_updated', handleBannerUpdate);
+      window.removeEventListener('amberleaf:signatures_updated', handleSigUpdate);
     };
   }, []);
 
@@ -242,6 +262,135 @@ export const Admin: React.FC = () => {
       menuService.resetMenu();
       refreshMenuData();
       alert('Menu restored to original default dishes.');
+    }
+  };
+
+  // --- SIGNATURE DISHES HANDLERS ---
+  const handleOpenAddSignature = () => {
+    setEditingSignature(null);
+    setSigFormData({
+      overtitle: '',
+      name: '',
+      ratingText: '4.9 ★ (300+ ratings)',
+      price: '',
+      description: '',
+      ingredientsStr: '',
+      image: '',
+    });
+    setSigImagePreview('');
+    setSigError('');
+    setIsAddingSignature(true);
+  };
+
+  const handleOpenEditSignature = (item: SignatureDishItem) => {
+    setIsAddingSignature(false);
+    setEditingSignature(item);
+    setSigFormData({
+      overtitle: item.overtitle,
+      name: item.name,
+      ratingText: item.ratingText,
+      price: String(item.price),
+      description: item.description,
+      ingredientsStr: Array.isArray(item.ingredients) ? item.ingredients.join(', ') : '',
+      image: item.image,
+    });
+    setSigImagePreview(item.image);
+    setSigError('');
+  };
+
+  const handleSigImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 3 * 1024 * 1024) {
+        setSigError('Image size is too large (max 3MB). Please choose a smaller image.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setSigFormData((prev) => ({ ...prev, image: result }));
+        setSigImagePreview(result);
+        setSigError('');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveSignature = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSigError('');
+
+    if (!sigFormData.name.trim()) {
+      setSigError('Signature dish name is required.');
+      return;
+    }
+    if (!sigFormData.price) {
+      setSigError('Please enter a valid price.');
+      return;
+    }
+    if (!sigFormData.description.trim()) {
+      setSigError('Please enter a description for this signature dish.');
+      return;
+    }
+
+    const ingredients = sigFormData.ingredientsStr
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    if (editingSignature) {
+      const res = menuService.updateSignature(editingSignature.id, {
+        overtitle: sigFormData.overtitle.trim() || 'AMBERLEAF SIGNATURE SPECIALTY',
+        name: sigFormData.name.trim(),
+        ratingText: sigFormData.ratingText.trim() || '4.9 ★ (300+ ratings)',
+        price: Number(sigFormData.price) || 0,
+        description: sigFormData.description.trim(),
+        ingredients,
+        image: sigFormData.image.trim() || './images/g8.jpg',
+      });
+      if (res.success) {
+        setSigSuccess(`Signature dish "${sigFormData.name}" updated successfully!`);
+        setEditingSignature(null);
+        setTimeout(() => setSigSuccess(''), 4000);
+      } else {
+        setSigError(res.error || 'Failed to update signature dish.');
+      }
+    } else {
+      const res = menuService.addSignature({
+        overtitle: sigFormData.overtitle.trim() || 'AMBERLEAF SIGNATURE SPECIALTY',
+        name: sigFormData.name.trim(),
+        ratingText: sigFormData.ratingText.trim() || '4.9 ★ (300+ ratings)',
+        price: Number(sigFormData.price) || 0,
+        description: sigFormData.description.trim(),
+        ingredients,
+        image: sigFormData.image.trim() || './images/g8.jpg',
+      });
+      if (res.success) {
+        setSigSuccess(`Signature dish "${sigFormData.name}" added successfully!`);
+        setIsAddingSignature(false);
+        setTimeout(() => setSigSuccess(''), 4000);
+      } else {
+        setSigError('Failed to add signature dish.');
+      }
+    }
+  };
+
+  const handleDeleteSignature = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to remove signature dish "${name}"?`)) {
+      menuService.deleteSignature(id);
+      setSigSuccess(`Signature dish "${name}" was removed.`);
+      if (editingSignature?.id === id) setEditingSignature(null);
+      setTimeout(() => setSigSuccess(''), 3000);
+    }
+  };
+
+  const handleResetSignatures = () => {
+    if (window.confirm('Reset all signature dishes to default Amberleaf specialties?')) {
+      menuService.resetSignatures();
+      setSigSuccess('All signature dishes have been reset to factory defaults.');
+      setEditingSignature(null);
+      setIsAddingSignature(false);
+      setTimeout(() => setSigSuccess(''), 4000);
     }
   };
 
@@ -469,21 +618,6 @@ export const Admin: React.FC = () => {
             </button>
           </form>
 
-          <div
-            style={{
-              marginTop: '1.5rem',
-              padding: '0.75rem',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(197, 160, 89, 0.08)',
-              border: '1px solid var(--border-light)',
-              fontSize: '0.78rem',
-              color: 'var(--text-secondary)',
-            }}
-          >
-            <span>💡 Default Passcode: </span>
-            <strong style={{ color: 'var(--accent-gold)' }}>Amberleaf@2026</strong>
-          </div>
-
           <div style={{ marginTop: '1.8rem' }}>
             <a
               href="#/home"
@@ -635,6 +769,27 @@ export const Admin: React.FC = () => {
           }}
         >
           <span>📋</span> Manage Dishes ({items.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('signatures')}
+          style={{
+            padding: '0.75rem 1.4rem',
+            borderRadius: '12px 12px 0 0',
+            border: 'none',
+            background: activeTab === 'signatures' ? 'var(--accent-gold)' : 'transparent',
+            color: activeTab === 'signatures' ? '#040906' : 'var(--text-primary)',
+            fontWeight: activeTab === 'signatures' ? 700 : 500,
+            fontSize: '0.92rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            transition: 'all 0.2s ease',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <Sparkles size={16} /> Signature Dishes ({signatures.length})
         </button>
 
         <button
@@ -1024,6 +1179,758 @@ export const Admin: React.FC = () => {
               <p>Try searching for a different keyword or category.</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB: SIGNATURE DISHES MANAGEMENT
+      ========================================================================= */}
+      {activeTab === 'signatures' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* Header & Actions */}
+          <div
+            className="glass-panel"
+            style={{
+              padding: '1.5rem 2rem',
+              borderRadius: '16px',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+            }}
+          >
+            <div>
+              <h2
+                style={{
+                  fontSize: '1.45rem',
+                  fontFamily: "'Playfair Display', serif",
+                  color: 'var(--text-primary)',
+                  margin: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                }}
+              >
+                <Sparkles size={22} color="var(--accent-gold)" />
+                Signature Masterpieces ({signatures.length})
+              </h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', margin: '0.35rem 0 0 0' }}>
+                Manage the premier showcase dishes featured prominently on the{' '}
+                <a
+                  href="#/signatures"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: 'var(--accent-gold)', textDecoration: 'none', fontWeight: 600 }}
+                >
+                  /signatures
+                </a>{' '}
+                page with alternating luxury layouts.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={handleOpenAddSignature}
+                className="btn-primary"
+                style={{
+                  padding: '0.65rem 1.35rem',
+                  fontSize: '0.86rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                <Plus size={16} /> Add Signature Dish
+              </button>
+              <button
+                onClick={handleResetSignatures}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  fontSize: '0.86rem',
+                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  color: '#ef4444',
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                }}
+              >
+                <RotateCcw size={14} /> Reset Defaults
+              </button>
+            </div>
+          </div>
+
+          {/* Success / Error notification */}
+          {sigSuccess && (
+            <div
+              style={{
+                padding: '0.9rem 1.25rem',
+                backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                border: '1px solid #22c55e',
+                color: '#22c55e',
+                borderRadius: '10px',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <CheckCircle2 size={18} />
+              <span>{sigSuccess}</span>
+            </div>
+          )}
+
+          {/* Add / Edit Form Modal / Box */}
+          {(isAddingSignature || editingSignature) && (
+            <div
+              className="glass-panel"
+              style={{
+                padding: '2rem 2.5rem',
+                borderRadius: '20px',
+                border: '2px solid var(--accent-gold)',
+                boxShadow: '0 8px 32px rgba(197, 160, 89, 0.18)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: '1.35rem',
+                    color: 'var(--text-primary)',
+                    fontFamily: "'Playfair Display', serif",
+                  }}
+                >
+                  {editingSignature
+                    ? `Edit Signature Dish: ${editingSignature.name}`
+                    : 'Add New Signature Masterpiece'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAddingSignature(false);
+                    setEditingSignature(null);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {sigError && (
+                <div
+                  style={{
+                    padding: '0.85rem 1.25rem',
+                    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                    border: '1px solid #ef4444',
+                    color: '#ef4444',
+                    borderRadius: '10px',
+                    marginBottom: '1.5rem',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  <AlertCircle size={18} />
+                  <span>{sigError}</span>
+                </div>
+              )}
+
+              <form
+                onSubmit={handleSaveSignature}
+                style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+              >
+                <div
+                  style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '1.25rem' }}
+                  className="form-row-2"
+                >
+                  <div>
+                    <label
+                      style={{
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        display: 'block',
+                        marginBottom: '0.35rem',
+                      }}
+                    >
+                      Dish Name *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Signature Mutton Rista"
+                      value={sigFormData.name}
+                      onChange={(e) => setSigFormData((prev) => ({ ...prev, name: e.target.value }))}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--input-bg)',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      style={{
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        display: 'block',
+                        marginBottom: '0.35rem',
+                      }}
+                    >
+                      Price (₹) *
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 490"
+                      value={sigFormData.price}
+                      onChange={(e) => setSigFormData((prev) => ({ ...prev, price: e.target.value }))}
+                      required
+                      min="0"
+                      step="1"
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--input-bg)',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}
+                  className="form-row-2"
+                >
+                  <div>
+                    <label
+                      style={{
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        display: 'block',
+                        marginBottom: '0.35rem',
+                      }}
+                    >
+                      Overtitle / Tagline
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. AUTHENTIC KASHMIRI WAZWAN ROYALTY"
+                      value={sigFormData.overtitle}
+                      onChange={(e) => setSigFormData((prev) => ({ ...prev, overtitle: e.target.value }))}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--input-bg)',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      style={{
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        display: 'block',
+                        marginBottom: '0.35rem',
+                      }}
+                    >
+                      Rating Display Text
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 5.0 ★ (410+ ratings)"
+                      value={sigFormData.ratingText}
+                      onChange={(e) => setSigFormData((prev) => ({ ...prev, ratingText: e.target.value }))}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--input-bg)',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                      display: 'block',
+                      marginBottom: '0.35rem',
+                    }}
+                  >
+                    Description *
+                  </label>
+                  <textarea
+                    placeholder="Describe the craftsmanship, slow-cooking techniques, and flavors..."
+                    value={sigFormData.description}
+                    onChange={(e) => setSigFormData((prev) => ({ ...prev, description: e.target.value }))}
+                    required
+                    rows={3}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--input-bg)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.9rem',
+                      outline: 'none',
+                      resize: 'vertical',
+                      lineHeight: '1.5',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                      display: 'block',
+                      marginBottom: '0.35rem',
+                    }}
+                  >
+                    Key Ingredients (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Hand-Pounded Mutton, Pampore Saffron, Maval Extract, Clarified Ghee"
+                    value={sigFormData.ingredientsStr}
+                    onChange={(e) => setSigFormData((prev) => ({ ...prev, ingredientsStr: e.target.value }))}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--input-bg)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.9rem',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                      display: 'block',
+                      marginBottom: '0.35rem',
+                    }}
+                  >
+                    Dish Photo (Image URL or File Upload)
+                  </label>
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    <input
+                      type="text"
+                      placeholder="Paste image URL (e.g. https://... or ./images/g12.jpg)"
+                      value={sigFormData.image}
+                      onChange={(e) => {
+                        setSigFormData((prev) => ({ ...prev, image: e.target.value }));
+                        setSigImagePreview(e.target.value);
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--input-bg)',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                      }}
+                    />
+                    <label
+                      style={{
+                        padding: '0.75rem 1.15rem',
+                        backgroundColor: 'rgba(197, 160, 89, 0.15)',
+                        border: '1px solid var(--accent-gold)',
+                        color: 'var(--accent-gold)',
+                        borderRadius: '8px',
+                        fontWeight: 600,
+                        fontSize: '0.84rem',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <Upload size={14} /> Upload Local
+                      <input type="file" accept="image/*" onChange={handleSigImageFile} style={{ display: 'none' }} />
+                    </label>
+                  </div>
+
+                  {/* Image Preview & Quick Plated Presets */}
+                  <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', alignItems: 'center' }}>
+                    {sigImagePreview && (
+                      <div
+                        style={{
+                          width: '75px',
+                          height: '75px',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          border: '2px solid var(--accent-gold)',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <img
+                          src={sigImagePreview}
+                          alt="Signature Preview"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = './images/g8.jpg';
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      Quick Plated Presets:{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const p =
+                            'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800';
+                          setSigFormData((prev) => ({ ...prev, image: p }));
+                          setSigImagePreview(p);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--accent-gold)',
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
+                          padding: '0 4px',
+                        }}
+                      >
+                        Wazwan Ribs
+                      </button>
+                      |
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const p =
+                            'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&q=80&w=800';
+                          setSigFormData((prev) => ({ ...prev, image: p }));
+                          setSigImagePreview(p);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--accent-gold)',
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
+                          padding: '0 4px',
+                        }}
+                      >
+                        Crispy Momos
+                      </button>
+                      |
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const p =
+                            'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=800';
+                          setSigFormData((prev) => ({ ...prev, image: p }));
+                          setSigImagePreview(p);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--accent-gold)',
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
+                          padding: '0 4px',
+                        }}
+                      >
+                        Dum Biryani
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    style={{
+                      padding: '0.8rem 1.75rem',
+                      fontSize: '0.92rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                    }}
+                  >
+                    <CheckCircle2 size={16} />
+                    {editingSignature ? 'Save Changes' : 'Publish Signature Dish'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddingSignature(false);
+                      setEditingSignature(null);
+                    }}
+                    style={{
+                      padding: '0.8rem 1.4rem',
+                      fontSize: '0.92rem',
+                      backgroundColor: 'transparent',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-secondary)',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* List of Signature Dishes */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {signatures.map((dish, idx) => (
+              <div
+                key={dish.id}
+                className="glass-panel"
+                style={{
+                  padding: '1.5rem',
+                  borderRadius: '16px',
+                  display: 'flex',
+                  gap: '1.5rem',
+                  alignItems: 'center',
+                  border: '1px solid var(--border-color)',
+                  transition: 'border-color 0.2s ease',
+                }}
+              >
+                {/* Number Badge */}
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(197, 160, 89, 0.15)',
+                    color: 'var(--accent-gold)',
+                    fontWeight: 800,
+                    fontSize: '0.86rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  #{idx + 1}
+                </div>
+
+                {/* Dish Photo */}
+                <div
+                  style={{
+                    width: '110px',
+                    height: '110px',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    backgroundColor: '#12100e',
+                  }}
+                >
+                  <img
+                    src={dish.image || './images/g8.jpg'}
+                    alt={dish.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = './images/g8.jpg';
+                    }}
+                  />
+                </div>
+
+                {/* Content */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.6rem',
+                      marginBottom: '0.2rem',
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: '#e23744',
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {dish.overtitle}
+                    </span>
+                    <span style={{ color: '#16a34a', fontSize: '0.78rem', fontWeight: 700 }}>
+                      {dish.ratingText}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.85rem' }}>
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: '1.2rem',
+                        fontFamily: "'Playfair Display', serif",
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      {dish.name}
+                    </h3>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--accent-gold)' }}>
+                      ₹{dish.price}
+                    </span>
+                  </div>
+
+                  <p
+                    style={{
+                      color: 'var(--text-secondary)',
+                      fontSize: '0.84rem',
+                      lineHeight: '1.45',
+                      margin: '0.35rem 0 0.65rem 0',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {dish.description}
+                  </p>
+
+                  {/* Ingredients Chips */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                    {dish.ingredients.map((ing, iIdx) => (
+                      <span
+                        key={iIdx}
+                        style={{
+                          fontSize: '0.7rem',
+                          padding: '0.15rem 0.5rem',
+                          borderRadius: '9999px',
+                          backgroundColor: 'rgba(197, 160, 89, 0.1)',
+                          color: 'var(--accent-gold)',
+                          border: '1px solid rgba(197, 160, 89, 0.25)',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {ing}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flexShrink: 0 }}>
+                  <button
+                    onClick={() => handleOpenEditSignature(dish)}
+                    style={{
+                      padding: '0.55rem 1rem',
+                      backgroundColor: 'rgba(197, 160, 89, 0.12)',
+                      border: '1px solid var(--accent-gold)',
+                      color: 'var(--accent-gold)',
+                      borderRadius: '8px',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
+                    <Edit size={14} /> Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteSignature(dish.id, dish.name)}
+                    style={{
+                      padding: '0.55rem 1rem',
+                      backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid rgba(239, 68, 68, 0.25)',
+                      color: '#ef4444',
+                      borderRadius: '8px',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {signatures.length === 0 && (
+              <div
+                className="glass-panel"
+                style={{
+                  padding: '4rem 2rem',
+                  textAlign: 'center',
+                  borderRadius: '16px',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                <Sparkles size={36} color="var(--accent-gold)" style={{ marginBottom: '1rem', opacity: 0.6 }} />
+                <h3>No Signature Dishes Configured</h3>
+                <p>
+                  Click &quot;Add Signature Dish&quot; above to create a masterpiece for your /signatures page, or reset to factory defaults.
+                </p>
+                <button onClick={handleResetSignatures} className="btn-primary" style={{ marginTop: '1rem' }}>
+                  Restore Default Signatures
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

@@ -1,8 +1,9 @@
-import { DEFAULT_MENU_ITEMS, DEFAULT_BROADCAST_BANNER } from '../data/defaultMenu';
-import type { MenuItem, BroadcastBannerData } from '../data/defaultMenu';
+import { DEFAULT_MENU_ITEMS, DEFAULT_BROADCAST_BANNER, DEFAULT_SIGNATURE_ITEMS } from '../data/defaultMenu';
+import type { MenuItem, BroadcastBannerData, SignatureDishItem } from '../data/defaultMenu';
 
 const STORAGE_KEY_MENU = 'amberleaf_restaurant_menu_items_v4';
 const STORAGE_KEY_BANNER = 'amberleaf_restaurant_broadcast_banner_v1';
+const STORAGE_KEY_SIGNATURES = 'amberleaf_restaurant_signatures_v1';
 const STORAGE_KEY_PASSCODE = 'amberleaf_restaurant_admin_passcode_v1';
 const STORAGE_KEY_API = 'amberleaf_restaurant_api_endpoint_v1';
 const SESSION_KEY_AUTH = 'amberleaf_restaurant_admin_auth_session';
@@ -84,6 +85,35 @@ export const menuService = {
         if (bData && bData.message !== undefined) {
           localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(bData));
           window.dispatchEvent(new CustomEvent('amberleaf:broadcast_updated', { detail: bData }));
+        }
+      }
+    } catch {
+      // Offline fallback
+    }
+
+    // 3. Sync Signature Masterpieces
+    try {
+      const sigUrl = base ? `${base}/api/signatures` : '/api/signatures';
+      const sigRes = await fetch(sigUrl);
+      if (sigRes.ok) {
+        const sigData = await sigRes.json();
+        if (Array.isArray(sigData) && sigData.length > 0) {
+          const formattedSig: SignatureDishItem[] = sigData.map((s: any) => ({
+            id: String(s.id),
+            overtitle: s.overtitle || '',
+            name: s.name,
+            ratingText: s.ratingText || '4.9 ★',
+            price: parsePriceNumber(s.price),
+            description: s.description || '',
+            ingredients: Array.isArray(s.ingredients)
+              ? s.ingredients
+              : s.ingredients
+              ? String(s.ingredients).split(',').map((x: string) => x.trim())
+              : [],
+            image: s.image || './images/g8.jpg',
+          }));
+          localStorage.setItem(STORAGE_KEY_SIGNATURES, JSON.stringify(formattedSig));
+          window.dispatchEvent(new CustomEvent('amberleaf:signatures_updated', { detail: formattedSig }));
         }
       }
     } catch {
@@ -212,6 +242,144 @@ export const menuService = {
     const menuUrl = base ? `${base}/api/menu` : '/api/menu';
     const passcode = menuService.getPasscode();
     fetch(menuUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
+      body: JSON.stringify({ action: 'reset', passcode }),
+    }).catch(() => {});
+
+    return { success: true };
+  },
+
+  // --- SIGNATURE DISHES CRUD ---
+  getSignatures: (): SignatureDishItem[] => {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY_SIGNATURES);
+      if (!data) return DEFAULT_SIGNATURE_ITEMS;
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map((item) => ({
+          ...item,
+          price: parsePriceNumber(item.price),
+          ingredients: Array.isArray(item.ingredients) ? item.ingredients : [],
+        }));
+      }
+      return DEFAULT_SIGNATURE_ITEMS;
+    } catch (err) {
+      console.error('Error reading signatures from storage:', err);
+      return DEFAULT_SIGNATURE_ITEMS;
+    }
+  },
+
+  saveSignatures: (items: SignatureDishItem[]) => {
+    try {
+      localStorage.setItem(STORAGE_KEY_SIGNATURES, JSON.stringify(items));
+      window.dispatchEvent(new CustomEvent('amberleaf:signatures_updated', { detail: items }));
+    } catch (err) {
+      console.error('Failed to save signatures to storage:', err);
+    }
+  },
+
+  addSignature: (
+    newItem: Omit<SignatureDishItem, 'id'> & { id?: string }
+  ): { success: boolean; item: SignatureDishItem } => {
+    const current = menuService.getSignatures();
+    const id = newItem.id || `sig_${Date.now()}`;
+    const item: SignatureDishItem = {
+      ...newItem,
+      id,
+      overtitle: (newItem.overtitle || 'AMBERLEAF SIGNATURE SPECIALTY').trim().toUpperCase(),
+      name: newItem.name.trim(),
+      ratingText: (newItem.ratingText || '4.9 ★ (300+ ratings)').trim(),
+      price: parsePriceNumber(newItem.price),
+      description: newItem.description.trim(),
+      ingredients: Array.isArray(newItem.ingredients)
+        ? newItem.ingredients.map((ing) => ing.trim()).filter(Boolean)
+        : [],
+      image: newItem.image?.trim() || './images/g8.jpg',
+    };
+
+    const updated = [...current, item];
+    menuService.saveSignatures(updated);
+
+    // Asynchronously sync to Cloudflare D1
+    const base = menuService.getApiEndpoint();
+    const sigUrl = base ? `${base}/api/signatures` : '/api/signatures';
+    const passcode = menuService.getPasscode();
+    fetch(sigUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
+      body: JSON.stringify({ action: 'add', item, passcode }),
+    }).catch(() => {});
+
+    return { success: true, item };
+  },
+
+  updateSignature: (
+    id: string,
+    updatedFields: Partial<SignatureDishItem>
+  ): { success: boolean; error?: string } => {
+    const current = menuService.getSignatures();
+    const index = current.findIndex((i) => i.id === id || i.name === updatedFields.name);
+    if (index === -1) {
+      return { success: false, error: 'Signature dish not found' };
+    }
+
+    const price =
+      updatedFields.price !== undefined ? parsePriceNumber(updatedFields.price) : current[index].price;
+
+    const updatedItem: SignatureDishItem = {
+      ...current[index],
+      ...updatedFields,
+      price,
+      overtitle:
+        updatedFields.overtitle !== undefined
+          ? updatedFields.overtitle.trim().toUpperCase()
+          : current[index].overtitle,
+      ingredients: updatedFields.ingredients !== undefined ? updatedFields.ingredients : current[index].ingredients,
+    };
+
+    const updatedList = [...current];
+    updatedList[index] = updatedItem;
+    menuService.saveSignatures(updatedList);
+
+    // Asynchronously sync to Cloudflare D1
+    const base = menuService.getApiEndpoint();
+    const sigUrl = base ? `${base}/api/signatures` : '/api/signatures';
+    const passcode = menuService.getPasscode();
+    fetch(sigUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
+      body: JSON.stringify({ action: 'update', id, updatedFields, passcode }),
+    }).catch(() => {});
+
+    return { success: true };
+  },
+
+  deleteSignature: (id: string): { success: boolean } => {
+    const current = menuService.getSignatures();
+    const filtered = current.filter((i) => i.id !== id);
+    menuService.saveSignatures(filtered);
+
+    // Asynchronously sync to Cloudflare D1
+    const base = menuService.getApiEndpoint();
+    const sigUrl = base ? `${base}/api/signatures` : '/api/signatures';
+    const passcode = menuService.getPasscode();
+    fetch(sigUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
+      body: JSON.stringify({ action: 'delete', id, passcode }),
+    }).catch(() => {});
+
+    return { success: true };
+  },
+
+  resetSignatures: (): { success: boolean } => {
+    menuService.saveSignatures(DEFAULT_SIGNATURE_ITEMS);
+
+    const base = menuService.getApiEndpoint();
+    const sigUrl = base ? `${base}/api/signatures` : '/api/signatures';
+    const passcode = menuService.getPasscode();
+    fetch(sigUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
       body: JSON.stringify({ action: 'reset', passcode }),

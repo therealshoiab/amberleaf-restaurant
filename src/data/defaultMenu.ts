@@ -303,3 +303,94 @@ export const DEFAULT_MENU_ITEMS: MenuItem[] = [
     isVegetarian: true,
   },
 ];
+
+export interface SignatureDishItem {
+  id: string;
+  overtitle: string;
+  name: string;
+  ratingText: string;
+  price: number;
+  description: string;
+  ingredients: string[];
+  image: string;
+}
+
+export const DEFAULT_SIGNATURE_ITEMS: SignatureDishItem[] = [
+  {
+    id: 'sig-1',
+    overtitle: 'ULTRA-CRISPY GOLDEN DUMPLINGS',
+    name: 'Fried Momos',
+    ratingText: '4.9 ★ (320+ ratings)',
+    price: 180,
+    description:
+      'Our signature chicken momos deep-fried to a perfect golden crisp, offering a crunchy exterior while remaining juicy and flavorful on the inside.',
+    ingredients: ['Fried Chicken Momos', 'Garlic Mayo', 'Tandoori Dipping Sauce'],
+    image: './images/g8.jpg',
+  },
+  {
+    id: 'sig-2',
+    overtitle: "SRINAGAR'S FAVORITE CHICKEN WRAP",
+    name: 'Chicken Kathi Roll',
+    ratingText: '4.8 ★ (190+ ratings)',
+    price: 220,
+    description:
+      'Juicy, fire-roasted tandoori chicken chunks tossed with fresh onions, capsicum, green chutney, and cream, all wrapped inside a soft, flaky flatbread.',
+    ingredients: ['Tandoori Chicken', 'Flaky Paratha', 'Sliced Onions', 'Mint Chutney'],
+    image: './images/g9.jpg',
+  },
+  {
+    id: 'sig-3',
+    overtitle: 'AUTHENTIC KASHMIRI WAZWAN ROYALTY',
+    name: 'Signature Mutton Rista',
+    ratingText: '5.0 ★ (410+ ratings)',
+    price: 490,
+    description:
+      'A masterpiece of Kashmiri Wazwan. Hand-hammered minced mutton meatballs simmered in a spiced red gravy infused with dried cockscomb flowers (maval) and pure Pampore saffron.',
+    ingredients: ['Hand-Pounded Mutton', 'Pampore Saffron', 'Maval Extract', 'Shallot Paste', 'Clarified Ghee'],
+    image: './images/g12.jpg',
+  },
+  {
+    id: 'sig-4',
+    overtitle: 'THE UNRIVALED KING OF WAZWAN',
+    name: 'Mutton Gushtaba Wazwan',
+    ratingText: '5.0 ★ (350+ ratings)',
+    price: 540,
+    description:
+      'Served traditionally as the grand finale of Wazwan feasts. Velvety mutton spheres poached slowly in a smooth, mildly tangy yogurt broth enriched with green cardamoms and dry mountain mint.',
+    ingredients: ['Velvet Hammered Lamb', 'Thick Spiced Curd', 'Dry Mountain Mint', 'Green Cardamom', 'Desi Ghee'],
+    image: './images/g10.jpg',
+  },
+  {
+    id: 'sig-5',
+    overtitle: 'SLOW-COOKED MOUNTAIN DUM STYLE',
+    name: 'Special Mutton Dum Biryani',
+    ratingText: '4.9 ★ (280+ ratings)',
+    price: 420,
+    description:
+      'Fragrant long-grain basmati rice layered with tender mutton chunks, caramelized onions, and our secret 14-spice blend, slow-cooked in traditional sealed dum style.',
+    ingredients: ['Tender Lamb Cuts', 'Aged Basmati Rice', 'Pampore Saffron', 'Fried Barista Onions', 'Mint Raita'],
+    image: './images/g11.jpg',
+  },
+  {
+    id: 'sig-6',
+    overtitle: 'TRADITIONAL SAMOVAR INFUSION',
+    name: 'Authentic Kashmiri Kahwa',
+    ratingText: '4.9 ★ (460+ ratings)',
+    price: 110,
+    description:
+      'Saffron-infused mountain green tea brewed in a traditional copper samovar. Sweetened with honey or rock sugar, enriched with crushed green cardamoms, cinnamon bark, and blanched almond slivers.',
+    ingredients: ['Organic Green Tea', 'Pampore Saffron Strands', 'Crushed Cardamoms', 'Cinnamon Bark', 'Slivered Almonds'],
+    image: './images/s3.jpg',
+  },
+  {
+    id: 'sig-7',
+    overtitle: 'HERITAGE MUGHAL DESSERT',
+    name: 'Shahi Tukda Royal',
+    ratingText: '4.9 ★ (210+ ratings)',
+    price: 180,
+    description:
+      'Crispy ghee-fried bread triangles soaked in warm saffron syrup, layered with double-thick reduced milk rabri, and garnished with pistachios and edible silver leaf.',
+    ingredients: ['Pure Ghee Bread', 'Six-Hour Slow Milk Rabri', 'Kashmiri Saffron', 'Pistachio Shavings', 'Edible Silver Vark'],
+    image: './images/s6.jpg',
+  },
+];
