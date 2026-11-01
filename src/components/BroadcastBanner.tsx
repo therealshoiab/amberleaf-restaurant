@@ -114,6 +114,8 @@ export const BroadcastBanner: React.FC<BroadcastBannerProps> = ({ onVisibilityCh
           whiteSpace: 'nowrap',
           margin: '0 1rem',
           position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
         }}
         title="Hover to pause announcement"
       >
@@ -123,13 +125,13 @@ export const BroadcastBanner: React.FC<BroadcastBannerProps> = ({ onVisibilityCh
             display: 'inline-flex',
             alignItems: 'center',
             whiteSpace: 'nowrap',
-            animation: 'marqueeScrollRightToLeft 28s linear infinite',
-            width: 'max-content',
+            paddingLeft: '100%',
+            animation: 'broadcastMarqueeRightToLeft 26s linear infinite',
+            willChange: 'transform',
           }}
         >
-          <span style={{ paddingRight: '3.5rem' }}>{banner.message}</span>
-          <span style={{ paddingRight: '3.5rem' }}>✦ &nbsp;&nbsp;&nbsp; {banner.message}</span>
-          <span style={{ paddingRight: '3.5rem' }}>✦ &nbsp;&nbsp;&nbsp; {banner.message}</span>
+          <span style={{ paddingRight: '4rem', flexShrink: 0 }}>{banner.message}</span>
+          <span style={{ paddingRight: '4rem', flexShrink: 0 }}>✦ &nbsp;&nbsp;&nbsp; {banner.message}</span>
         </div>
       </div>
 
@@ -185,9 +187,9 @@ export const BroadcastBanner: React.FC<BroadcastBannerProps> = ({ onVisibilityCh
       </div>
 
       <style>{`
-        @keyframes marqueeScrollRightToLeft {
+        @keyframes broadcastMarqueeRightToLeft {
           0% { transform: translate3d(0, 0, 0); }
-          100% { transform: translate3d(-50%, 0, 0); }
+          100% { transform: translate3d(-100%, 0, 0); }
         }
         .broadcast-marquee-container:hover .broadcast-marquee-track {
           animation-play-state: paused;
