@@ -135,7 +135,7 @@ export const BroadcastBanner: React.FC<BroadcastBannerProps> = ({ onVisibilityCh
 
       {/* Right Action & Dismiss */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexShrink: 0, zIndex: 2 }}>
-        {banner.linkText && banner.linkUrl && (
+        {banner.linkText && !banner.linkText.toLowerCase().includes('reserve') && banner.linkUrl && (
           <button
             onClick={handleLinkClick}
             style={{

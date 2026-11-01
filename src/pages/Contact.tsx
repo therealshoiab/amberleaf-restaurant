@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { SEO } from '../components/SEO';
-import { MapPin, Phone, Clock, Calendar, Check, Send } from 'lucide-react';
+import { MapPin, Phone, Clock, Calendar, Check, Send, PhoneCall, CheckCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export const Contact: React.FC = React.memo(() => {
@@ -380,6 +380,93 @@ export const Contact: React.FC = React.memo(() => {
               </button>
             </form>
           </div>
+        </div>
+      </motion.div>
+
+      {/* Takeaway / Curbside Pickup Instructions Panel (from Image 3) */}
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="glass-panel"
+        style={{
+          marginTop: '3.5rem',
+          padding: '2.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem',
+          borderRadius: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+          <PhoneCall size={24} style={{ color: 'var(--accent-gold)' }} />
+          <h3 style={{ fontSize: '1.6rem', color: 'var(--text-primary)', margin: 0 }}>Takeaway & Curbside Pickup</h3>
+        </div>
+
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', maxWidth: '800px' }}>
+          Avoid wait times! Place an order directly with our crew and pick it up on your way home or straight to your vehicle at Balgarden.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.75rem' }}>
+          {/* Step 1 */}
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'flex-start' }}>
+            <CheckCircle size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
+            <div>
+              <span style={{ display: 'block', fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem', marginBottom: '0.3rem' }}>
+                1. Pre-order via Call
+              </span>
+              <span style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Call us 20 minutes prior to arrival at{' '}
+                <a href="tel:+916006379610" style={{ color: 'var(--accent-gold)', textDecoration: 'none', fontWeight: 700 }}>
+                  +91 6006379610
+                </a>{' '}
+                to place your order.
+              </span>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'flex-start' }}>
+            <CheckCircle size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
+            <div>
+              <span style={{ display: 'block', fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem', marginBottom: '0.3rem' }}>
+                2. Drive to Balgarden
+              </span>
+              <span style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Drive to our address: 310, Balgarden - Nursing garh Rd, Srinagar. Pull up by our parking lane.
+              </span>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'flex-start' }}>
+            <CheckCircle size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '0.2rem' }} />
+            <div>
+              <span style={{ display: 'block', fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem', marginBottom: '0.3rem' }}>
+                3. Curbside Handover
+              </span>
+              <span style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Our crew will deliver your sealed order in premium insulated carrybags directly to your car window or motorcycle.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: '0.5rem',
+            paddingTop: '1rem',
+            borderTop: '1px solid var(--border-light)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: '0.88rem',
+            color: 'var(--text-secondary)',
+          }}
+        >
+          <MapPin size={16} style={{ color: 'var(--accent-gold)' }} />
+          <span>Curbside pickup coordinates are free from street parking fees.</span>
         </div>
       </motion.div>
 

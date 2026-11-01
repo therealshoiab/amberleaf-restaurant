@@ -1,12 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { SplineHero } from '../components/SplineHero';
 import { SEO } from '../components/SEO';
-import { ArrowRight, Star, Clock, Utensils, Calendar } from 'lucide-react';
+import {
+  ArrowRight,
+  Star,
+  Utensils,
+  Calendar,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  HelpCircle,
+  Send,
+} from 'lucide-react';
+import confetti from 'canvas-confetti';
+
+interface Review {
+  id: string;
+  author: string;
+  rating: number;
+  date: string;
+  comment: string;
+  type: string;
+}
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
 
 export const Home: React.FC = () => {
-  const [activeImage, setActiveImage] = useState('./images/g1.jpg');
-  const showcaseImages = [
+  // --- 1. HERO SLIDESHOW STATE ---
+  const sanctuaryImages = [
+    './images/amberleaf-vibe.jpg',
     './images/g1.jpg',
     './images/g2.jpg',
     './images/g3.jpg',
@@ -16,240 +41,508 @@ export const Home: React.FC = () => {
     './images/g7.jpg',
   ];
 
-  // Video autoplay states & refs
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
-  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
-  const rowRef = useRef<HTMLDivElement | null>(null);
-  const isHovering = useRef(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Recalculates which video is closest to the horizontal center of the scroll container
-  const recalculateCenterVideo = () => {
-    if (isHovering.current || !rowRef.current) return;
+  useEffect(() => {
+    const slideTimer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % sanctuaryImages.length);
+    }, 4500);
+    return () => clearInterval(slideTimer);
+  }, [sanctuaryImages.length]);
 
-    const row = rowRef.current;
-    const containerRect = row.getBoundingClientRect();
-    const containerCenter = containerRect.left + containerRect.width / 2;
-    
-    let closestVideoId: string | null = null;
-    let minDistance = Infinity;
-
-    Object.entries(videoRefs.current).forEach(([id, video]) => {
-      if (video) {
-        const rect = video.getBoundingClientRect();
-        const videoCenter = rect.left + rect.width / 2;
-        const distance = Math.abs(containerCenter - videoCenter);
-        const isVisible = rect.left < containerRect.right && rect.right > containerRect.left;
-
-        if (isVisible && distance < minDistance) {
-          minDistance = distance;
-          closestVideoId = id;
-        }
-      }
-    });
-
-    setActiveVideoId(closestVideoId);
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % sanctuaryImages.length);
   };
 
-  // Sync play/pause based on activeVideoId
-  useEffect(() => {
-    Object.entries(videoRefs.current).forEach(([id, video]) => {
-      if (video) {
-        if (id === activeVideoId) {
-          video.play().catch((err) => console.log('Home autoplay blocked:', err));
-        } else {
-          video.pause();
-        }
-      }
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + sanctuaryImages.length) % sanctuaryImages.length);
+  };
+
+  // --- 2. 6 CULINARY VIDEOS (2 ROWS OF 3 VIDEOS) ---
+  const homeVideos = [
+    { id: 's1', url: './images/s1.mp4', title: 'The Royal Samovar Brew', tag: 'Artisanal Kahwa' },
+    { id: 's2', url: './images/s2.mp4', title: 'Pounding the Velvet Rista', tag: 'Master Wazwan' },
+    { id: 's4', url: './images/s4.mp4', title: 'Fiery Charcoal Tandoor', tag: 'Tandoori Grills' },
+    { id: 's5', url: './images/s5.mp4', title: 'Gushtaba Curd & Mint Simmer', tag: 'Royal Feast' },
+    { id: 's7', url: './images/s7.mp4', title: 'Signature Mocktail Pour', tag: 'Beverage Bar' },
+    { id: 's8', url: './images/s8.mp4', title: 'Evening Ambiance at Balgarden', tag: 'Fine Dining' },
+  ];
+
+  // --- 3. FAQ ACCORDION STATE ---
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const faqItems: FAQItem[] = [
+    {
+      question: 'What are your operational timings?',
+      answer: 'Amberleaf is open daily from 09:00 AM to 10:30 PM. We serve breakfast, brunch, lunch, dinner, and late-night artisan dessert bites.',
+    },
+    {
+      question: 'Is your food 100% Halal certified?',
+      answer: 'Yes. All our meats are sourced exclusively from trusted certified suppliers, and all ingredients used across our entire culinary menu are 100% Halal.',
+    },
+    {
+      question: 'Do you offer private dining rooms for groups and families?',
+      answer: 'Absolutely. We have private dining sanctuaries designed specifically for family banquets and business groups. You can book in advance by filling out our Table Reservation form.',
+    },
+    {
+      question: 'Is there parking space available?',
+      answer: 'Yes, we offer both a dedicated on-site parking lot and complimentary street parking close to our entrance at 310, Balgarden, Srinagar.',
+    },
+    {
+      question: 'How does your Table Reservation work?',
+      answer: 'When you confirm your reservation on our website, your booking details transmit directly to our host desk and WhatsApp concierge, ensuring instant table allocation.',
+    },
+    {
+      question: 'Can I order online for delivery or curbside pickup?',
+      answer: 'Yes, we are listed on Swiggy and Zomato for prompt home delivery. For takeaway, simply call +91 60063 79610 twenty minutes in advance and our crew will deliver your sealed order straight to your car at our Balgarden curbside.',
+    },
+    {
+      question: 'Do you cater to dietary restrictions or vegetarian preferences?',
+      answer: 'Yes, our menu features clearly labeled vegetarian and non-vegetarian selections. If you have specific dietary needs, please notify our team when ordering.',
+    },
+  ];
+
+  // --- 4. REVIEWS & TESTIMONIALS STATE ---
+  const [reviewsList, setReviewsList] = useState<Review[]>([
+    {
+      id: 'r1',
+      author: 'Arshid Ahmad',
+      rating: 5,
+      date: 'June 18, 2026',
+      comment: 'Best Rista in Srinagar! The meat is so tender and cooked to perfection. The glassmorphic design and the warm lighting make it look like a high-end luxury resort cafe. Highly recommend!',
+      type: 'Family Dining',
+    },
+    {
+      id: 'r2',
+      author: 'Sarmista Acharya',
+      rating: 5,
+      date: 'June 12, 2026',
+      comment: 'Amazing place! We came here for lunch and the hospitality was unmatched. The Saffron Cooler mocktail is out of this world. Will definitely return with friends.',
+      type: 'Group Outing',
+    },
+    {
+      id: 'r3',
+      author: 'Basit Ali',
+      rating: 5,
+      date: 'May 30, 2026',
+      comment: 'Very cozy environment. I often visit for solo dining, especially for their French Press coffee and Butter Chicken. Staff is exceptionally polite.',
+      type: 'Solo Dining',
+    },
+    {
+      id: 'r4',
+      author: 'Mehak Jan',
+      rating: 5,
+      date: 'May 28, 2026',
+      comment: 'We booked a private room for a small family gathering. The Wazwan platter was delicious. Dal Makhani was also quite rich. 4.9 stars is well-deserved!',
+      type: 'Family Dining',
+    },
+    {
+      id: 'r5',
+      author: 'Ishfaq Bhat',
+      rating: 5,
+      date: 'May 24, 2026',
+      comment: 'Hands down the most premium restaurant in Balgarden. The tandoori platter had a nice smoky flavor. Fast service and clean restrooms.',
+      type: 'Group Outing',
+    },
+    {
+      id: 'r6',
+      author: 'Aditi Sharma',
+      rating: 5,
+      date: 'May 15, 2026',
+      comment: 'A true gem in Srinagar. The glassmorphic panel design gives a luxury vibe. Loved the Shahi Tukda and hot Kashmiri Kahwa!',
+      type: 'Solo Dining',
+    },
+  ]);
+
+  const [newName, setNewName] = useState('');
+  const [newType, setNewType] = useState('Family Dining');
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState('');
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName.trim() || !newComment.trim()) return;
+
+    const newRev: Review = {
+      id: `rev_${Date.now()}`,
+      author: newName.trim(),
+      type: newType,
+      rating: newRating,
+      comment: newComment.trim(),
+      date: 'Just now',
+    };
+
+    setReviewsList([newRev, ...reviewsList]);
+    setReviewSuccess(true);
+    setNewName('');
+    setNewComment('');
+
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
     });
-  }, [activeVideoId]);
 
-  // Listen to horizontal scroll stopping
-  useEffect(() => {
-    const row = rowRef.current;
-    if (!row) return;
+    setTimeout(() => setReviewSuccess(false), 4500);
+  };
 
-    let scrollTimeout: number;
-
-    const handleScroll = () => {
-      window.clearTimeout(scrollTimeout);
-      scrollTimeout = window.setTimeout(() => {
-        recalculateCenterVideo();
-      }, 150);
-    };
-
-    row.addEventListener('scroll', handleScroll);
-    
-    // Initial check on load
-    const initTimeout = setTimeout(recalculateCenterVideo, 500);
-
-    return () => {
-      row.removeEventListener('scroll', handleScroll);
-      window.clearTimeout(scrollTimeout);
-      clearTimeout(initTimeout);
-    };
-  }, []);
-
-  // Framer Motion entrance animations for sections
   const scrollSectionVariants = {
     hidden: { opacity: 0, y: 40 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
-    }
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
+    },
   };
 
   return (
-    <div className="page-container" style={{ position: 'relative' }}>
+    <div className="page-container" style={{ position: 'relative', maxWidth: '1280px', margin: '0 auto' }}>
       <SEO
         title="Home"
-        description="Welcome to Amberleaf Restaurant in Srinagar. Enjoy modern fine dining, authentic Kashmiri specialties, and artisanal mocktails in an elegant glassmorphic ambiance."
+        description="Welcome to Amberleaf Restaurant in Srinagar. Experience modern fine dining, authentic Kashmiri specialties, and artisanal mocktails in an elegant glassmorphic ambiance."
       />
-      
+
       {/* 1. Film Grain Noise Overlay */}
       <div className="noise-overlay" />
 
-      {/* Hero Section */}
+      {/* =========================================================================
+          HERO SLIDESHOW SECTION WITH CENTERED RESTAURANT TEXT
+      ========================================================================= */}
       <div
+        className="hero-slideshow-container"
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gap: '3rem',
-          alignItems: 'start',
-          flex: 1,
-          paddingTop: '2rem',
+          position: 'relative',
+          width: '100%',
+          minHeight: '680px',
+          borderRadius: '24px',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: '1px solid var(--border-color)',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.35)',
+          marginTop: '1rem',
         }}
-        className="hero-grid"
       >
-        {/* Left Panel: Content */}
+        {/* Slideshow Background Images */}
+        {sanctuaryImages.map((img, idx) => (
+          <div
+            key={idx}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: `url(${img})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              opacity: currentSlide === idx ? 1 : 0,
+              transform: currentSlide === idx ? 'scale(1.03)' : 'scale(1.0)',
+              transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 6s ease-out',
+              zIndex: 1,
+            }}
+          />
+        ))}
+
+        {/* Cinematic Multi-Layer Luxury Darkening Overlay for High Legibility in Bright & Dark Mode */}
         <div
           style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              'radial-gradient(circle at center, rgba(4, 9, 6, 0.72) 0%, rgba(4, 9, 6, 0.88) 100%)',
+            backdropFilter: 'blur(3px)',
+            WebkitBackdropFilter: 'blur(3px)',
+            zIndex: 2,
+          }}
+        />
+
+        {/* Slideshow Left & Right Arrow Navigation */}
+        <button
+          onClick={prevSlide}
+          aria-label="Previous Slide"
+          style={{
+            position: 'absolute',
+            left: '1.25rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: 10,
+            background: 'rgba(0, 0, 0, 0.4)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--accent-gold)',
+            borderRadius: '50%',
+            width: '42px',
+            height: '42px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '1.5rem',
-            textAlign: 'center',
             alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
+            e.currentTarget.style.color = '#000';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+            e.currentTarget.style.color = 'var(--accent-gold)';
           }}
         >
-          {/* Badges Container */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem', justifyContent: 'center' }}>
-            <div
-              className="glass-card"
+          <ChevronLeft size={22} />
+        </button>
+
+        <button
+          onClick={nextSlide}
+          aria-label="Next Slide"
+          style={{
+            position: 'absolute',
+            right: '1.25rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: 10,
+            background: 'rgba(0, 0, 0, 0.4)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--accent-gold)',
+            borderRadius: '50%',
+            width: '42px',
+            height: '42px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
+            e.currentTarget.style.color = '#000';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+            e.currentTarget.style.color = 'var(--accent-gold)';
+          }}
+        >
+          <ChevronRight size={22} />
+        </button>
+
+        {/* Slideshow Dot Indicators */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '1.25rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: '0.5rem',
+            zIndex: 10,
+          }}
+        >
+          {sanctuaryImages.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentSlide(i)}
+              aria-label={`Slide ${i + 1}`}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.4rem 1rem',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
-                fontWeight: 600,
+                width: currentSlide === i ? '24px' : '8px',
+                height: '8px',
+                borderRadius: '4px',
+                backgroundColor: currentSlide === i ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.3)',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                padding: 0,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* =========================================================================
+            CENTERED RESTAURANT INFORMATION & CALL TO ACTIONS
+        ========================================================================= */}
+        <div
+          className="hero-center-content"
+          style={{
+            position: 'relative',
+            zIndex: 5,
+            padding: '3rem 2rem',
+            maxWidth: '850px',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1.25rem',
+          }}
+        >
+          {/* Welcome Badge & Address */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
+            <span
+              style={{
                 color: 'var(--accent-gold)',
-                border: '1px solid var(--border-color)',
+                textTransform: 'uppercase',
+                fontSize: '0.82rem',
+                letterSpacing: '0.25em',
+                fontWeight: 800,
+                display: 'block',
               }}
             >
-              <Star size={14} fill="var(--accent-gold)" />
-              <span>4.9 / 5 Guest Rating</span>
-            </div>
-
-            <div
-              className="glass-card"
+              Welcome to
+            </span>
+            <h2
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.4rem 1rem',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                color: 'var(--text-secondary)',
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 'clamp(2rem, 5vw, 3.2rem)',
+                color: '#ffffff',
+                margin: 0,
+                lineHeight: 1.15,
+                textShadow: '0 2px 15px rgba(0,0,0,0.8)',
               }}
             >
-              <Clock size={14} style={{ color: 'var(--accent-gold)' }} />
-              <span>Open Daily: 09:00am - 10:30pm</span>
-            </div>
-          </div>
-
-          {/* Heading and Tagline */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {/* Cinematic Clippath Reveal Animation */}
-            <motion.h1
-              initial={{ clipPath: 'inset(0 100% 0 0)' }}
-              animate={{ clipPath: 'inset(0 0% 0 0)' }}
-              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
-              style={{
-                fontSize: 'clamp(1.8rem, 5vw, 3.5rem)',
-                lineHeight: 1.1,
-                color: 'var(--text-primary)',
-              }}
-            >
-              Where Taste Meets <br />
-              <span className="text-gold" style={{ display: 'inline-block', position: 'relative' }}>
-                Refined Elegance
-              </span>
-            </motion.h1>
-            
+              Amberleaf Fine Dine
+            </h2>
             <p
               style={{
-                fontSize: '1.1rem',
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontSize: '0.95rem',
+                letterSpacing: '0.1em',
+                margin: '0.2rem 0 0 0',
+                textShadow: '0 2px 8px rgba(0,0,0,0.8)',
+              }}
+            >
+              310, Balgarden, Srinagar
+            </p>
+          </div>
+
+          {/* Headline with cinematic reveal */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <h1
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 'clamp(1.7rem, 4vw, 2.7rem)',
+                lineHeight: 1.2,
+                color: '#ffffff',
+                margin: 0,
+                textShadow: '0 3px 20px rgba(0,0,0,0.9)',
+              }}
+            >
+              Where Taste Meets{' '}
+              <span className="text-gold" style={{ display: 'inline-block' }}>
+                Refined Elegance
+              </span>
+            </h1>
+
+            <p
+              style={{
+                fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
                 fontFamily: "'Playfair Display', serif",
                 fontStyle: 'italic',
                 color: 'var(--accent-gold)',
-                letterSpacing: '0.05em',
+                letterSpacing: '0.04em',
                 fontWeight: 500,
+                margin: 0,
+                textShadow: '0 2px 10px rgba(0,0,0,0.8)',
               }}
             >
               Elevating Kashmiri Hospitality & Culinary Artistry
             </p>
           </div>
 
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: '1.7', maxWidth: '550px' }}>
+          {/* Description */}
+          <p
+            style={{
+              color: 'rgba(255, 255, 255, 0.9)',
+              fontSize: '1.05rem',
+              lineHeight: '1.75',
+              maxWidth: '720px',
+              margin: '0.25rem 0',
+              textShadow: '0 2px 12px rgba(0,0,0,0.9)',
+            }}
+          >
             Located in the heart of Srinagar, Amberleaf merges cozy glassmorphic aesthetics with a premium, multi-cuisine dining experience. Indulge in our masterfully crafted Kashmiri Wazwan, fiery tandoor starters, and signature artisanal beverages.
           </p>
 
-          {/* Call to Actions */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
-            <a href="#/menu" className="btn-primary" style={{ gap: '0.5rem' }}>
+          {/* Call to Actions (Explore Menu & Book a Table) */}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '1.25rem',
+              justifyContent: 'center',
+              marginTop: '0.75rem',
+            }}
+          >
+            <a
+              href="#/menu"
+              className="btn-primary"
+              style={{
+                gap: '0.5rem',
+                padding: '0.85rem 2rem',
+                fontSize: '1rem',
+                boxShadow: '0 6px 25px rgba(197, 160, 89, 0.4)',
+              }}
+            >
               <Utensils size={18} />
               Explore Menu
               <ArrowRight size={16} />
             </a>
-            <a href="#/contact" className="btn-secondary" style={{ gap: '0.5rem' }}>
+            <a
+              href="#/contact"
+              className="btn-secondary"
+              style={{
+                gap: '0.5rem',
+                padding: '0.85rem 2rem',
+                fontSize: '1rem',
+                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                borderColor: 'var(--accent-gold)',
+                color: '#ffffff',
+                backdropFilter: 'blur(10px)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
+                e.currentTarget.style.color = '#000';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+                e.currentTarget.style.color = '#ffffff';
+              }}
+            >
               <Calendar size={18} />
               Book a Table
             </a>
           </div>
 
-          {/* Micro-Features grid */}
-          <div className="hero-features-grid">
+          {/* Micro-Features Row */}
+          <div
+            className="hero-features-grid"
+            style={{
+              width: '100%',
+              maxWidth: '650px',
+              marginTop: '1.5rem',
+              paddingTop: '1.25rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+            }}
+          >
             <div>
-              <span style={{ display: 'block', fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent-gold)' }}>100%</span>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Halal Ingredients</span>
+              <span style={{ display: 'block', fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent-gold)' }}>100%</span>
+              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.85)' }}>Halal Ingredients</span>
             </div>
             <div>
-              <span style={{ display: 'block', fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent-gold)' }}>Private</span>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Dining Room Available</span>
+              <span style={{ display: 'block', fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent-gold)' }}>Private</span>
+              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.85)' }}>Dining Room Available</span>
             </div>
             <div>
-              <span style={{ display: 'block', fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent-gold)' }}>Free</span>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>On-site Parking</span>
+              <span style={{ display: 'block', fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent-gold)' }}>Free</span>
+              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.85)' }}>On-site Parking</span>
             </div>
           </div>
         </div>
-
-        {/* Right Panel: 3D Spline Canvas */}
-        <div
-          style={{
-            height: '450px',
-            width: '100%',
-            position: 'relative',
-          }}
-          className="hero-canvas-container"
-        >
-          <SplineHero />
-        </div>
       </div>
 
-      {/* 2. Infinite Horizontal Marquee Ticker */}
+      {/* =========================================================================
+          INFINITE HORIZONTAL MARQUEE TICKER
+      ========================================================================= */}
       <div className="marquee-container" style={{ margin: '3.5rem 0' }}>
         <div className="marquee-content">
           <span className="marquee-item">
@@ -267,116 +560,27 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Ambience Showcase Section (Scroll triggered) */}
+      {/* =========================================================================
+          CULINARY MOTION - 6 VIDEOS ON 2 LINES (3 VIDEOS PER LINE)
+      ========================================================================= */}
       <motion.div
         variants={scrollSectionVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="glass-panel ambience-grid"
+        viewport={{ once: true, margin: '-100px' }}
         style={{
-          padding: 'clamp(1.2rem, 5vw, 2.5rem)',
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr)',
-          gap: '2.5rem',
-          alignItems: 'center',
-        }}
-      >
-        {/* Large Preview & Thumbnails Container */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minWidth: 0 }}>
-          <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', height: '330px', border: '1px solid var(--border-color)' }}>
-            <img
-              src={activeImage}
-              alt="Amberleaf Restaurant Interior"
-              loading="lazy"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                borderRadius: '12px',
-                transition: 'all 0.5s ease',
-              }}
-            />
-          </div>
-          {/* Thumbnails Row */}
-          <div
-            style={{
-              display: 'flex',
-              gap: '0.6rem',
-              overflowX: 'auto',
-              paddingBottom: '0.4rem',
-            }}
-          >
-            {showcaseImages.map((img, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveImage(img)}
-                style={{
-                  width: '100px',
-                  height: '75px',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  border: activeImage === img ? '2px solid var(--accent-gold)' : '1px solid var(--border-light)',
-                  padding: 0,
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  transition: 'border-color 0.2s ease',
-                  backgroundColor: '#000',
-                }}
-              >
-                <img src={img} alt={`Thumbnail ${i+1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', minWidth: 0 }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-            Dine-In Ambiance
-          </span>
-          <h3 style={{ fontSize: '1.8rem', color: 'var(--text-primary)', margin: 0 }}>
-            Our Balgarden Sanctuary
-          </h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.7' }}>
-            Step into a space where modern glass architecture meets warm, cozy wooden accents. Designed specifically for group gatherings, family dinners, and peaceful solo dining. Scroll through our real photo showcase to preview our warm lighting and dining spaces.
-          </p>
-          <a
-            href="#/gallery"
-            style={{
-              color: 'var(--accent-gold)',
-              textDecoration: 'none',
-              fontWeight: 700,
-              fontSize: '0.95rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.25rem',
-              marginTop: '0.5rem',
-            }}
-          >
-            Explore Full Gallery &rarr;
-          </a>
-        </div>
-      </motion.div>
-
-      {/* Visual Stories - 5 Video Reels Preview (Scroll triggered) */}
-      <motion.div
-        variants={scrollSectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        style={{
-          marginTop: '3.5rem',
+          marginTop: '2rem',
           display: 'flex',
           flexDirection: 'column',
-          gap: '1.5rem',
+          gap: '2rem',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
               Culinary Motion
             </span>
-            <h3 style={{ fontSize: '1.8rem', color: 'var(--text-primary)', margin: '0.25rem 0 0 0' }}>
+            <h3 style={{ fontSize: '2rem', color: 'var(--text-primary)', margin: '0.25rem 0 0 0' }}>
               Stories from the Kitchen & Lounge
             </h3>
           </div>
@@ -386,128 +590,543 @@ export const Home: React.FC = () => {
               color: 'var(--accent-gold)',
               textDecoration: 'none',
               fontWeight: 700,
-              fontSize: '0.9rem',
+              fontSize: '0.95rem',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.25rem',
+              gap: '0.3rem',
             }}
           >
-            All Videos &rarr;
+            All Videos & Gallery &rarr;
           </a>
         </div>
 
-        {/* Videos Horizontal Row */}
+        {/* 6 Videos Grid: 2 Lines of 3 Videos */}
         <div
-          ref={rowRef}
           style={{
-            display: 'flex',
-            gap: '1rem',
-            overflowX: 'auto',
-            paddingBottom: '1rem',
-            scrollbarWidth: 'thin',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '1.5rem',
             width: '100%',
           }}
-          className="home-videos-row"
+          className="home-videos-grid-3x2"
         >
-          {[
-            { id: 's1', url: './images/s1.mp4' },
-            { id: 's2', url: './images/s2.mp4' },
-            { id: 's4', url: './images/s4.mp4' },
-            { id: 's5', url: './images/s5.mp4' },
-            { id: 's7', url: './images/s7.mp4' },
-          ].map((vid) => {
-            const isActive = activeVideoId === vid.id;
-            return (
-              <div
-                key={vid.id}
-                className="glass-panel interactive-card"
-                style={{
-                  padding: '0.35rem',
-                  borderRadius: '14px',
-                  minWidth: '200px',
-                  width: '200px',
-                  flexShrink: 0,
-                  position: 'relative',
-                  border: isActive ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
-                  boxShadow: isActive ? '0 8px 24px rgba(197, 160, 89, 0.2)' : 'none',
-                  transition: 'all 0.3s ease',
-                }}
-                onClick={() => { window.location.hash = `#/gallery?video=${vid.id}`; }}
-              >
-                <div
+          {homeVideos.map((vid) => (
+            <div
+              key={vid.id}
+              className="glass-panel"
+              style={{
+                borderRadius: '16px',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                border: '1px solid var(--border-color)',
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.15)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 12px 35px rgba(197, 160, 89, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.15)';
+              }}
+            >
+              <div style={{ position: 'relative', width: '100%', height: '320px', backgroundColor: '#000' }}>
+                <video
+                  src={vid.url}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
                   style={{
                     width: '100%',
-                    height: '280px',
-                    borderRadius: '10px',
-                    overflow: 'hidden',
-                    position: 'relative',
-                    backgroundColor: '#000',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '0.75rem',
+                    left: '0.75rem',
+                    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                    backdropFilter: 'blur(6px)',
+                    color: 'var(--accent-gold)',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(197, 160, 89, 0.3)',
                   }}
                 >
-                  <video
-                    ref={(el) => { videoRefs.current[vid.id] = el; }}
-                    src={vid.url}
-                    loop
-                    muted
-                    playsInline
+                  {vid.tag}
+                </span>
+              </div>
+
+              <div style={{ padding: '1rem 1.25rem' }}>
+                <h4 style={{ fontSize: '1.05rem', color: 'var(--text-primary)', margin: 0, fontWeight: 600 }}>
+                  {vid.title}
+                </h4>
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* =========================================================================
+          COMBINED SECTION 1: FREQUENTLY ASKED QUESTIONS (FAQ)
+      ========================================================================= */}
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-100px' }}
+        style={{
+          marginTop: '6rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <span
+            style={{
+              color: 'var(--accent-gold)',
+              fontSize: '0.8rem',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase',
+              fontWeight: 700,
+            }}
+          >
+            Got Questions?
+          </span>
+          <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>
+            Frequently Asked Questions
+          </h2>
+          <div
+            style={{
+              width: '60px',
+              height: '2px',
+              backgroundColor: 'var(--accent-gold)',
+              margin: '1rem auto 0 auto',
+            }}
+          />
+        </div>
+
+        {/* FAQ Accordion List */}
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '900px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+          }}
+        >
+          {faqItems.map((item, index) => {
+            const isOpen = openFaqIndex === index;
+            return (
+              <div
+                key={index}
+                className="glass-panel"
+                style={{
+                  borderRadius: '14px',
+                  overflow: 'hidden',
+                  border: isOpen ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
+                  transition: 'border-color 0.3s ease',
+                }}
+              >
+                <button
+                  onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                  style={{
+                    width: '100%',
+                    padding: '1.25rem 1.75rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-primary)',
+                    fontSize: '1.05rem',
+                    fontWeight: 600,
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    gap: '1rem',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <HelpCircle size={18} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
+                    <span>{item.question}</span>
+                  </div>
+                  <ChevronDown
+                    size={20}
                     style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      display: 'block',
-                    }}
-                    onMouseEnter={() => {
-                      isHovering.current = true;
-                      setActiveVideoId(vid.id);
-                    }}
-                    onMouseLeave={() => {
-                      isHovering.current = false;
-                      setActiveVideoId(null);
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.3s ease',
+                      color: isOpen ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                      flexShrink: 0,
                     }}
                   />
+                </button>
+
+                {isOpen && (
                   <div
                     style={{
-                      position: 'absolute',
-                      top: '0.5rem',
-                      right: '0.5rem',
-                      backgroundColor: 'rgba(0,0,0,0.5)',
-                      borderRadius: '50%',
-                      width: '24px',
-                      height: '24px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#fff',
-                      fontSize: '0.7rem',
-                      boxShadow: isActive ? '0 0 10px var(--accent-gold)' : 'none',
-                      pointerEvents: 'none',
+                      padding: '0 1.75rem 1.5rem 3.25rem',
+                      color: 'var(--text-secondary)',
+                      fontSize: '0.95rem',
+                      lineHeight: '1.7',
+                      borderTop: '1px solid var(--border-light)',
+                      paddingTop: '1rem',
                     }}
                   >
-                    {isActive ? '⏸' : '▶'}
+                    {item.answer}
                   </div>
-                </div>
+                )}
               </div>
             );
           })}
         </div>
       </motion.div>
 
-      {/* Inline media query style overrides */}
+      {/* =========================================================================
+          COMBINED SECTION 2: GUEST REVIEWS & EPICUREAN TESTIMONIALS
+      ========================================================================= */}
+      <motion.div
+        variants={scrollSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-100px' }}
+        style={{
+          marginTop: '6rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <span
+            style={{
+              color: 'var(--accent-gold)',
+              fontSize: '0.8rem',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase',
+              fontWeight: 700,
+            }}
+          >
+            Guest Voices
+          </span>
+          <h2 style={{ fontSize: '2.5rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>
+            Epicurean Testimonials
+          </h2>
+          <div
+            style={{
+              width: '60px',
+              height: '2px',
+              backgroundColor: 'var(--accent-gold)',
+              margin: '1rem auto 0 auto',
+            }}
+          />
+        </div>
+
+        {/* Rating Summary Pill */}
+        <div
+          className="glass-panel"
+          style={{
+            padding: '1rem 2rem',
+            borderRadius: '9999px',
+            marginBottom: '3rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '1rem',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <div style={{ display: 'flex', gap: '0.2rem' }}>
+            {[1, 2, 3, 4, 5].map((s) => (
+              <Star key={s} size={18} fill="var(--accent-gold)" color="var(--accent-gold)" />
+            ))}
+          </div>
+          <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>
+            4.9 out of 5 Stars
+          </span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
+            (250+ Verified Guest Ratings)
+          </span>
+        </div>
+
+        {/* Reviews Layout: 2 Columns (Left: Form, Right: Scrollable Reviews List) */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1.3fr',
+            gap: '2.5rem',
+            width: '100%',
+            alignItems: 'start',
+          }}
+          className="home-reviews-layout"
+        >
+          {/* Left Column: Submit a Review Form */}
+          <div
+            className="glass-panel"
+            style={{
+              padding: '2rem',
+              borderRadius: '20px',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+              Share Your Experience
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+              Dined with us recently? We would love to hear your feedback about our Kashmiri Wazwan, grills, and ambiance.
+            </p>
+
+            {reviewSuccess && (
+              <div
+                style={{
+                  padding: '0.85rem 1.25rem',
+                  backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                  border: '1px solid #22c55e',
+                  color: '#22c55e',
+                  borderRadius: '10px',
+                  marginBottom: '1.25rem',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                }}
+              >
+                🎉 Thank you! Your review has been added to our guestbook.
+              </div>
+            )}
+
+            <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              <div>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '0.35rem' }}>
+                  Your Name *
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Farooq Mir"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.92rem',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '0.35rem' }}>
+                  Dining Type
+                </label>
+                <select
+                  value={newType}
+                  onChange={(e) => setNewType(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--bg-secondary)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.92rem',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <option value="Family Dining">Family Dining</option>
+                  <option value="Group Outing">Group Outing</option>
+                  <option value="Solo Dining">Solo Dining</option>
+                  <option value="Special Celebration">Special Celebration</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '0.35rem' }}>
+                  Rating
+                </label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setNewRating(star)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '0.2rem',
+                      }}
+                    >
+                      <Star
+                        size={24}
+                        fill={star <= newRating ? 'var(--accent-gold)' : 'none'}
+                        color="var(--accent-gold)"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '0.35rem' }}>
+                  Your Review *
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Tell us about the flavors, service, or atmosphere..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.92rem',
+                    boxSizing: 'border-box',
+                    resize: 'vertical',
+                  }}
+                />
+              </div>
+
+              <button type="submit" className="btn-primary" style={{ padding: '0.85rem', gap: '0.5rem', width: '100%', marginTop: '0.5rem' }}>
+                <Send size={16} />
+                Submit Review
+              </button>
+            </form>
+          </div>
+
+          {/* Right Column: Scrollable List of Guest Reviews */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.25rem',
+              maxHeight: '620px',
+              overflowY: 'auto',
+              paddingRight: '0.5rem',
+            }}
+          >
+            {reviewsList.map((rev) => (
+              <div
+                key={rev.id}
+                className="glass-panel"
+                style={{
+                  padding: '1.75rem',
+                  borderRadius: '16px',
+                  border: '1px solid var(--border-color)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.75rem',
+                  position: 'relative',
+                }}
+              >
+                {/* Decorative quote mark */}
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1.5rem',
+                    fontSize: '3.5rem',
+                    fontFamily: "'Playfair Display', serif",
+                    color: 'var(--accent-gold)',
+                    opacity: 0.18,
+                    lineHeight: 1,
+                    userSelect: 'none',
+                  }}
+                >
+                  &ldquo;
+                </span>
+
+                {/* Stars and Type */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', gap: '0.15rem' }}>
+                    {[...Array(rev.rating)].map((_, i) => (
+                      <Star key={i} size={15} fill="var(--accent-gold)" color="var(--accent-gold)" />
+                    ))}
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      color: 'var(--accent-gold)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}
+                  >
+                    {rev.type}
+                  </span>
+                </div>
+
+                {/* Review Text */}
+                <p
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontStyle: 'italic',
+                    color: 'var(--text-primary)',
+                    fontSize: '1.02rem',
+                    lineHeight: '1.65',
+                    margin: '0.25rem 0',
+                    zIndex: 2,
+                  }}
+                >
+                  &ldquo;{rev.comment}&rdquo;
+                </p>
+
+                {/* Author and Date */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderTop: '1px solid var(--border-light)',
+                    paddingTop: '0.65rem',
+                    marginTop: '0.25rem',
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{rev.author}</span>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{rev.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Responsive Styles */}
       <style>{`
-        @media (min-width: 1024px) {
-          .hero-grid {
-            grid-template-columns: 1.1fr 0.9fr !important;
+        @media (max-width: 1024px) {
+          .home-videos-grid-3x2 {
+            grid-template-columns: repeat(2, 1fr) !important;
           }
-          .hero-canvas-container {
-            height: 550px !important;
+          .home-reviews-layout {
+            grid-template-columns: 1fr !important;
           }
         }
-        @media (min-width: 768px) {
-          .ambience-grid {
-            grid-template-columns: 1.1fr 0.9fr !important;
+        @media (max-width: 640px) {
+          .home-videos-grid-3x2 {
+            grid-template-columns: 1fr !important;
+          }
+          .hero-slideshow-container {
+            min-height: 750px !important;
           }
         }
       `}</style>
     </div>
   );
 };
+
+export default Home;

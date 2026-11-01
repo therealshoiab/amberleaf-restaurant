@@ -12,7 +12,6 @@ const Menu = React.lazy(() => import('./pages/Menu').then((module) => ({ default
 const Signatures = React.lazy(() => import('./pages/Signatures').then((module) => ({ default: module.Signatures })));
 const Gallery = React.lazy(() => import('./pages/Gallery').then((module) => ({ default: module.Gallery })));
 const Reviews = React.lazy(() => import('./pages/Reviews').then((module) => ({ default: module.Reviews })));
-const OrderOnline = React.lazy(() => import('./pages/OrderOnline').then((module) => ({ default: module.OrderOnline })));
 const Contact = React.lazy(() => import('./pages/Contact').then((module) => ({ default: module.Contact })));
 const FAQ = React.lazy(() => import('./pages/FAQ').then((module) => ({ default: module.FAQ })));
 const Legal = React.lazy(() => import('./pages/Legal').then((module) => ({ default: module.Legal })));
@@ -82,7 +81,7 @@ export const App: React.FC = () => {
       case '#/reviews':
         return <Reviews />;
       case '#/order':
-        return <OrderOnline />;
+        return <Contact />;
       case '#/contact':
         return <Contact />;
       case '#/faq':

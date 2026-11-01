@@ -1,0 +1,13 @@
+{
+  "name": "amberleaf-restaurant",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "amberleaf-db",
+      "database_id": "amberleaf-restaurant-d1"
+    }
+  ]
+}

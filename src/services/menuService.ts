@@ -44,12 +44,8 @@ export const menuService = {
 
   syncWithRemote: async (): Promise<{ success: boolean; menuCount?: number }> => {
     const base = menuService.getApiEndpoint();
-    if (!base) {
-      return { success: false, menuCount: menuService.getMenuItems().length };
-    }
-
-    const menuUrl = `${base}/api/menu`;
-    const broadcastUrl = `${base}/api/broadcast`;
+    const menuUrl = base ? `${base}/api/menu` : '/api/menu';
+    const broadcastUrl = base ? `${base}/api/broadcast` : '/api/broadcast';
     let menuSynced = false;
 
     // 1. Sync Menu Items
@@ -146,16 +142,15 @@ export const menuService = {
     const updated = [item, ...current];
     menuService.saveMenuItems(updated);
 
-    // Optional Remote Sync
+    // Asynchronously sync to Cloudflare D1
     const base = menuService.getApiEndpoint();
-    if (base) {
-      const passcode = menuService.getPasscode();
-      fetch(`${base}/api/menu`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
-        body: JSON.stringify({ action: 'add', item, passcode }),
-      }).catch(() => {});
-    }
+    const menuUrl = base ? `${base}/api/menu` : '/api/menu';
+    const passcode = menuService.getPasscode();
+    fetch(menuUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
+      body: JSON.stringify({ action: 'add', item, passcode }),
+    }).catch(() => {});
 
     return { success: true, item };
   },
@@ -179,16 +174,15 @@ export const menuService = {
     updatedList[index] = updatedItem;
     menuService.saveMenuItems(updatedList);
 
-    // Optional Remote Sync
+    // Asynchronously sync to Cloudflare D1
     const base = menuService.getApiEndpoint();
-    if (base) {
-      const passcode = menuService.getPasscode();
-      fetch(`${base}/api/menu`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
-        body: JSON.stringify({ action: 'update', id, updatedFields, passcode }),
-      }).catch(() => {});
-    }
+    const menuUrl = base ? `${base}/api/menu` : '/api/menu';
+    const passcode = menuService.getPasscode();
+    fetch(menuUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
+      body: JSON.stringify({ action: 'update', id, updatedFields, passcode }),
+    }).catch(() => {});
 
     return { success: true };
   },
@@ -198,16 +192,15 @@ export const menuService = {
     const filtered = current.filter((i) => String(i.id) !== String(id));
     menuService.saveMenuItems(filtered);
 
-    // Optional Remote Sync
+    // Asynchronously sync to Cloudflare D1
     const base = menuService.getApiEndpoint();
-    if (base) {
-      const passcode = menuService.getPasscode();
-      fetch(`${base}/api/menu`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
-        body: JSON.stringify({ action: 'delete', id, passcode }),
-      }).catch(() => {});
-    }
+    const menuUrl = base ? `${base}/api/menu` : '/api/menu';
+    const passcode = menuService.getPasscode();
+    fetch(menuUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
+      body: JSON.stringify({ action: 'delete', id, passcode }),
+    }).catch(() => {});
 
     return { success: true };
   },
@@ -216,14 +209,13 @@ export const menuService = {
     menuService.saveMenuItems(DEFAULT_MENU_ITEMS);
 
     const base = menuService.getApiEndpoint();
-    if (base) {
-      const passcode = menuService.getPasscode();
-      fetch(`${base}/api/menu`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
-        body: JSON.stringify({ action: 'reset', passcode }),
-      }).catch(() => {});
-    }
+    const menuUrl = base ? `${base}/api/menu` : '/api/menu';
+    const passcode = menuService.getPasscode();
+    fetch(menuUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
+      body: JSON.stringify({ action: 'reset', passcode }),
+    }).catch(() => {});
 
     return { success: true };
   },
@@ -233,7 +225,12 @@ export const menuService = {
     try {
       const data = localStorage.getItem(STORAGE_KEY_BANNER);
       if (!data) return DEFAULT_BROADCAST_BANNER;
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (parsed.linkText && parsed.linkText.toLowerCase().includes('reserve')) {
+        parsed.linkText = '';
+        parsed.linkUrl = '';
+      }
+      return parsed;
     } catch (err) {
       console.error('Error reading broadcast banner:', err);
       return DEFAULT_BROADCAST_BANNER;
@@ -242,18 +239,23 @@ export const menuService = {
 
   saveBroadcastBanner: (banner: BroadcastBannerData): { success: boolean } => {
     try {
-      localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(banner));
-      window.dispatchEvent(new CustomEvent('amberleaf:broadcast_updated', { detail: banner }));
+      const cleanBanner = { ...banner };
+      if (cleanBanner.linkText && cleanBanner.linkText.toLowerCase().includes('reserve')) {
+        cleanBanner.linkText = '';
+        cleanBanner.linkUrl = '';
+      }
+
+      localStorage.setItem(STORAGE_KEY_BANNER, JSON.stringify(cleanBanner));
+      window.dispatchEvent(new CustomEvent('amberleaf:broadcast_updated', { detail: cleanBanner }));
 
       const base = menuService.getApiEndpoint();
-      if (base) {
-        const passcode = menuService.getPasscode();
-        fetch(`${base}/api/broadcast`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
-          body: JSON.stringify({ ...banner, passcode }),
-        }).catch(() => {});
-      }
+      const broadcastUrl = base ? `${base}/api/broadcast` : '/api/broadcast';
+      const passcode = menuService.getPasscode();
+      fetch(broadcastUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-secret': passcode },
+        body: JSON.stringify({ ...cleanBanner, passcode }),
+      }).catch(() => {});
 
       return { success: true };
     } catch (err) {
@@ -310,3 +312,11 @@ export const menuService = {
     }
   },
 };
+
+// Auto-sync with Cloudflare D1 on application load in the browser
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    menuService.syncWithRemote().catch(() => {});
+  }, 100);
+}
+

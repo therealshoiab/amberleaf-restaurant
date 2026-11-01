@@ -163,7 +163,9 @@ export const Menu: React.FC = React.memo(() => {
         <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Prefer delivery? Order via:</span>
         <div style={{ display: 'flex', gap: '0.8rem' }}>
           <a
-            href="#/order"
+            href="https://www.swiggy.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn-swiggy"
             style={{
               padding: '0.6rem 1.2rem',
@@ -176,7 +178,9 @@ export const Menu: React.FC = React.memo(() => {
             <ExternalLink size={12} />
           </a>
           <a
-            href="#/order"
+            href="https://www.zomato.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn-zomato"
             style={{
               padding: '0.6rem 1.2rem',

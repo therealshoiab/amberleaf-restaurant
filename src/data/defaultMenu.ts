@@ -33,8 +33,8 @@ export const MENU_CATEGORIES = [
 export const DEFAULT_BROADCAST_BANNER: BroadcastBannerData = {
   enabled: true,
   message: '✨ Experience Fine Dining at Amberleaf Srinagar: Royal Kashmiri Wazwan, Tandoori Masterpieces & Private Dining. Call +91 60063 79610 or WhatsApp +91 77809 38743.',
-  linkText: 'Reserve Table',
-  linkUrl: '#/contact',
+  linkText: '',
+  linkUrl: '',
   variant: 'gold',
 };
 

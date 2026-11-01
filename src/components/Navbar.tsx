@@ -8,20 +8,19 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }) => {
-  const [isThemeLight, setIsThemeLight] = useState(false);
+  const [isThemeLight, setIsThemeLight] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Initialize theme from localStorage or system settings
+  // Initialize theme from localStorage or default to bright (light theme)
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
 
-    if (savedTheme === 'light' || (!savedTheme && systemPrefersLight)) {
-      setIsThemeLight(true);
-      document.documentElement.classList.add('light-theme');
-    } else {
+    if (savedTheme === 'dark') {
       setIsThemeLight(false);
       document.documentElement.classList.remove('light-theme');
+    } else {
+      setIsThemeLight(true);
+      document.documentElement.classList.add('light-theme');
     }
   }, []);
 
@@ -43,7 +42,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
     { label: 'Signatures', hash: '#/signatures' },
     { label: 'Gallery', hash: '#/gallery' },
     { label: 'Reviews', hash: '#/reviews' },
-    { label: 'Order', hash: '#/order' },
     { label: 'Contact', hash: '#/contact' },
     { label: 'FAQ', hash: '#/faq' },
   ];
