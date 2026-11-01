@@ -5,14 +5,16 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { BroadcastBanner } from './components/BroadcastBanner';
 
-// Lazy load all page components for optimization
-const Home = React.lazy(() => import('./pages/Home').then((module) => ({ default: module.Home })));
-const About = React.lazy(() => import('./pages/About').then((module) => ({ default: module.About })));
-const Menu = React.lazy(() => import('./pages/Menu').then((module) => ({ default: module.Menu })));
-const Signatures = React.lazy(() => import('./pages/Signatures').then((module) => ({ default: module.Signatures })));
-const Gallery = React.lazy(() => import('./pages/Gallery').then((module) => ({ default: module.Gallery })));
-const Contact = React.lazy(() => import('./pages/Contact').then((module) => ({ default: module.Contact })));
-const Legal = React.lazy(() => import('./pages/Legal').then((module) => ({ default: module.Legal })));
+// Direct import core pages for instantaneous, zero-latency transitions
+import { Home } from './pages/Home';
+import { About } from './pages/About';
+import { Menu } from './pages/Menu';
+import { Signatures } from './pages/Signatures';
+import { Gallery } from './pages/Gallery';
+import { Contact } from './pages/Contact';
+import { Legal } from './pages/Legal';
+
+// Admin panel remains lazy loaded for bundle efficiency
 const Admin = React.lazy(() => import('./pages/Admin').then((module) => ({ default: module.Admin })));
 
 // Custom Minimalist Luxury Loader Fallback
@@ -95,44 +97,42 @@ export const App: React.FC = () => {
 
   return (
     <>
-      {/* Cinematic preloader */}
-      {loading ? (
-        <Preloader onComplete={() => setLoading(false)} />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          {/* Live Top Broadcast Announcement Banner */}
-          <BroadcastBanner onVisibilityChange={setHasBanner} />
+      {/* Cinematic preloader: renders on top so the website is already mounted and revealed seamlessly when shutters open */}
+      {loading && <Preloader onComplete={() => setLoading(false)} />}
 
-          {/* Floating Navigation Header */}
-          <Navbar currentHash={currentHash} hasBanner={hasBanner} />
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        {/* Live Top Broadcast Announcement Banner */}
+        <BroadcastBanner onVisibilityChange={setHasBanner} />
 
-          {/* Main Content Area with Page Transitions */}
-          <main
-            style={{
-              flex: '1 0 auto',
-              position: 'relative',
-              overflow: 'hidden',
-              marginTop: hasBanner ? '36px' : '0px',
-              transition: 'margin-top 0.3s ease',
-            }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentHash.split('?')[0]}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <Suspense fallback={<PageLoader />}>{renderActivePage()}</Suspense>
-              </motion.div>
-            </AnimatePresence>
-          </main>
+        {/* Floating Navigation Header */}
+        <Navbar currentHash={currentHash} hasBanner={hasBanner} />
 
-          {/* Premium Info Footer */}
-          <Footer />
-        </div>
-      )}
+        {/* Main Content Area with Snappy Page Transitions */}
+        <main
+          style={{
+            flex: '1 0 auto',
+            position: 'relative',
+            overflow: 'hidden',
+            marginTop: hasBanner ? '36px' : '0px',
+            transition: 'margin-top 0.3s ease',
+          }}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentHash.split('?')[0]}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: 'easeInOut' }}
+            >
+              <Suspense fallback={<PageLoader />}>{renderActivePage()}</Suspense>
+            </motion.div>
+          </AnimatePresence>
+        </main>
+
+        {/* Premium Info Footer */}
+        <Footer />
+      </div>
     </>
   );
 };

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { MapPin, Phone, Clock, Calendar, Check, Send, PhoneCall, CheckCircle } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 export const Contact: React.FC = React.memo(() => {
   // Form State
@@ -17,14 +16,14 @@ export const Contact: React.FC = React.memo(() => {
   const [formError, setFormError] = useState('');
   const [pendingWaUrl, setPendingWaUrl] = useState('');
 
-  const handleSubmitBooking = (e: React.FormEvent) => {
+  const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validation
     if (!name.trim()) {
       setFormError('Please enter your name.');
       return;
-      }
+    }
     if (!phone.trim() || phone.length < 10) {
       setFormError('Please enter a valid phone number.');
       return;
@@ -50,20 +49,24 @@ export const Contact: React.FC = React.memo(() => {
     // Show popup success modal overlay
     setShowSuccessModal(true);
 
-    // Trigger canvas-confetti
-    confetti({
-      particleCount: 150,
-      spread: 80,
-      origin: { y: 0.6 }
-    });
+    // Trigger canvas-confetti dynamically without blocking page load
+    try {
+      const confettiModule = await import('canvas-confetti');
+      const confetti = confettiModule.default || confettiModule;
+      confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 }
+      });
+    } catch {}
   };
 
   const scrollSectionVariants = {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
+      transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }
     }
   };
 
@@ -76,10 +79,10 @@ export const Contact: React.FC = React.memo(() => {
 
       {/* Page Header */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        style={{ textAlign: 'center', marginBottom: '4rem' }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        style={{ textAlign: 'center', marginBottom: '3.5rem' }}
       >
         <span
           style={{
@@ -105,10 +108,9 @@ export const Contact: React.FC = React.memo(() => {
 
       {/* Grid structure: Left Info & map, Right Form */}
       <motion.div
-        variants={scrollSectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr',
@@ -215,7 +217,7 @@ export const Contact: React.FC = React.memo(() => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. John Doe"
+                  placeholder="e.g. Shoiab Mushtaq"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   style={{
@@ -244,7 +246,7 @@ export const Contact: React.FC = React.memo(() => {
                   <input
                     type="tel"
                     required
-                    placeholder="e.g. +91 9999999999"
+                    placeholder="e.g. 9419600518"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     style={{

@@ -12,14 +12,14 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const nameLetters = "AMBERLEAF".split("");
 
   useEffect(() => {
-    // Synchronous luxury reveal: line and name animate together immediately
+    // 1. Give enough time for the line and letters to sync and shine (1.4s)
     const exitTimer = setTimeout(() => {
       setIsExiting(true);
-      // Wait for exit curtains slide transition (0.7s) before calling onComplete
+      // 2. Wait for exit shutters slide transition (0.75s) before unmounting overlay
       setTimeout(() => {
         onComplete();
-      }, 700);
-    }, 2200);
+      }, 750);
+    }, 1400);
 
     return () => {
       clearTimeout(exitTimer);
@@ -35,11 +35,6 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const panelBottomVariants = {
     initial: { translateY: 0 },
     exit: { translateY: "100%" }
-  };
-
-  const containerVariants = {
-    initial: { opacity: 1 },
-    exit: { opacity: 0, transition: { duration: 0.25 } }
   };
 
   // Synchronized letter reveal: starts immediately alongside the gold line
@@ -89,7 +84,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           variants={panelTopVariants}
           initial="initial"
           animate={isExiting ? "exit" : "initial"}
-          transition={{ duration: 0.8, ease: [0.85, 0, 0.15, 1] }}
+          transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
           style={{
             position: 'absolute',
             top: 0,
@@ -108,7 +103,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           variants={panelBottomVariants}
           initial="initial"
           animate={isExiting ? "exit" : "initial"}
-          transition={{ duration: 0.8, ease: [0.85, 0, 0.15, 1] }}
+          transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
           style={{
             position: 'absolute',
             bottom: 0,
@@ -122,27 +117,24 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           }}
         />
 
-        {/* Central Content Area (Fades out just before curtain splits) */}
-        {!isExiting && (
-          <motion.div
-            variants={containerVariants}
-            initial="initial"
-            animate="initial"
-            exit="exit"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 100000,
-              pointerEvents: 'auto',
-            }}
-          >
+        {/* Central Content Area (Fades out smoothly as curtain splits) */}
+        <motion.div
+          animate={{ opacity: isExiting ? 0 : 1 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100000,
+            pointerEvents: isExiting ? 'none' : 'auto',
+          }}
+        >
             {/* SVG Logo Mark - Glowing & Premium */}
             <div style={{ position: 'relative', marginBottom: '2.5rem' }}>
               <img
@@ -225,7 +217,6 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
               Fine Dining &middot; Srinagar
             </motion.p>
           </motion.div>
-        )}
       </div>
 
       <style>{`
