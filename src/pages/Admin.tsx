@@ -307,7 +307,7 @@ export const Admin: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '7rem 1.5rem 4rem 1.5rem',
+          padding: '150px 1.5rem 4rem 1.5rem',
         }}
       >
         <SEO

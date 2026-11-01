@@ -45,7 +45,7 @@ export const Menu: React.FC = React.memo(() => {
   };
 
   return (
-    <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto', padding: '2rem 1.5rem 5rem 1.5rem' }}>
+    <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto', paddingTop: '150px', paddingBottom: '5rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
       <SEO
         title="Menu"
         description="Browse the complete culinary menu of Amberleaf Restaurant in Srinagar. Explore our Kashmiri Wazwan, Tandoor & Grills, Starters, and Artisanal Beverages."

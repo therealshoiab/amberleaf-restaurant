@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import {
@@ -12,6 +12,7 @@ import {
   Send,
   Volume2,
   VolumeX,
+  Play,
   CheckCircle2,
   PenTool,
   X,
@@ -72,6 +73,71 @@ export const Home: React.FC = () => {
     s7: true,
     s8: true,
   });
+
+  // Track video elements & active playing video for smart hover/scroll controller
+  const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+
+  const playSingleVideo = (targetId: string | null) => {
+    setPlayingVideoId(targetId);
+    Object.entries(videoRefs.current).forEach(([id, vidEl]) => {
+      if (!vidEl) return;
+      if (id === targetId) {
+        vidEl.muted = mutedVideos[id] ?? true;
+        vidEl.play().catch(() => {});
+      } else {
+        vidEl.pause();
+      }
+    });
+  };
+
+  // Mobile view: only play the video on which the user stops scrolling
+  useEffect(() => {
+    let scrollTimeout: any = null;
+
+    const handleScroll = () => {
+      // Only execute scroll-stop video playback on mobile/tablet view
+      if (window.innerWidth > 768) return;
+
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+
+      // Debounce: trigger once user has stopped scrolling (180ms)
+      scrollTimeout = setTimeout(() => {
+        const screenCenter = window.innerHeight / 2;
+        let closestId: string | null = null;
+        let minDistance = Infinity;
+
+        homeVideos.forEach((vid) => {
+          const el = videoRefs.current[vid.id];
+          if (!el) return;
+          const rect = el.getBoundingClientRect();
+          // Ensure video is actively within the viewport
+          if (rect.bottom > 80 && rect.top < window.innerHeight - 80) {
+            const vidCenter = rect.top + rect.height / 2;
+            const dist = Math.abs(vidCenter - screenCenter);
+            if (dist < minDistance) {
+              minDistance = dist;
+              closestId = vid.id;
+            }
+          }
+        });
+
+        if (closestId && minDistance < 360) {
+          playSingleVideo(closestId);
+        } else {
+          playSingleVideo(null);
+        }
+      }, 180);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
+  }, [homeVideos]);
 
   const toggleMute = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -517,14 +583,37 @@ export const Home: React.FC = () => {
           <div className="home-videos-grid-3x2">
             {homeVideos.map((vid) => {
               const isMuted = mutedVideos[vid.id] ?? true;
+              const isPlaying = playingVideoId === vid.id;
               return (
-                <div key={vid.id} className="video-card-9-16">
+                <div
+                  key={vid.id}
+                  className="video-card-9-16"
+                  style={{ cursor: 'pointer', position: 'relative' }}
+                  onMouseEnter={() => {
+                    if (window.innerWidth > 768) playSingleVideo(vid.id);
+                  }}
+                  onMouseLeave={() => {
+                    if (window.innerWidth > 768) playSingleVideo(null);
+                  }}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === 'mouse' && window.innerWidth > 768) playSingleVideo(vid.id);
+                  }}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType === 'mouse' && window.innerWidth > 768) playSingleVideo(null);
+                  }}
+                  onClick={() => {
+                    playSingleVideo(isPlaying ? null : vid.id);
+                  }}
+                >
                   <video
+                    ref={(el) => {
+                      videoRefs.current[vid.id] = el;
+                    }}
                     src={vid.url}
-                    autoPlay
                     loop
                     muted={isMuted}
                     playsInline
+                    preload="metadata"
                     style={{
                       width: '100%',
                       height: '100%',
@@ -532,6 +621,38 @@ export const Home: React.FC = () => {
                       display: 'block',
                     }}
                   />
+
+                  {/* Play Icon Overlay (Visible when video is paused) */}
+                  {!isPlaying && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '54px',
+                        height: '54px',
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.55)',
+                        backdropFilter: 'blur(8px)',
+                        border: '1.5px solid var(--accent-gold)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 3,
+                        pointerEvents: 'none',
+                        boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5)',
+                        transition: 'opacity 0.3s ease',
+                      }}
+                    >
+                      <Play
+                        size={22}
+                        fill="var(--accent-gold)"
+                        color="var(--accent-gold)"
+                        style={{ marginLeft: '3px' }}
+                      />
+                    </div>
+                  )}
 
                   {/* Category Pill Tag */}
                   <span
@@ -574,7 +695,7 @@ export const Home: React.FC = () => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
-                      zIndex: 3,
+                      zIndex: 4,
                       transition: 'all 0.2s ease',
                     }}
                     onMouseEnter={(e) => {

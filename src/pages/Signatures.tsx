@@ -35,7 +35,7 @@ export const Signatures: React.FC = React.memo(() => {
       description:
         'Juicy, fire-roasted tandoori chicken chunks tossed with fresh onions, capsicum, green chutney, and cream, all wrapped inside a soft, flaky flatbread.',
       ingredients: ['Tandoori Chicken', 'Flaky Paratha', 'Sliced Onions', 'Mint Chutney'],
-      image: './images/g7.jpg',
+      image: './images/g9.jpg',
     },
     {
       id: 'sig-3',
@@ -46,7 +46,7 @@ export const Signatures: React.FC = React.memo(() => {
       description:
         'A masterpiece of Kashmiri Wazwan. Hand-hammered minced mutton meatballs simmered in a spiced red gravy infused with dried cockscomb flowers (maval) and pure Pampore saffron.',
       ingredients: ['Hand-Pounded Mutton', 'Pampore Saffron', 'Maval Extract', 'Shallot Paste', 'Clarified Ghee'],
-      image: './images/g2.jpg',
+      image: './images/g12.jpg',
     },
     {
       id: 'sig-4',
@@ -57,7 +57,7 @@ export const Signatures: React.FC = React.memo(() => {
       description:
         'Served traditionally as the grand finale of Wazwan feasts. Velvety mutton spheres poached slowly in a smooth, mildly tangy yogurt broth enriched with green cardamoms and dry mountain mint.',
       ingredients: ['Velvet Hammered Lamb', 'Thick Spiced Curd', 'Dry Mountain Mint', 'Green Cardamom', 'Desi Ghee'],
-      image: './images/g3.jpg',
+      image: './images/g10.jpg',
     },
     {
       id: 'sig-5',
@@ -79,7 +79,7 @@ export const Signatures: React.FC = React.memo(() => {
       description:
         'Saffron-infused mountain green tea brewed in a traditional copper samovar. Sweetened with honey or rock sugar, enriched with crushed green cardamoms, cinnamon bark, and blanched almond slivers.',
       ingredients: ['Organic Green Tea', 'Pampore Saffron Strands', 'Crushed Cardamoms', 'Cinnamon Bark', 'Slivered Almonds'],
-      image: './images/amberleaf-vibe.jpg',
+      image: './images/s3.jpg',
     },
     {
       id: 'sig-7',
@@ -90,7 +90,7 @@ export const Signatures: React.FC = React.memo(() => {
       description:
         'Crispy ghee-fried bread triangles soaked in warm saffron syrup, layered with double-thick reduced milk rabri, and garnished with pistachios and edible silver leaf.',
       ingredients: ['Pure Ghee Bread', 'Six-Hour Slow Milk Rabri', 'Kashmiri Saffron', 'Pistachio Shavings', 'Edible Silver Vark'],
-      image: './images/g1.jpg',
+      image: './images/s6.jpg',
     },
   ];
 
@@ -113,7 +113,7 @@ export const Signatures: React.FC = React.memo(() => {
   };
 
   return (
-    <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto', padding: '2rem 1.5rem 6rem 1.5rem' }}>
+    <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto', paddingTop: '150px', paddingBottom: '6rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
       <SEO
         title="Signatures"
         description="Explore the signature culinary masterpieces of Amberleaf Restaurant in Srinagar. Discover our Fried Momos, Chicken Kathi Roll, Mutton Rista, and Kashmiri Kahwa."
@@ -272,7 +272,7 @@ export const Signatures: React.FC = React.memo(() => {
                 </div>
               </div>
 
-              {/* Two Action Buttons Replacing Zomato & Swiggy (Matching Visual Style of Image 3) */}
+              {/* Two Action Buttons Replacing Zomato & Swiggy (Matching Visual Style of Reference Image 5) */}
               <div
                 style={{
                   display: 'flex',
@@ -282,69 +282,73 @@ export const Signatures: React.FC = React.memo(() => {
                   flexWrap: 'wrap',
                 }}
               >
-                {/* Button 1: Order on WhatsApp (Vibrant Red Pill matching Zomato's position) */}
+                {/* Button 1: Order on WhatsApp (Matching Gold Box Style in Image 5) */}
                 <button
                   onClick={() => handleWhatsAppOrder(dish.name, dish.price)}
                   style={{
-                    backgroundColor: '#e23744',
-                    color: '#ffffff',
+                    backgroundColor: 'var(--accent-gold)',
+                    color: '#040906',
                     border: 'none',
-                    borderRadius: '9999px',
-                    padding: '0.75rem 1.6rem',
-                    fontSize: '0.88rem',
+                    borderRadius: '6px',
+                    padding: '0.65rem 1.45rem',
+                    fontSize: '0.82rem',
                     fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.45rem',
-                    boxShadow: '0 4px 14px rgba(226, 55, 68, 0.35)',
-                    transition: 'all 0.25s ease',
+                    boxShadow: '0 4px 15px rgba(197, 160, 89, 0.35)',
+                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#cc2f3b';
+                    e.currentTarget.style.backgroundColor = 'var(--accent-gold-hover)';
                     e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(226, 55, 68, 0.45)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(197, 160, 89, 0.5)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#e23744';
+                    e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(226, 55, 68, 0.35)';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(197, 160, 89, 0.35)';
                   }}
                 >
-                  <MessageCircle size={16} />
+                  <MessageCircle size={15} />
                   <span>Order on WhatsApp</span>
                 </button>
 
-                {/* Button 2: Reserve a Table (Warm Orange / Gold Pill matching Swiggy's position) */}
+                {/* Button 2: Reserve a Table (Matching Gold Box Style in Image 5) */}
                 <button
                   onClick={() => handleReserveTable(dish.name)}
                   style={{
-                    backgroundColor: '#fc8019',
-                    color: '#ffffff',
+                    backgroundColor: 'var(--accent-gold)',
+                    color: '#040906',
                     border: 'none',
-                    borderRadius: '9999px',
-                    padding: '0.75rem 1.6rem',
-                    fontSize: '0.88rem',
+                    borderRadius: '6px',
+                    padding: '0.65rem 1.45rem',
+                    fontSize: '0.82rem',
                     fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.45rem',
-                    boxShadow: '0 4px 14px rgba(252, 128, 25, 0.35)',
-                    transition: 'all 0.25s ease',
+                    boxShadow: '0 4px 15px rgba(197, 160, 89, 0.35)',
+                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#e57013';
+                    e.currentTarget.style.backgroundColor = 'var(--accent-gold-hover)';
                     e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(252, 128, 25, 0.45)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(197, 160, 89, 0.5)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#fc8019';
+                    e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(252, 128, 25, 0.35)';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(197, 160, 89, 0.35)';
                   }}
                 >
-                  <Calendar size={16} />
+                  <Calendar size={15} />
                   <span>Reserve a Table</span>
                 </button>
               </div>
