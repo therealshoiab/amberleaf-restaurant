@@ -198,14 +198,15 @@ export const Menu: React.FC = React.memo(() => {
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))',
-            gap: '1.75rem',
+            gap: '1.5rem',
+            gridAutoRows: '192px',
           }}
           className="menu-horizontal-grid"
         >
           {filteredItems.map((item) => (
             <div
               key={item.id}
-              className="glass-panel"
+              className="glass-panel menu-item-card"
               style={{
                 borderRadius: '16px',
                 border: '1px solid var(--border-color)',
@@ -216,7 +217,9 @@ export const Menu: React.FC = React.memo(() => {
                 boxShadow: '0 4px 18px rgba(0, 0, 0, 0.05)',
                 transition: 'transform 0.25s ease, box-shadow 0.25s ease',
                 position: 'relative',
-                minHeight: '175px',
+                height: '192px',
+                minHeight: '192px',
+                maxHeight: '192px',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
@@ -227,11 +230,15 @@ export const Menu: React.FC = React.memo(() => {
                 e.currentTarget.style.boxShadow = '0 4px 18px rgba(0, 0, 0, 0.05)';
               }}
             >
-              {/* Left Column: Dish Image with Veg/Non-Veg Square Indicator */}
+              {/* Left Column: SQUARE Dish Image (192px x 192px, 1:1 Aspect Ratio) */}
               <div
                 style={{
-                  width: '185px',
-                  minWidth: '185px',
+                  width: '192px',
+                  minWidth: '192px',
+                  maxWidth: '192px',
+                  height: '192px',
+                  aspectRatio: '1 / 1',
+                  flexShrink: 0,
                   position: 'relative',
                   backgroundColor: '#1a1815',
                   overflow: 'hidden',
@@ -239,18 +246,19 @@ export const Menu: React.FC = React.memo(() => {
                 className="menu-card-image-wrapper"
               >
                 <img
-                  src={item.image || './images/g1.jpg'}
+                  src={item.image || 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600'}
                   alt={item.name}
                   loading="lazy"
                   style={{
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
+                    objectPosition: 'center',
                     display: 'block',
                     transition: 'transform 0.4s ease',
                   }}
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = './images/g1.jpg';
+                    (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600';
                   }}
                 />
 
@@ -287,12 +295,14 @@ export const Menu: React.FC = React.memo(() => {
               {/* Right Column: Title, Gold Price, Popular Badge, Description & Bottom Action */}
               <div
                 style={{
-                  padding: '1.25rem 1.5rem',
+                  padding: '1.1rem 1.4rem',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   flexGrow: 1,
-                  gap: '0.5rem',
+                  height: '100%',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden',
                 }}
               >
                 <div>
@@ -308,7 +318,7 @@ export const Menu: React.FC = React.memo(() => {
                     <h3
                       style={{
                         fontFamily: "'Playfair Display', serif",
-                        fontSize: '1.22rem',
+                        fontSize: '1.16rem',
                         fontWeight: 700,
                         color: 'var(--text-primary)',
                         margin: 0,
@@ -320,7 +330,7 @@ export const Menu: React.FC = React.memo(() => {
                     <span
                       style={{
                         fontFamily: "'Playfair Display', serif",
-                        fontSize: '1.28rem',
+                        fontSize: '1.25rem',
                         fontWeight: 700,
                         color: 'var(--accent-gold)',
                         whiteSpace: 'nowrap',
@@ -332,7 +342,7 @@ export const Menu: React.FC = React.memo(() => {
 
                   {/* Popular Badge (if applicable) */}
                   {item.isPopular && (
-                    <div style={{ marginTop: '0.35rem' }}>
+                    <div style={{ marginTop: '0.25rem' }}>
                       <span
                         style={{
                           display: 'inline-flex',
@@ -341,9 +351,9 @@ export const Menu: React.FC = React.memo(() => {
                           backgroundColor: 'rgba(197, 160, 89, 0.15)',
                           border: '1px solid var(--accent-gold)',
                           color: 'var(--accent-gold)',
-                          fontSize: '0.66rem',
+                          fontSize: '0.64rem',
                           fontWeight: 700,
-                          padding: '0.15rem 0.55rem',
+                          padding: '0.12rem 0.5rem',
                           borderRadius: '9999px',
                           letterSpacing: '0.06em',
                           textTransform: 'uppercase',
@@ -354,13 +364,17 @@ export const Menu: React.FC = React.memo(() => {
                     </div>
                   )}
 
-                  {/* Description (2 lines) */}
+                  {/* Description (2 lines clamped) */}
                   <p
                     style={{
                       color: 'var(--text-secondary)',
-                      fontSize: '0.86rem',
-                      lineHeight: '1.5',
-                      margin: '0.5rem 0 0 0',
+                      fontSize: '0.84rem',
+                      lineHeight: '1.45',
+                      margin: '0.35rem 0 0 0',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
                     }}
                   >
                     {item.description}
@@ -373,8 +387,8 @@ export const Menu: React.FC = React.memo(() => {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginTop: '0.75rem',
-                    paddingTop: '0.65rem',
+                    marginTop: '0.45rem',
+                    paddingTop: '0.45rem',
                     borderTop: '1px solid var(--border-light)',
                   }}
                 >

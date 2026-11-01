@@ -318,6 +318,56 @@ h1, h2, h3, h4, h5, h6, .font-serif {
   transition: all 0.3s ease;
 }
 
+/* Menu Card & Horizontal Grid Styles (1:1 Square Plated Dish Photography) */
+.menu-horizontal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+  gap: 1.5rem;
+  grid-auto-rows: 192px;
+}
+
+.menu-item-card {
+  height: 192px !important;
+  min-height: 192px !important;
+  max-height: 192px !important;
+}
+
+.menu-card-image-wrapper {
+  width: 192px !important;
+  min-width: 192px !important;
+  max-width: 192px !important;
+  height: 192px !important;
+  aspect-ratio: 1 / 1 !important;
+  flex-shrink: 0 !important;
+}
+
+@media (max-width: 640px) {
+  .menu-horizontal-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    grid-auto-rows: 145px !important;
+  }
+
+  .menu-item-card {
+    height: 145px !important;
+    min-height: 145px !important;
+    max-height: 145px !important;
+  }
+
+  .menu-card-image-wrapper {
+    width: 145px !important;
+    min-width: 145px !important;
+    max-width: 145px !important;
+    height: 145px !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  .menu-card-image-wrapper img {
+    width: 145px !important;
+    height: 145px !important;
+  }
+}
+
 /* Gallery Tab Container & Buttons */
 .gallery-tab-container {
   display: flex;
