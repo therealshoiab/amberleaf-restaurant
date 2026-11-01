@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import {
-  ArrowRight,
   Star,
   Utensils,
   Calendar,
@@ -11,6 +10,8 @@ import {
   ChevronRight,
   HelpCircle,
   Send,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -58,7 +59,7 @@ export const Home: React.FC = () => {
     setCurrentSlide((prev) => (prev - 1 + sanctuaryImages.length) % sanctuaryImages.length);
   };
 
-  // --- 2. 6 CULINARY VIDEOS (2 ROWS OF 3 VIDEOS) ---
+  // --- 2. 6 CULINARY VIDEOS (2 ROWS OF 3 VIDEOS IN 9:16) ---
   const homeVideos = [
     { id: 's1', url: './images/s1.mp4', title: 'The Royal Samovar Brew', tag: 'Artisanal Kahwa' },
     { id: 's2', url: './images/s2.mp4', title: 'Pounding the Velvet Rista', tag: 'Master Wazwan' },
@@ -67,6 +68,20 @@ export const Home: React.FC = () => {
     { id: 's7', url: './images/s7.mp4', title: 'Signature Mocktail Pour', tag: 'Beverage Bar' },
     { id: 's8', url: './images/s8.mp4', title: 'Evening Ambiance at Balgarden', tag: 'Fine Dining' },
   ];
+
+  const [mutedVideos, setMutedVideos] = useState<Record<string, boolean>>({
+    s1: true,
+    s2: true,
+    s4: true,
+    s5: true,
+    s7: true,
+    s8: true,
+  });
+
+  const toggleMute = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMutedVideos((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   // --- 3. FAQ ACCORDION STATE ---
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -196,7 +211,7 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="page-container" style={{ position: 'relative', maxWidth: '1280px', margin: '0 auto' }}>
+    <div className="home-page-root" style={{ width: '100%', position: 'relative', overflowX: 'hidden' }}>
       <SEO
         title="Home"
         description="Welcome to Amberleaf Restaurant in Srinagar. Experience modern fine dining, authentic Kashmiri specialties, and artisanal mocktails in an elegant glassmorphic ambiance."
@@ -206,25 +221,25 @@ export const Home: React.FC = () => {
       <div className="noise-overlay" />
 
       {/* =========================================================================
-          HERO SLIDESHOW SECTION WITH CENTERED RESTAURANT TEXT
+          HERO SLIDESHOW SECTION (EDGE-TO-EDGE FULLSCREEN LIKE MEYDANI CAFE)
       ========================================================================= */}
-      <div
-        className="hero-slideshow-container"
+      <section
+        className="hero-fullscreen-section"
         style={{
           position: 'relative',
           width: '100%',
-          minHeight: '680px',
-          borderRadius: '24px',
-          overflow: 'hidden',
+          minHeight: '100vh',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          border: '1px solid var(--border-color)',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.35)',
-          marginTop: '1rem',
+          margin: 0,
+          padding: '115px 1.5rem 4rem 1.5rem',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
         }}
       >
-        {/* Slideshow Background Images */}
+        {/* Slideshow Background Images - High Clarity & Quality */}
         {sanctuaryImages.map((img, idx) => (
           <div
             key={idx}
@@ -239,13 +254,13 @@ export const Home: React.FC = () => {
               backgroundPosition: 'center',
               opacity: currentSlide === idx ? 1 : 0,
               transform: currentSlide === idx ? 'scale(1.03)' : 'scale(1.0)',
-              transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 6s ease-out',
+              transition: 'opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 7s ease-out',
               zIndex: 1,
             }}
           />
         ))}
 
-        {/* Cinematic Multi-Layer Luxury Darkening Overlay for High Legibility in Bright & Dark Mode */}
+        {/* Clear Luxury Vignette Overlay (NO blur for maximum image sharpness & quality) */}
         <div
           style={{
             position: 'absolute',
@@ -254,29 +269,28 @@ export const Home: React.FC = () => {
             right: 0,
             bottom: 0,
             background:
-              'radial-gradient(circle at center, rgba(4, 9, 6, 0.72) 0%, rgba(4, 9, 6, 0.88) 100%)',
-            backdropFilter: 'blur(3px)',
-            WebkitBackdropFilter: 'blur(3px)',
+              'linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.22) 35%, rgba(0, 0, 0, 0.38) 65%, rgba(4, 9, 6, 0.88) 100%)',
             zIndex: 2,
           }}
         />
 
-        {/* Slideshow Left & Right Arrow Navigation */}
+        {/* Slideshow Left & Right Arrow Navigation (Edge Aligned) */}
         <button
           onClick={prevSlide}
           aria-label="Previous Slide"
           style={{
             position: 'absolute',
-            left: '1.25rem',
+            left: '1.5rem',
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 10,
-            background: 'rgba(0, 0, 0, 0.4)',
-            border: '1px solid var(--border-color)',
+            background: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
             color: 'var(--accent-gold)',
             borderRadius: '50%',
-            width: '42px',
-            height: '42px',
+            width: '46px',
+            height: '46px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -288,11 +302,11 @@ export const Home: React.FC = () => {
             e.currentTarget.style.color = '#000';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.45)';
             e.currentTarget.style.color = 'var(--accent-gold)';
           }}
         >
-          <ChevronLeft size={22} />
+          <ChevronLeft size={24} />
         </button>
 
         <button
@@ -300,16 +314,17 @@ export const Home: React.FC = () => {
           aria-label="Next Slide"
           style={{
             position: 'absolute',
-            right: '1.25rem',
+            right: '1.5rem',
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 10,
-            background: 'rgba(0, 0, 0, 0.4)',
-            border: '1px solid var(--border-color)',
+            background: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
             color: 'var(--accent-gold)',
             borderRadius: '50%',
-            width: '42px',
-            height: '42px',
+            width: '46px',
+            height: '46px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -321,22 +336,22 @@ export const Home: React.FC = () => {
             e.currentTarget.style.color = '#000';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.45)';
             e.currentTarget.style.color = 'var(--accent-gold)';
           }}
         >
-          <ChevronRight size={22} />
+          <ChevronRight size={24} />
         </button>
 
         {/* Slideshow Dot Indicators */}
         <div
           style={{
             position: 'absolute',
-            bottom: '1.25rem',
+            bottom: '3.5rem',
             left: '50%',
             transform: 'translateX(-50%)',
             display: 'flex',
-            gap: '0.5rem',
+            gap: '0.6rem',
             zIndex: 10,
           }}
         >
@@ -346,13 +361,13 @@ export const Home: React.FC = () => {
               onClick={() => setCurrentSlide(i)}
               aria-label={`Slide ${i + 1}`}
               style={{
-                width: currentSlide === i ? '24px' : '8px',
+                width: currentSlide === i ? '28px' : '8px',
                 height: '8px',
                 borderRadius: '4px',
-                backgroundColor: currentSlide === i ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.3)',
+                backgroundColor: currentSlide === i ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.4)',
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.35s ease',
                 padding: 0,
               }}
             />
@@ -360,29 +375,57 @@ export const Home: React.FC = () => {
         </div>
 
         {/* =========================================================================
-            CENTERED RESTAURANT INFORMATION & CALL TO ACTIONS
+            CENTERED HERO TYPOGRAPHY & CALL TO ACTIONS (MEYDANI CAFE STYLE)
         ========================================================================= */}
         <div
           className="hero-center-content"
           style={{
             position: 'relative',
             zIndex: 5,
-            padding: '3rem 2rem',
-            maxWidth: '850px',
+            maxWidth: '920px',
             textAlign: 'center',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '1.25rem',
+            gap: '1rem',
+            width: '100%',
           }}
         >
-          {/* Welcome Badge & Address */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
+          {/* Top Rating Badges (Google, Zomato, Srinagar) - Meydani Style */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '0.75rem',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              marginBottom: '0.5rem',
+            }}
+          >
+            <div className="hero-rating-pill">
+              <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 700 }}>GOOGLE</span>
+              <Star size={13} fill="#c5a059" color="#c5a059" />
+              <span style={{ color: '#fff', fontWeight: 700 }}>4.9</span>
+              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem' }}>(1,250 reviews)</span>
+            </div>
+            <div className="hero-rating-pill">
+              <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 700 }}>ZOMATO</span>
+              <Star size={13} fill="#c5a059" color="#c5a059" />
+              <span style={{ color: '#fff', fontWeight: 700 }}>4.8</span>
+              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem' }}>(850 reviews)</span>
+            </div>
+            <div className="hero-rating-pill">
+              <span style={{ color: 'var(--accent-gold)', fontWeight: 700 }}>SRINAGAR</span>
+              <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.8rem' }}>310, Balgarden</span>
+            </div>
+          </div>
+
+          {/* Grand Restaurant Title */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
             <span
               style={{
                 color: 'var(--accent-gold)',
                 textTransform: 'uppercase',
-                fontSize: '0.82rem',
+                fontSize: '0.85rem',
                 letterSpacing: '0.25em',
                 fontWeight: 800,
                 display: 'block',
@@ -390,40 +433,44 @@ export const Home: React.FC = () => {
             >
               Welcome to
             </span>
-            <h2
+            <h1
               style={{
                 fontFamily: "'Playfair Display', serif",
-                fontSize: 'clamp(2rem, 5vw, 3.2rem)',
+                fontSize: 'clamp(2.7rem, 6.5vw, 4.8rem)',
                 color: '#ffffff',
                 margin: 0,
-                lineHeight: 1.15,
-                textShadow: '0 2px 15px rgba(0,0,0,0.8)',
+                lineHeight: 1.1,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                textShadow: '0 4px 25px rgba(0,0,0,0.9)',
               }}
             >
               Amberleaf Fine Dine
-            </h2>
+            </h1>
             <p
               style={{
-                color: 'rgba(255, 255, 255, 0.85)',
-                fontSize: '0.95rem',
-                letterSpacing: '0.1em',
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: 'clamp(0.95rem, 2vw, 1.15rem)',
+                letterSpacing: '0.12em',
                 margin: '0.2rem 0 0 0',
-                textShadow: '0 2px 8px rgba(0,0,0,0.8)',
+                textShadow: '0 2px 10px rgba(0,0,0,0.85)',
+                fontWeight: 500,
               }}
             >
               310, Balgarden, Srinagar
             </p>
           </div>
 
-          {/* Headline with cinematic reveal */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
-            <h1
+          {/* Headline & Luxury Subtitles */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginTop: '0.25rem' }}>
+            <h2
               style={{
                 fontFamily: "'Playfair Display', serif",
-                fontSize: 'clamp(1.7rem, 4vw, 2.7rem)',
+                fontSize: 'clamp(1.75rem, 3.8vw, 2.6rem)',
                 lineHeight: 1.2,
                 color: '#ffffff',
                 margin: 0,
+                fontWeight: 600,
                 textShadow: '0 3px 20px rgba(0,0,0,0.9)',
               }}
             >
@@ -431,85 +478,55 @@ export const Home: React.FC = () => {
               <span className="text-gold" style={{ display: 'inline-block' }}>
                 Refined Elegance
               </span>
-            </h1>
+            </h2>
 
             <p
               style={{
-                fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+                fontSize: 'clamp(1rem, 2.2vw, 1.3rem)',
                 fontFamily: "'Playfair Display', serif",
                 fontStyle: 'italic',
                 color: 'var(--accent-gold)',
                 letterSpacing: '0.04em',
-                fontWeight: 500,
+                fontWeight: 600,
                 margin: 0,
-                textShadow: '0 2px 10px rgba(0,0,0,0.8)',
+                textShadow: '0 2px 10px rgba(0,0,0,0.85)',
               }}
             >
-              Elevating Kashmiri Hospitality & Culinary Artistry
+              Elevating Kashmiri Hospitality &amp; Culinary Artistry
             </p>
           </div>
 
           {/* Description */}
           <p
             style={{
-              color: 'rgba(255, 255, 255, 0.9)',
-              fontSize: '1.05rem',
+              color: 'rgba(255, 255, 255, 0.88)',
+              fontSize: 'clamp(0.95rem, 1.8vw, 1.08rem)',
               lineHeight: '1.75',
-              maxWidth: '720px',
-              margin: '0.25rem 0',
+              maxWidth: '760px',
+              margin: '0.25rem auto',
               textShadow: '0 2px 12px rgba(0,0,0,0.9)',
             }}
           >
             Located in the heart of Srinagar, Amberleaf merges cozy glassmorphic aesthetics with a premium, multi-cuisine dining experience. Indulge in our masterfully crafted Kashmiri Wazwan, fiery tandoor starters, and signature artisanal beverages.
           </p>
 
-          {/* Call to Actions (Explore Menu & Book a Table) */}
+          {/* Call to Actions (Meydani Cafe Style) */}
           <div
             style={{
               display: 'flex',
               flexWrap: 'wrap',
               gap: '1.25rem',
               justifyContent: 'center',
-              marginTop: '0.75rem',
+              marginTop: '1.25rem',
             }}
           >
-            <a
-              href="#/menu"
-              className="btn-primary"
-              style={{
-                gap: '0.5rem',
-                padding: '0.85rem 2rem',
-                fontSize: '1rem',
-                boxShadow: '0 6px 25px rgba(197, 160, 89, 0.4)',
-              }}
-            >
-              <Utensils size={18} />
-              Explore Menu
-              <ArrowRight size={16} />
-            </a>
-            <a
-              href="#/contact"
-              className="btn-secondary"
-              style={{
-                gap: '0.5rem',
-                padding: '0.85rem 2rem',
-                fontSize: '1rem',
-                backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                borderColor: 'var(--accent-gold)',
-                color: '#ffffff',
-                backdropFilter: 'blur(10px)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
-                e.currentTarget.style.color = '#000';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
-                e.currentTarget.style.color = '#ffffff';
-              }}
-            >
+            <a href="#/contact" className="meydani-cta-primary">
               <Calendar size={18} />
               Book a Table
+            </a>
+            <a href="#/menu" className="meydani-cta-secondary">
+              <Utensils size={18} />
+              Explore Menu
             </a>
           </div>
 
@@ -518,10 +535,10 @@ export const Home: React.FC = () => {
             className="hero-features-grid"
             style={{
               width: '100%',
-              maxWidth: '650px',
+              maxWidth: '680px',
               marginTop: '1.5rem',
               paddingTop: '1.25rem',
-              borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.2)',
             }}
           >
             <div>
@@ -538,12 +555,38 @@ export const Home: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Scroll Down Indicator - Meydani Style */}
+        <a
+          href="#marquee-anchor"
+          style={{
+            position: 'absolute',
+            bottom: '1rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.2rem',
+            textDecoration: 'none',
+            color: 'rgba(255, 255, 255, 0.8)',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            zIndex: 10,
+            transition: 'color 0.3s ease',
+          }}
+        >
+          <span>EXPLORE MORE</span>
+          <ChevronDown size={18} className="bounce-chevron" style={{ color: 'var(--accent-gold)' }} />
+        </a>
+      </section>
 
       {/* =========================================================================
-          INFINITE HORIZONTAL MARQUEE TICKER
+          INFINITE HORIZONTAL MARQUEE TICKER (FULL WIDTH)
       ========================================================================= */}
-      <div className="marquee-container" style={{ margin: '3.5rem 0' }}>
+      <div id="marquee-anchor" className="marquee-container" style={{ margin: 0 }}>
         <div className="marquee-content">
           <span className="marquee-item">
             &bull; EST. 2023 &bull; SRINAGAR, KASHMIR &bull; FINE DINING &bull; ARTISANAL MOCKTAILS &bull; KASHMIRI CUISINE &bull;&nbsp;
@@ -561,118 +604,177 @@ export const Home: React.FC = () => {
       </div>
 
       {/* =========================================================================
-          CULINARY MOTION - 6 VIDEOS ON 2 LINES (3 VIDEOS PER LINE)
+          PAGE CONTENT WRAPPER: VIDEOS (9:16), FAQ & REVIEWS
       ========================================================================= */}
-      <motion.div
-        variants={scrollSectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-100px' }}
+      <div
         style={{
-          marginTop: '2rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '2rem',
+          maxWidth: '1240px',
+          margin: '0 auto',
+          padding: '4rem 1.5rem 6rem 1.5rem',
+          width: '100%',
+          boxSizing: 'border-box',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          <div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-              Culinary Motion
-            </span>
-            <h3 style={{ fontSize: '2rem', color: 'var(--text-primary)', margin: '0.25rem 0 0 0' }}>
-              Stories from the Kitchen & Lounge
-            </h3>
-          </div>
-          <a
-            href="#/gallery"
-            style={{
-              color: 'var(--accent-gold)',
-              textDecoration: 'none',
-              fontWeight: 700,
-              fontSize: '0.95rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.3rem',
-            }}
-          >
-            All Videos & Gallery &rarr;
-          </a>
-        </div>
-
-        {/* 6 Videos Grid: 2 Lines of 3 Videos */}
-        <div
+        {/* =========================================================================
+            CULINARY MOTION - 6 VIDEOS ON 2 LINES (3 VIDEOS PER LINE, 9:16 RATIO)
+        ========================================================================= */}
+        <motion.div
+          variants={scrollSectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-100px' }}
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '1.5rem',
-            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2.5rem',
           }}
-          className="home-videos-grid-3x2"
         >
-          {homeVideos.map((vid) => (
-            <div
-              key={vid.id}
-              className="glass-panel"
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+                Culinary Motion
+              </span>
+              <h3 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', color: 'var(--text-primary)', margin: '0.25rem 0 0 0' }}>
+                Stories from the Kitchen &amp; Lounge
+              </h3>
+            </div>
+            <a
+              href="#/gallery"
               style={{
-                borderRadius: '16px',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                border: '1px solid var(--border-color)',
-                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.15)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 12px 35px rgba(197, 160, 89, 0.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.15)';
+                color: 'var(--accent-gold)',
+                textDecoration: 'none',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.3rem',
               }}
             >
-              <div style={{ position: 'relative', width: '100%', height: '320px', backgroundColor: '#000' }}>
-                <video
-                  src={vid.url}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                  }}
-                />
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '0.75rem',
-                    left: '0.75rem',
-                    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-                    backdropFilter: 'blur(6px)',
-                    color: 'var(--accent-gold)',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    padding: '0.2rem 0.6rem',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(197, 160, 89, 0.3)',
-                  }}
-                >
-                  {vid.tag}
-                </span>
-              </div>
+              All Videos &amp; Gallery &rarr;
+            </a>
+          </div>
 
-              <div style={{ padding: '1rem 1.25rem' }}>
-                <h4 style={{ fontSize: '1.05rem', color: 'var(--text-primary)', margin: 0, fontWeight: 600 }}>
-                  {vid.title}
-                </h4>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+          {/* 6 Videos Grid: 2 Lines of 3 Videos in 9:16 Aspect Ratio */}
+          <div className="home-videos-grid-3x2">
+            {homeVideos.map((vid) => {
+              const isMuted = mutedVideos[vid.id] ?? true;
+              return (
+                <div key={vid.id} className="video-card-9-16">
+                  <video
+                    src={vid.url}
+                    autoPlay
+                    loop
+                    muted={isMuted}
+                    playsInline
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  />
+
+                  {/* Category Pill Tag */}
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      left: '1rem',
+                      backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                      backdropFilter: 'blur(8px)',
+                      color: 'var(--accent-gold)',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      padding: '0.35rem 0.75rem',
+                      borderRadius: '9999px',
+                      border: '1px solid rgba(197, 160, 89, 0.35)',
+                      textTransform: 'uppercase',
+                      zIndex: 3,
+                    }}
+                  >
+                    {vid.tag}
+                  </span>
+
+                  {/* Sound Toggle Button */}
+                  <button
+                    onClick={(e) => toggleMute(vid.id, e)}
+                    aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+                    style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                      backdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
+                      color: isMuted ? '#ffffff' : 'var(--accent-gold)',
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      zIndex: 3,
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
+                      e.currentTarget.style.color = '#000';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.65)';
+                      e.currentTarget.style.color = isMuted ? '#ffffff' : 'var(--accent-gold)';
+                    }}
+                  >
+                    {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                  </button>
+
+                  {/* Bottom Gradient Scrim with Title */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: '3rem 1.25rem 1.25rem 1.25rem',
+                      background:
+                        'linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.5) 60%, transparent 100%)',
+                      zIndex: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    <h4
+                      style={{
+                        fontSize: '1.08rem',
+                        color: '#ffffff',
+                        margin: 0,
+                        fontWeight: 600,
+                        lineHeight: 1.3,
+                        textShadow: '0 2px 8px rgba(0,0,0,0.9)',
+                      }}
+                    >
+                      {vid.title}
+                    </h4>
+                    <span
+                      style={{
+                        fontSize: '0.74rem',
+                        color: 'var(--accent-gold)',
+                        fontWeight: 600,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      9:16 Cinematic Motion
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
 
       {/* =========================================================================
           COMBINED SECTION 1: FREQUENTLY ASKED QUESTIONS (FAQ)
@@ -1105,6 +1207,7 @@ export const Home: React.FC = () => {
           </div>
         </div>
       </motion.div>
+      </div>
 
       {/* Responsive Styles */}
       <style>{`

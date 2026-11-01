@@ -10,6 +10,19 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }) => {
   const [isThemeLight, setIsThemeLight] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const isHome = currentHash === '#/home' || currentHash === '' || currentHash === '#';
+
+  // Track scroll position to transition from transparent over hero to frosted glass
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 40);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Initialize theme from localStorage or default to bright (light theme)
   useEffect(() => {
@@ -46,9 +59,18 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
     { label: 'FAQ', hash: '#/faq' },
   ];
 
+  // Meydani Cafe style: Floating transparent navbar directly over hero on Home
+  const isTransparentOverHero = isHome && !isScrolled;
+  const navTextColor = isTransparentOverHero ? '#ffffff' : 'var(--text-primary)';
+  const navBg = isTransparentOverHero
+    ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 65%, transparent 100%)'
+    : 'var(--navbar-bg)';
+  const navBorder = isTransparentOverHero ? 'none' : '1px solid var(--border-color)';
+  const navShadow = isTransparentOverHero ? 'none' : '0 4px 30px rgba(0, 0, 0, 0.25)';
+
   return (
     <nav
-      className="glass-navbar"
+      className={isTransparentOverHero ? 'transparent-navbar' : 'glass-navbar'}
       style={{
         position: 'fixed',
         top: hasBanner ? '36px' : 0,
@@ -60,7 +82,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 2rem',
-        transition: 'all 0.3s ease',
+        background: navBg,
+        borderBottom: navBorder,
+        boxShadow: navShadow,
+        backdropFilter: isTransparentOverHero ? 'none' : 'blur(55px) saturate(200%)',
+        WebkitBackdropFilter: isTransparentOverHero ? 'none' : 'blur(55px) saturate(200%)',
+        transition: 'background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
       }}
     >
       {/* Brand Logo and Name */}
@@ -91,10 +118,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
               fontSize: 'clamp(1.05rem, 4.5vw, 1.25rem)',
               fontWeight: 700,
               letterSpacing: '0.05em',
-              color: 'var(--text-primary)',
+              color: navTextColor,
               textTransform: 'uppercase',
               lineHeight: 1,
               whiteSpace: 'nowrap',
+              textShadow: isTransparentOverHero ? '0 2px 10px rgba(0,0,0,0.8)' : 'none',
+              transition: 'color 0.3s ease',
             }}
           >
             Amberleaf
@@ -107,6 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
               textTransform: 'uppercase',
               fontWeight: 600,
               whiteSpace: 'nowrap',
+              textShadow: isTransparentOverHero ? '0 2px 8px rgba(0,0,0,0.8)' : 'none',
             }}
           >
             Fine Dine & Cafe
@@ -131,7 +161,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
                 href={item.hash}
                 className="luxury-nav-link"
                 style={{
-                  color: isActive ? 'var(--accent-gold)' : 'var(--text-primary)',
+                  color: isActive ? 'var(--accent-gold)' : navTextColor,
                   textDecoration: 'none',
                   fontSize: '0.88rem',
                   fontWeight: 600,
@@ -139,6 +169,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
                   padding: '0.3rem 0',
                   position: 'relative',
                   transition: 'color 0.3s ease',
+                  textShadow: isTransparentOverHero ? '0 2px 8px rgba(0,0,0,0.8)' : 'none',
                 }}
               >
                 {item.label}
@@ -149,7 +180,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
                     bottom: 0,
                     left: 0,
                     width: '100%',
-                    height: '1.5px',
+                    height: '2px',
                     backgroundColor: 'var(--accent-gold)',
                     transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
                     transformOrigin: 'left',
@@ -163,7 +194,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
                 <span
                   style={{
                     color: 'var(--accent-gold)',
-                    opacity: 0.4,
+                    opacity: 0.5,
                     fontSize: '0.7rem',
                     userSelect: 'none',
                   }}
@@ -178,35 +209,38 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
 
       {/* Controls Container */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {/* Reserve a Table CTA Button */}
+        {/* Solid Gold Reserve Table CTA Button (Exact Meydani Cafe style) */}
         <a
           href="#/contact"
           className="btn-reserve-nav"
           style={{
-            border: '1px solid var(--accent-gold)',
-            backgroundColor: 'transparent',
-            color: 'var(--accent-gold)',
-            padding: '0.55rem 1.25rem',
-            borderRadius: '9999px',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            letterSpacing: '0.05em',
+            backgroundColor: 'var(--accent-gold)',
+            color: '#040906',
+            padding: '0.6rem 1.45rem',
+            borderRadius: '6px',
+            fontSize: '0.82rem',
+            fontWeight: 700,
+            letterSpacing: '0.08em',
             textDecoration: 'none',
             textTransform: 'uppercase',
-            transition: 'all 0.3s ease',
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            boxShadow: '0 4px 15px rgba(var(--accent-gold-rgb), 0.4)',
+            border: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
-            e.currentTarget.style.color = '#000';
-            e.currentTarget.style.boxShadow = '0 0 15px rgba(var(--accent-gold-rgb), 0.3)';
+            e.currentTarget.style.backgroundColor = 'var(--accent-gold-hover)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(var(--accent-gold-rgb), 0.6)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = 'var(--accent-gold)';
-            e.currentTarget.style.boxShadow = 'none';
+            e.currentTarget.style.backgroundColor = 'var(--accent-gold)';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 15px rgba(var(--accent-gold-rgb), 0.4)';
           }}
         >
-          Reserve a Table
+          Reserve Table
         </a>
 
         {/* Admin Quick Access Button */}
@@ -216,45 +250,46 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
           title="Admin Portal"
           style={{
             background: 'none',
-            border: 'none',
-            color: currentHash === '#/admin' ? 'var(--accent-gold)' : 'var(--text-secondary)',
+            border: isTransparentOverHero ? '1px solid rgba(255, 255, 255, 0.25)' : 'none',
+            color: currentHash === '#/admin' ? 'var(--accent-gold)' : (isTransparentOverHero ? '#ffffff' : 'var(--text-secondary)'),
             cursor: 'pointer',
             padding: '0.5rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: '50%',
-            backgroundColor: currentHash === '#/admin' ? 'rgba(197, 160, 89, 0.15)' : 'var(--border-light)',
+            backgroundColor: currentHash === '#/admin' ? 'rgba(197, 160, 89, 0.25)' : (isTransparentOverHero ? 'rgba(0, 0, 0, 0.3)' : 'var(--border-light)'),
             transition: 'background-color 0.3s ease, color 0.3s ease, transform 0.3s ease',
             textDecoration: 'none',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = 'var(--accent-gold)';
             e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.color = 'var(--accent-gold)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = currentHash === '#/admin' ? 'var(--accent-gold)' : 'var(--text-secondary)';
             e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.color = currentHash === '#/admin' ? 'var(--accent-gold)' : (isTransparentOverHero ? '#ffffff' : 'var(--text-secondary)');
           }}
         >
-          <Lock size={17} />
+          <Lock size={16} />
         </a>
 
         {/* Theme Toggle Button */}
         <button
           onClick={toggleTheme}
           aria-label="Toggle Theme"
+          title={`Switch to ${isThemeLight ? 'Dark' : 'Light'} Mode`}
           style={{
             background: 'none',
-            border: 'none',
-            color: 'var(--text-primary)',
+            border: isTransparentOverHero ? '1px solid rgba(255, 255, 255, 0.25)' : 'none',
+            color: isTransparentOverHero ? '#ffffff' : 'var(--text-primary)',
             cursor: 'pointer',
             padding: '0.5rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: '50%',
-            backgroundColor: 'var(--border-light)',
+            backgroundColor: isTransparentOverHero ? 'rgba(0, 0, 0, 0.3)' : 'var(--border-light)',
             transition: 'background-color 0.3s ease, transform 0.3s ease',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = 'rotate(15deg)')}
@@ -286,17 +321,17 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
           <motion.div
             animate={isMobileMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            style={{ width: '22px', height: '2px', backgroundColor: 'var(--text-primary)' }}
+            style={{ width: '22px', height: '2px', backgroundColor: navTextColor }}
           />
           <motion.div
             animate={isMobileMenuOpen ? { opacity: 0 } : { opacity: 1 }}
             transition={{ duration: 0.2 }}
-            style={{ width: '22px', height: '2px', backgroundColor: 'var(--text-primary)' }}
+            style={{ width: '22px', height: '2px', backgroundColor: navTextColor }}
           />
           <motion.div
             animate={isMobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            style={{ width: '22px', height: '2px', backgroundColor: 'var(--text-primary)' }}
+            style={{ width: '22px', height: '2px', backgroundColor: navTextColor }}
           />
         </button>
       </div>
