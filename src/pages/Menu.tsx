@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { SEO } from '../components/SEO';
-import { Search, Flame, Award, ShoppingBag, ExternalLink } from 'lucide-react';
+import { Search, Flame, Award } from 'lucide-react';
 import { menuService } from '../services/menuService';
 import { MENU_CATEGORIES } from '../data/defaultMenu';
 import type { MenuItem } from '../data/defaultMenu';
@@ -146,52 +146,6 @@ export const Menu: React.FC = React.memo(() => {
               {cat}
             </button>
           ))}
-        </div>
-      </div>
-
-      {/* Online Order Quick CTA Links */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '1rem',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginBottom: 'var(--section-margin)',
-        }}
-      >
-        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Prefer delivery? Order via:</span>
-        <div style={{ display: 'flex', gap: '0.8rem' }}>
-          <a
-            href="https://www.swiggy.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-swiggy"
-            style={{
-              padding: '0.6rem 1.2rem',
-              fontSize: '0.85rem',
-              gap: '0.4rem',
-            }}
-          >
-            <ShoppingBag size={14} />
-            Swiggy Order
-            <ExternalLink size={12} />
-          </a>
-          <a
-            href="https://www.zomato.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-zomato"
-            style={{
-              padding: '0.6rem 1.2rem',
-              fontSize: '0.85rem',
-              gap: '0.4rem',
-            }}
-          >
-            <ShoppingBag size={14} />
-            Zomato Order
-            <ExternalLink size={12} />
-          </a>
         </div>
       </div>
 

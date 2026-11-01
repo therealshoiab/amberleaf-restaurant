@@ -391,34 +391,6 @@ export const Home: React.FC = () => {
             width: '100%',
           }}
         >
-          {/* Top Rating Badges (Google, Zomato, Srinagar) - Meydani Style */}
-          <div
-            style={{
-              display: 'flex',
-              gap: '0.75rem',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              marginBottom: '0.5rem',
-            }}
-          >
-            <div className="hero-rating-pill">
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 700 }}>GOOGLE</span>
-              <Star size={13} fill="#c5a059" color="#c5a059" />
-              <span style={{ color: '#fff', fontWeight: 700 }}>4.9</span>
-              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem' }}>(1,250 reviews)</span>
-            </div>
-            <div className="hero-rating-pill">
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 700 }}>ZOMATO</span>
-              <Star size={13} fill="#c5a059" color="#c5a059" />
-              <span style={{ color: '#fff', fontWeight: 700 }}>4.8</span>
-              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem' }}>(850 reviews)</span>
-            </div>
-            <div className="hero-rating-pill">
-              <span style={{ color: 'var(--accent-gold)', fontWeight: 700 }}>SRINAGAR</span>
-              <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.8rem' }}>310, Balgarden</span>
-            </div>
-          </div>
-
           {/* Grand Restaurant Title */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
             <span
@@ -517,7 +489,7 @@ export const Home: React.FC = () => {
               flexWrap: 'wrap',
               gap: '1.25rem',
               justifyContent: 'center',
-              marginTop: '1.25rem',
+              marginTop: '1.5rem',
             }}
           >
             <a href="#/contact" className="meydani-cta-primary">
@@ -528,31 +500,6 @@ export const Home: React.FC = () => {
               <Utensils size={18} />
               Explore Menu
             </a>
-          </div>
-
-          {/* Micro-Features Row */}
-          <div
-            className="hero-features-grid"
-            style={{
-              width: '100%',
-              maxWidth: '680px',
-              marginTop: '1.5rem',
-              paddingTop: '1.25rem',
-              borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-            }}
-          >
-            <div>
-              <span style={{ display: 'block', fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent-gold)' }}>100%</span>
-              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.85)' }}>Halal Ingredients</span>
-            </div>
-            <div>
-              <span style={{ display: 'block', fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent-gold)' }}>Private</span>
-              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.85)' }}>Dining Room Available</span>
-            </div>
-            <div>
-              <span style={{ display: 'block', fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent-gold)' }}>Free</span>
-              <span style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.85)' }}>On-site Parking</span>
-            </div>
           </div>
         </div>
 
@@ -780,6 +727,7 @@ export const Home: React.FC = () => {
           COMBINED SECTION 1: FREQUENTLY ASKED QUESTIONS (FAQ)
       ========================================================================= */}
       <motion.div
+        id="faq"
         variants={scrollSectionVariants}
         initial="hidden"
         whileInView="visible"
@@ -896,6 +844,7 @@ export const Home: React.FC = () => {
           COMBINED SECTION 2: GUEST REVIEWS & EPICUREAN TESTIMONIALS
       ========================================================================= */}
       <motion.div
+        id="reviews"
         variants={scrollSectionVariants}
         initial="hidden"
         whileInView="visible"

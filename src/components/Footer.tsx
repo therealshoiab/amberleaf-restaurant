@@ -181,8 +181,8 @@ export const Footer: React.FC = () => {
               </a>
             </li>
             <li>
-              <a href="#/reviews" style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}>
-                Guest Reviews
+              <a href="#/about" style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}>
+                About Amberleaf
               </a>
             </li>
             <li>

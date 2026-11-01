@@ -11,9 +11,7 @@ const About = React.lazy(() => import('./pages/About').then((module) => ({ defau
 const Menu = React.lazy(() => import('./pages/Menu').then((module) => ({ default: module.Menu })));
 const Signatures = React.lazy(() => import('./pages/Signatures').then((module) => ({ default: module.Signatures })));
 const Gallery = React.lazy(() => import('./pages/Gallery').then((module) => ({ default: module.Gallery })));
-const Reviews = React.lazy(() => import('./pages/Reviews').then((module) => ({ default: module.Reviews })));
 const Contact = React.lazy(() => import('./pages/Contact').then((module) => ({ default: module.Contact })));
-const FAQ = React.lazy(() => import('./pages/FAQ').then((module) => ({ default: module.FAQ })));
 const Legal = React.lazy(() => import('./pages/Legal').then((module) => ({ default: module.Legal })));
 const Admin = React.lazy(() => import('./pages/Admin').then((module) => ({ default: module.Admin })));
 
@@ -79,13 +77,13 @@ export const App: React.FC = () => {
       case '#/gallery':
         return <Gallery />;
       case '#/reviews':
-        return <Reviews />;
+        return <Home />;
       case '#/order':
         return <Contact />;
       case '#/contact':
         return <Contact />;
       case '#/faq':
-        return <FAQ />;
+        return <Home />;
       case '#/legal':
         return <Legal />;
       case '#/admin':

@@ -54,9 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, hasBanner = false }
     { label: 'Menu', hash: '#/menu' },
     { label: 'Signatures', hash: '#/signatures' },
     { label: 'Gallery', hash: '#/gallery' },
-    { label: 'Reviews', hash: '#/reviews' },
     { label: 'Contact', hash: '#/contact' },
-    { label: 'FAQ', hash: '#/faq' },
   ];
 
   // Meydani Cafe style: Floating transparent navbar directly over hero on Home
